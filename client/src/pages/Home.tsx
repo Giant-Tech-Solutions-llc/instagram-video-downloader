@@ -13,16 +13,49 @@ import {
   PlayCircle, 
   Smartphone, 
   ShieldCheck, 
-  Zap 
+  Zap,
+  Video,
+  Camera,
+  Clapperboard,
+  History,
+  Monitor
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+type DownloaderType = 'video' | 'foto' | 'reels' | 'historia' | 'destaques';
 
 export default function Home() {
   const [url, setUrl] = useState("");
+  const [activeTab, setActiveTab] = useState<DownloaderType>('video');
   const { toast } = useToast();
   
   const processMutation = useProcessDownload();
   const { data: stats } = useStats();
+
+  const tabs = [
+    { id: 'video' as const, label: 'Vídeo', icon: Video },
+    { id: 'foto' as const, label: 'Foto', icon: Camera },
+    { id: 'reels' as const, label: 'Reels', icon: Clapperboard },
+    { id: 'historia' as const, label: 'História', icon: History },
+    { id: 'destaques' as const, label: 'Destaques', icon: Monitor },
+  ];
+
+  const getTitle = () => {
+    switch (activeTab) {
+      case 'foto': return 'Baixar Fotos do Instagram';
+      case 'reels': return 'Baixar Reels do Instagram';
+      case 'historia': return 'Baixar Stories do Instagram';
+      case 'destaques': return 'Baixar Destaques do Instagram';
+      default: return 'Baixar Vídeo do Instagram';
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url) return;
+    processMutation.mutate({ url });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +95,24 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              <div className="flex flex-wrap justify-center gap-2 mb-12 max-w-2xl mx-auto p-1.5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300",
+                      activeTab === tab.id 
+                        ? "bg-white text-primary shadow-lg" 
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    )}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -71,7 +122,7 @@ export default function Home() {
               </div>
               
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-extrabold text-secondary mb-6 tracking-tight">
-                Baixar Vídeo do <span className="text-gradient">Instagram</span>
+                {getTitle().split(' ')[0]} <span className="text-gradient">{getTitle().split(' ').slice(1).join(' ')}</span>
               </h1>
               
               <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10">
@@ -90,24 +141,25 @@ export default function Home() {
                   <div className="relative flex-grow">
                     <input
                       type="url"
-                      placeholder="Cole o link do Instagram aqui..."
-                      className="w-full h-14 pl-6 pr-12 rounded-xl bg-muted/30 border-2 border-transparent focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none text-lg placeholder:text-muted-foreground/60"
+                      placeholder="Inserir link"
+                      className="w-full h-14 pl-6 pr-24 rounded-xl bg-muted/30 border-2 border-transparent focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none text-lg placeholder:text-muted-foreground/60"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                     />
                     <button
                       type="button"
                       onClick={handlePaste}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-primary transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-muted border border-border flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
                       title="Colar link"
                     >
-                      <Copy className="w-5 h-5" />
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Colar</span>
                     </button>
                   </div>
                   <button
                     type="submit"
                     disabled={processMutation.isPending || !url}
-                    className="h-14 px-8 rounded-xl bg-primary text-primary-foreground font-bold text-lg shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-w-[160px]"
+                    className="h-14 px-8 rounded-xl bg-[#E6195E] text-white font-bold text-lg shadow-lg shadow-primary/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-w-[160px]"
                   >
                     {processMutation.isPending ? (
                       <>
@@ -116,8 +168,7 @@ export default function Home() {
                       </>
                     ) : (
                       <>
-                        <span>Baixar</span>
-                        <ArrowRight className="w-5 h-5" />
+                        <span>BAIXAR</span>
                       </>
                     )}
                   </button>
