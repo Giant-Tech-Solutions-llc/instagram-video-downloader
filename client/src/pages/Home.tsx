@@ -57,12 +57,6 @@ export default function Home() {
     processMutation.mutate({ url });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url) return;
-    processMutation.mutate({ url });
-  };
-
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
