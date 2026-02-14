@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Contact from "@/pages/Contact";
+import ComoFunciona from "@/pages/ComoFunciona";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/termos" component={TermsOfUse} />
       <Route path="/privacidade" component={PrivacyPolicy} />
       <Route path="/contato" component={Contact} />
+      <Route path="/como-funciona" component={ComoFunciona} />
       <Route component={NotFound} />
     </Switch>
   );

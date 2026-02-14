@@ -14,22 +14,6 @@ export function Navbar() {
               Insta<span className="text-primary">Saver</span>
             </span>
           </Link>
-
-          <div className="flex items-center gap-4">
-            <Link 
-              href="#faq" 
-              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Como Funciona
-            </Link>
-            <Link 
-              href="/"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90 transition-colors shadow-sm"
-            >
-              <Download className="w-4 h-4" />
-              <span>Instalar App</span>
-            </Link>
-          </div>
         </div>
       </div>
     </nav>

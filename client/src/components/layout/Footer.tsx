@@ -14,6 +14,7 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Links Úteis</h4>
             <ul className="space-y-2 text-sm">
+              <li><Link href="/como-funciona" className="hover:underline">Como Funciona</Link></li>
               <li><Link href="/termos" className="hover:underline">Termos de Uso</Link></li>
               <li><Link href="/privacidade" className="hover:underline">Política de Privacidade</Link></li>
               <li><Link href="/contato" className="hover:underline">Contato</Link></li>

@@ -348,6 +348,47 @@ export default function Home() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-20 space-y-12 border-t pt-20">
+              <div className="prose prose-slate max-w-none">
+                <h2 className="text-3xl font-bold">Guia de Download Especializado</h2>
+                
+                <div className="mt-8">
+                  <h3 className="text-2xl font-semibold">Baixar Vídeos do Instagram</h3>
+                  <p className="text-muted-foreground mt-4">
+                    Nossa tecnologia de extração de vídeo garante que você receba o arquivo MP4 original sem compressão adicional. 
+                    Ideal para criadores de conteúdo e usuários que buscam alta fidelidade visual. O processo de download é 
+                    criptografado e direto dos servidores oficiais.
+                  </p>
+                </div>
+
+                <div className="mt-8">
+                  <h3 className="text-2xl font-semibold">Baixar Fotos em HD</h3>
+                  <p className="text-muted-foreground mt-4">
+                    Suportamos download de fotos individuais e posts em carrossel. Basta inserir o link e nosso sistema 
+                    identificará todas as imagens disponíveis na publicação, permitindo que você salve cada uma em sua 
+                    resolução máxima disponível no Instagram.
+                  </p>
+                </div>
+
+                <div className="mt-8">
+                  <h3 className="text-2xl font-semibold">Downloader de Reels e Stories</h3>
+                  <p className="text-muted-foreground mt-4">
+                    Os Reels e Stories são conteúdos dinâmicos que muitas vezes queremos guardar para referência futura. 
+                    O InstaSaver captura o fluxo de vídeo e áudio de forma síncrona, entregando um arquivo pronto para 
+                    reprodução em qualquer player de mídia moderno.
+                  </p>
+                </div>
+
+                <div className="mt-8">
+                  <h3 className="text-2xl font-semibold">Destaques (Highlights)</h3>
+                  <p className="text-muted-foreground mt-4">
+                    Para baixar Destaques, basta copiar o link da coleção de destaques ou de um item específico dentro dela. 
+                    Nossa ferramenta processará a playlist e fornecerá os links de download para os itens desejados.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
