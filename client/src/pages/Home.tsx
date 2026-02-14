@@ -98,7 +98,7 @@ export default function Home() {
                       "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300",
                       activeTab === tab.id 
                         ? "bg-white text-primary shadow-lg" 
-                        : "text-white/80 hover:text-white hover:bg-white/10"
+                        : "text-black/60 hover:text-black hover:bg-black/5"
                     )}
                   >
                     <tab.icon className="w-4 h-4" />
