@@ -318,19 +318,27 @@ export default function Home() {
               {[
                 {
                   q: "Como baixar vídeos do Instagram?",
-                  a: "Copie o link do vídeo ou reel no aplicativo do Instagram, cole no campo acima e clique em 'Baixar'. O vídeo será processado e o botão de download aparecerá."
+                  a: "Copie o link do vídeo, cole no campo acima e clique em 'BAIXAR'. O vídeo será processado e o link de download em MP4 aparecerá instantaneamente."
                 },
                 {
-                  q: "É gratuito usar o InstaSaver?",
-                  a: "Sim! Nossa ferramenta é 100% gratuita e ilimitada. Você pode baixar quantos vídeos quiser."
+                  q: "Como baixar Fotos do Instagram em alta qualidade?",
+                  a: "Basta colar o link da publicação da foto. Nosso sistema extrai a imagem em sua resolução original (HD), permitindo que você salve em JPG sem perda de nitidez."
                 },
                 {
-                  q: "Posso baixar vídeos de contas privadas?",
-                  a: "Não. Por questões de privacidade e segurança, nossa ferramenta só permite baixar conteúdo de perfis públicos."
+                  q: "É possível baixar Reels com áudio?",
+                  a: "Sim! O InstaSaver baixa Reels completos com áudio e vídeo em alta definição, ideal para assistir offline ou compartilhar."
                 },
                 {
-                  q: "Onde os vídeos são salvos?",
-                  a: "Os vídeos são salvos na pasta 'Downloads' do seu dispositivo, ou na galeria caso esteja usando um celular."
+                  q: "Como baixar Stories e Destaques (Highlights)?",
+                  a: "Copie o link do Story ou do Destaque desejado. Lembre-se que Stories expiram em 24h, então baixe-os enquanto ainda estão visíveis no perfil público."
+                },
+                {
+                  q: "O serviço é gratuito e ilimitado?",
+                  a: "Com certeza. Você pode realizar downloads ilimitados de vídeos, fotos e reels sem pagar nada e sem precisar criar uma conta."
+                },
+                {
+                  q: "Funciona em celulares Android e iPhone?",
+                  a: "Sim, o InstaSaver é 100% online e funciona em qualquer navegador de smartphone (Safari, Chrome, Samsung Internet) ou computador."
                 }
               ].map((item, i) => (
                 <div key={i} className="bg-white rounded-xl border border-border/50 overflow-hidden">

@@ -73,6 +73,36 @@ export default function ComoFunciona() {
                 </p>
               </article>
             </div>
+
+            <div className="mt-20 pt-20 border-t">
+              <h2 className="text-3xl font-display font-bold mb-12 text-center">Perguntas Frequentes por Categoria</h2>
+              
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold flex items-center gap-2"><Play className="w-5 h-5 text-primary" /> Vídeo & Reels</h3>
+                  <div className="space-y-4 text-sm">
+                    <p><strong>Qual o formato dos vídeos?</strong> Todos os vídeos são salvos em MP4, garantindo compatibilidade universal.</p>
+                    <p><strong>Posso escolher a qualidade?</strong> Nosso sistema sempre busca a maior resolução disponível (até 4K).</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-primary" /> Fotos</h3>
+                  <div className="space-y-4 text-sm">
+                    <p><strong>Como baixar carrosséis?</strong> Ao colar o link de um carrossel, você poderá salvar cada foto individualmente.</p>
+                    <p><strong>As fotos perdem qualidade?</strong> Não, extraímos o link direto do CDN do Instagram em HD.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold flex items-center gap-2"><Download className="w-5 h-5 text-primary" /> Stories & Destaques</h3>
+                  <div className="space-y-4 text-sm">
+                    <p><strong>O dono do perfil saberá que baixei?</strong> Não, o download através do InstaSaver é totalmente anônimo.</p>
+                    <p><strong>Consigo baixar destaques antigos?</strong> Sim, desde que o perfil seja público e o destaque ainda esteja ativo.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
