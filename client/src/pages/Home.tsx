@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useProcessDownload, useStats } from "@/hooks/use-download";
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/layout/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowRight, 
