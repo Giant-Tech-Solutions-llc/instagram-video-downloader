@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights), TikTok (videos without watermark), and Pinterest (videos, images, GIFs). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
+This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights), TikTok (videos without watermark), Pinterest (videos, images, GIFs), and Facebook (videos, images). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
 
 ## User Preferences
 

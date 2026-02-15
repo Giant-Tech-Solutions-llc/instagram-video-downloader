@@ -21,7 +21,7 @@ import {
   Sparkles,
   ExternalLink
 } from "lucide-react";
-import { SiTiktok, SiInstagram, SiPinterest } from "react-icons/si";
+import { SiTiktok, SiInstagram, SiPinterest, SiFacebook } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
@@ -33,10 +33,15 @@ function isPinterestUrl(url: string): boolean {
   return url.includes('pinterest.com') || url.includes('pin.it');
 }
 
+function isFacebookUrl(url: string): boolean {
+  return url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com') || url.includes('m.facebook.com');
+}
+
 export default function TikTok() {
   const [url, setUrl] = useState("");
   const [showInstagramHint, setShowInstagramHint] = useState(false);
   const [showPinterestHint, setShowPinterestHint] = useState(false);
+  const [showFacebookHint, setShowFacebookHint] = useState(false);
   const { toast } = useToast();
   const [, navigate] = useLocation();
   
@@ -56,15 +61,15 @@ export default function TikTok() {
 
   const handleUrlChange = (value: string) => {
     setUrl(value);
+    setShowInstagramHint(false);
+    setShowPinterestHint(false);
+    setShowFacebookHint(false);
     if (isInstagramUrl(value)) {
       setShowInstagramHint(true);
-      setShowPinterestHint(false);
     } else if (isPinterestUrl(value)) {
       setShowPinterestHint(true);
-      setShowInstagramHint(false);
-    } else {
-      setShowInstagramHint(false);
-      setShowPinterestHint(false);
+    } else if (isFacebookUrl(value)) {
+      setShowFacebookHint(true);
     }
   };
 
@@ -77,6 +82,10 @@ export default function TikTok() {
     }
     if (isPinterestUrl(url)) {
       setShowPinterestHint(true);
+      return;
+    }
+    if (isFacebookUrl(url)) {
+      setShowFacebookHint(true);
       return;
     }
     processMutation.mutate({ url });
@@ -221,6 +230,27 @@ export default function TikTok() {
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
                     >
                       Ir para Pinterest <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+                {showFacebookHint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 p-5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
+                    data-testid="hint-facebook-redirect"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SiFacebook className="w-5 h-5 flex-shrink-0" />
+                      <p className="font-medium">Este link é do Facebook! Use nosso downloader de Facebook.</p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/facebook")}
+                      data-testid="button-go-facebook"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
+                    >
+                      Ir para Facebook <ExternalLink className="w-4 h-4" />
                     </button>
                   </motion.div>
                 )}

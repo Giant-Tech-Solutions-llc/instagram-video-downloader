@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProcessPinterestDownload } from "@/hooks/use-download";
+import { useProcessFacebookDownload } from "@/hooks/use-download";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,7 @@ import {
   FileImage,
   ExternalLink
 } from "lucide-react";
-import { SiPinterest, SiInstagram, SiTiktok, SiFacebook } from "react-icons/si";
+import { SiFacebook, SiInstagram, SiTiktok, SiPinterest } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
@@ -33,28 +33,28 @@ function isTikTokUrl(url: string): boolean {
   return url.includes('tiktok.com') || url.includes('vm.tiktok.com');
 }
 
-function isFacebookUrl(url: string): boolean {
-  return url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com') || url.includes('m.facebook.com');
+function isPinterestUrl(url: string): boolean {
+  return url.includes('pinterest.com') || url.includes('pin.it');
 }
 
-export default function Pinterest() {
+export default function Facebook() {
   const [url, setUrl] = useState("");
-  const [showOtherPlatformHint, setShowOtherPlatformHint] = useState<'instagram' | 'tiktok' | 'facebook' | null>(null);
+  const [showOtherPlatformHint, setShowOtherPlatformHint] = useState<'instagram' | 'tiktok' | 'pinterest' | null>(null);
   const { toast } = useToast();
   const [, navigate] = useLocation();
   
-  const processMutation = useProcessPinterestDownload();
+  const processMutation = useProcessFacebookDownload();
 
   if (typeof document !== 'undefined') {
-    document.title = "Baixar Vídeo e Imagem do Pinterest - HD Grátis | Baixar Vídeo";
+    document.title = "Baixar Vídeo e Imagem do Facebook - HD Grátis | Baixar Vídeo";
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
-      metaDesc.setAttribute('content', "Baixe vídeos, imagens e GIFs do Pinterest em HD grátis. Ferramenta online rápida e segura para salvar pins do Pinterest no celular ou PC.");
+      metaDesc.setAttribute('content', "Baixe vídeos, imagens e GIFs do Facebook em HD grátis. Ferramenta online rápida e segura para salvar vídeos do Facebook no celular ou PC.");
     }
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', "Baixar Vídeo e Imagem do Pinterest - HD Grátis");
+    if (ogTitle) ogTitle.setAttribute('content', "Baixar Vídeo e Imagem do Facebook - HD Grátis");
     const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', "Baixe vídeos, imagens e GIFs do Pinterest em alta qualidade. 100% gratuito, sem login.");
+    if (ogDesc) ogDesc.setAttribute('content', "Baixe vídeos e imagens do Facebook em alta qualidade. 100% gratuito, sem login.");
   }
 
   const handleUrlChange = (value: string) => {
@@ -63,8 +63,8 @@ export default function Pinterest() {
       setShowOtherPlatformHint('instagram');
     } else if (isTikTokUrl(value)) {
       setShowOtherPlatformHint('tiktok');
-    } else if (isFacebookUrl(value)) {
-      setShowOtherPlatformHint('facebook');
+    } else if (isPinterestUrl(value)) {
+      setShowOtherPlatformHint('pinterest');
     } else {
       setShowOtherPlatformHint(null);
     }
@@ -81,8 +81,8 @@ export default function Pinterest() {
       setShowOtherPlatformHint('tiktok');
       return;
     }
-    if (isFacebookUrl(url)) {
-      setShowOtherPlatformHint('facebook');
+    if (isPinterestUrl(url)) {
+      setShowOtherPlatformHint('pinterest');
       return;
     }
     processMutation.mutate({ url });
@@ -120,17 +120,17 @@ export default function Pinterest() {
               transition={{ duration: 0.5 }}
             >
               <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-black/5 text-black/60 text-sm font-black uppercase tracking-wider mb-8 border border-black/5">
-                <SiPinterest className="w-4 h-4" />
-                Vídeos, Imagens e GIFs
+                <SiFacebook className="w-4 h-4" />
+                Vídeos e Imagens
               </div>
               
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]" data-testid="text-pinterest-title">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]" data-testid="text-facebook-title">
                 Baixar do <br />
-                <span className="text-[#E6195E]">Pinterest</span>
+                <span className="text-[#E6195E]">Facebook</span>
               </h1>
               
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-16 font-medium leading-relaxed">
-                Baixe vídeos, imagens e GIFs do Pinterest em qualidade original. <br className="hidden md:block" /> 
+                Baixe vídeos e imagens do Facebook em qualidade HD. <br className="hidden md:block" /> 
                 Rápido, gratuito e sem necessidade de login.
               </p>
             </motion.div>
@@ -146,15 +146,15 @@ export default function Pinterest() {
                   <div className="relative flex-grow">
                     <input
                       type="url"
-                      data-testid="input-pinterest-url"
-                      placeholder="Insira o link do Pinterest aqui..."
+                      data-testid="input-facebook-url"
+                      placeholder="Insira o link do Facebook aqui..."
                       className="w-full h-20 pl-10 pr-32 rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-xl font-medium placeholder:text-black/20"
                       value={url}
                       onChange={(e) => handleUrlChange(e.target.value)}
                     />
                     <button
                       type="button"
-                      data-testid="button-paste-pinterest"
+                      data-testid="button-paste-facebook"
                       onClick={handlePaste}
                       className="absolute right-4 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-2xl bg-white border border-black/5 flex items-center gap-2 text-sm font-bold text-black/60 hover:text-[#E6195E] hover:border-[#E6195E]/20 transition-all shadow-sm active:scale-95"
                       title="Colar link"
@@ -165,7 +165,7 @@ export default function Pinterest() {
                   </div>
                   <button
                     type="submit"
-                    data-testid="button-download-pinterest"
+                    data-testid="button-download-facebook"
                     disabled={processMutation.isPending || !url}
                     className="h-20 px-12 rounded-[1.8rem] bg-[#E6195E] text-white font-black text-2xl shadow-2xl shadow-[#E6195E]/30 hover:scale-[1.03] hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 min-w-[220px]"
                   >
@@ -224,24 +224,24 @@ export default function Pinterest() {
                     </button>
                   </motion.div>
                 )}
-                {showOtherPlatformHint === 'facebook' && (
+                {showOtherPlatformHint === 'pinterest' && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
-                    data-testid="hint-facebook-redirect"
+                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-700 border border-red-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
+                    data-testid="hint-pinterest-redirect"
                   >
                     <div className="flex items-center gap-3">
-                      <SiFacebook className="w-5 h-5 flex-shrink-0" />
-                      <p className="font-medium">Este link é do Facebook! Use nosso downloader de Facebook.</p>
+                      <SiPinterest className="w-5 h-5 flex-shrink-0" />
+                      <p className="font-medium">Este link é do Pinterest! Use nosso downloader de Pinterest.</p>
                     </div>
                     <button
-                      onClick={() => navigate("/facebook")}
-                      data-testid="button-go-facebook"
+                      onClick={() => navigate("/pinterest")}
+                      data-testid="button-go-pinterest"
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
                     >
-                      Ir para Facebook <ExternalLink className="w-4 h-4" />
+                      Ir para Pinterest <ExternalLink className="w-4 h-4" />
                     </button>
                   </motion.div>
                 )}
@@ -256,7 +256,7 @@ export default function Pinterest() {
                     className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3 text-left max-w-4xl mx-auto"
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="font-medium" data-testid="text-error-pinterest">{processMutation.error.message}</p>
+                    <p className="font-medium" data-testid="text-error-facebook">{processMutation.error.message}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -267,8 +267,6 @@ export default function Pinterest() {
                   <span className="text-xs font-bold text-black/30">MP4 HD</span>
                   <span className="text-black/10">|</span>
                   <span className="text-xs font-bold text-black/30">JPG Original</span>
-                  <span className="text-black/10">|</span>
-                  <span className="text-xs font-bold text-black/30">GIF</span>
                 </div>
               </div>
             </motion.div>
@@ -291,7 +289,7 @@ export default function Pinterest() {
                         src={processMutation.data.thumbnail} 
                         alt="Preview" 
                         className="w-full h-full object-cover absolute inset-0"
-                        data-testid="img-pinterest-preview"
+                        data-testid="img-facebook-preview"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
@@ -310,18 +308,18 @@ export default function Pinterest() {
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-4">
                         <CheckCircle className="w-3 h-3" /> Sucesso
                       </div>
-                      <h3 className="text-3xl font-black font-display text-foreground mb-4 leading-tight" data-testid="text-download-ready-pinterest">
+                      <h3 className="text-3xl font-black font-display text-foreground mb-4 leading-tight" data-testid="text-download-ready-facebook">
                         Download Pronto!
                       </h3>
                       <p className="text-muted-foreground text-lg">
-                        Seu {processMutation.data.type === 'video' ? 'vídeo' : 'imagem'} do Pinterest está pronto para baixar.
+                        Seu {processMutation.data.type === 'video' ? 'vídeo' : 'imagem'} do Facebook está pronto para baixar.
                       </p>
                     </div>
 
                     <div className="space-y-4">
                       <a
-                        href={`/api/pinterest/download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || 'pinterest-download')}`}
-                        data-testid="link-download-pinterest-result"
+                        href={`/api/facebook/download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || 'facebook-download')}`}
+                        data-testid="link-download-facebook-result"
                         className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-[#E6195E] text-white font-black text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
                       >
                         <Download className="w-6 h-6" />
@@ -333,7 +331,7 @@ export default function Pinterest() {
                           processMutation.reset();
                           setUrl("");
                         }}
-                        data-testid="button-download-another-pinterest"
+                        data-testid="button-download-another-facebook"
                         className="w-full py-4 text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
                       >
                         Baixar outro conteúdo
@@ -353,9 +351,9 @@ export default function Pinterest() {
                 <div className="w-full aspect-[4/5] bg-[#E6195E] rounded-[3rem] relative overflow-hidden flex items-center justify-center">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20" />
                   <div className="relative z-10 text-center">
-                    <SiPinterest className="w-24 h-24 text-white mx-auto mb-6" />
-                    <p className="text-white/80 text-xl font-bold">Pinterest Downloader</p>
-                    <p className="text-white/50 text-sm mt-2">Vídeos, Imagens e GIFs</p>
+                    <SiFacebook className="w-24 h-24 text-white mx-auto mb-6" />
+                    <p className="text-white/80 text-xl font-bold">Facebook Downloader</p>
+                    <p className="text-white/50 text-sm mt-2">Vídeos e Imagens</p>
                   </div>
                 </div>
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#E6195E]/10 rounded-full blur-3xl -z-10" />
@@ -365,14 +363,14 @@ export default function Pinterest() {
                 <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Processo Simples</span>
                 <h2 className="text-5xl md:text-6xl font-display font-black text-[#1A1A1A] mb-12 leading-tight">
                   Como baixar <br />
-                  <span className="text-[#E6195E]">do Pinterest</span>
+                  <span className="text-[#E6195E]">do Facebook</span>
                 </h2>
                 
                 <div className="space-y-10">
                   {[
-                    { step: "01", title: "Encontre o Pin", desc: "Abra o Pinterest, encontre o pin com o vídeo, imagem ou GIF desejado e copie o link." },
+                    { step: "01", title: "Copie o Link", desc: "Abra o Facebook, encontre o vídeo ou imagem desejada e copie o link de compartilhamento." },
                     { step: "02", title: "Cole o Link", desc: "Cole o link copiado no campo acima e clique no botão 'BAIXAR' para processar." },
-                    { step: "03", title: "Baixe em HD", desc: "O conteúdo será processado em qualidade original. Clique para salvar no seu dispositivo." }
+                    { step: "03", title: "Baixe em HD", desc: "O conteúdo será processado em qualidade HD. Clique para salvar no seu dispositivo." }
                   ].map((item, i) => (
                     <div key={i} className="flex gap-8 group">
                       <div className="text-4xl font-display font-black text-black/5 group-hover:text-[#E6195E]/10 transition-colors">{item.step}</div>
@@ -393,15 +391,15 @@ export default function Pinterest() {
             <div className="text-center mb-24">
               <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Vantagens</span>
               <h2 className="text-5xl md:text-6xl font-display font-black mb-8 leading-tight">
-                Por que usar nosso <span className="text-[#E6195E]">Pinterest Downloader</span>?
+                Por que usar nosso <span className="text-[#E6195E]">Facebook Downloader</span>?
               </h2>
             </div>
 
             <div className="grid md:grid-cols-4 gap-12">
               {[
-                { icon: <Film className="w-8 h-8" />, title: "Vídeos em HD", desc: "Baixe vídeos do Pinterest em MP4 com a melhor qualidade disponível." },
+                { icon: <Film className="w-8 h-8" />, title: "Vídeos em HD", desc: "Baixe vídeos do Facebook em MP4 com a melhor qualidade disponível, incluindo HD." },
                 { icon: <Image className="w-8 h-8" />, title: "Imagens Originais", desc: "Salve imagens na resolução original, sem compressão ou perda de qualidade." },
-                { icon: <FileImage className="w-8 h-8" />, title: "GIFs Animados", desc: "Baixe GIFs animados do Pinterest mantendo todas as animações." },
+                { icon: <Zap className="w-8 h-8" />, title: "Super Rápido", desc: "Processamento instantâneo. Cole o link e baixe em segundos." },
                 { icon: <Infinity className="w-8 h-8" />, title: "100% Gratuito", desc: "Downloads ilimitados sem criar conta e sem pagar nada." }
               ].map((feature, i) => (
                 <div key={i} className="text-center group">
@@ -428,28 +426,28 @@ export default function Pinterest() {
             <div className="space-y-6">
               {[
                 {
-                  q: "Como baixar vídeos do Pinterest?",
-                  a: "Copie o link do pin com o vídeo no Pinterest, cole no campo acima e clique em 'BAIXAR'. Nosso sistema processa o vídeo e entrega um arquivo MP4 em alta definição pronto para salvar."
+                  q: "Como baixar vídeos do Facebook?",
+                  a: "Copie o link do vídeo no Facebook (clique em compartilhar e depois em 'Copiar link'), cole no campo acima e clique em 'BAIXAR'. Nosso sistema processa o vídeo e entrega um arquivo MP4 em alta definição."
                 },
                 {
-                  q: "Posso baixar imagens em alta resolução?",
-                  a: "Sim! Nosso downloader extrai a imagem na resolução original do Pinterest, sem nenhuma compressão adicional. Você recebe a melhor qualidade disponível."
+                  q: "Posso baixar vídeos do Facebook em HD?",
+                  a: "Sim! Nosso downloader detecta automaticamente a melhor qualidade disponível, incluindo HD e Full HD quando disponível no vídeo original."
                 },
                 {
-                  q: "Funciona com GIFs do Pinterest?",
-                  a: "Sim! GIFs animados do Pinterest são baixados mantendo todas as animações e a qualidade original do arquivo."
+                  q: "Funciona com vídeos do Facebook Watch?",
+                  a: "Sim! Nossa ferramenta funciona com vídeos publicados no feed, Facebook Watch, Reels do Facebook e páginas públicas."
                 },
                 {
-                  q: "Preciso instalar algum aplicativo?",
-                  a: "Não! Nossa ferramenta é 100% online. Funciona diretamente no navegador do seu celular, tablet ou computador, sem necessidade de instalar nenhum app."
+                  q: "Posso baixar imagens do Facebook?",
+                  a: "Sim! Além de vídeos, você também pode baixar imagens publicadas no Facebook em qualidade original."
                 },
                 {
-                  q: "É gratuito?",
-                  a: "Sim, completamente gratuito e ilimitado. Você pode baixar quantos pins quiser sem pagar nada e sem criar conta."
+                  q: "Preciso estar logado no Facebook?",
+                  a: "Não! Você não precisa estar logado. Basta copiar o link do conteúdo público e colar no nosso downloader."
                 },
                 {
-                  q: "Funciona com pins privados?",
-                  a: "Não, nossa ferramenta só funciona com pins públicos do Pinterest. Pins de boards privados não podem ser acessados por motivos de privacidade."
+                  q: "Funciona com vídeos privados?",
+                  a: "Não, nossa ferramenta só funciona com conteúdo público do Facebook. Vídeos e imagens de perfis ou grupos privados não podem ser acessados."
                 }
               ].map((item, i) => (
                 <div key={i} className="bg-[#F8F9FA] rounded-[2rem] border border-black/5 overflow-hidden">
@@ -471,41 +469,39 @@ export default function Pinterest() {
             <div className="mt-32 space-y-16 border-t border-black/5 pt-32">
               <div className="prose prose-slate max-w-none">
                 <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block text-center">Guia Completo</span>
-                <h2 className="text-4xl md:text-5xl font-black text-[#1A1A1A] text-center mb-16">Pinterest Downloader</h2>
+                <h2 className="text-4xl md:text-5xl font-black text-[#1A1A1A] text-center mb-16">Facebook Downloader</h2>
                 
                 <div className="grid md:grid-cols-2 gap-16">
                   <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Baixar Vídeos do Pinterest</h3>
+                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Baixar Vídeos do Facebook</h3>
                     <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      O Pinterest é uma plataforma rica em vídeos inspiradores, tutoriais e conteúdo criativo. 
-                      Nosso downloader permite que você salve esses vídeos em MP4 HD para assistir offline 
-                      ou usar como referência em seus projetos.
+                      O Facebook é a maior rede social do mundo, repleta de vídeos incríveis compartilhados por amigos, 
+                      páginas e criadores de conteúdo. Nosso downloader permite que você salve esses vídeos em MP4 HD 
+                      para assistir offline a qualquer momento.
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Imagens em Qualidade Original</h3>
+                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Qualidade HD Garantida</h3>
                     <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      As imagens do Pinterest são conhecidas pela alta qualidade e inspiração visual. 
-                      Nosso sistema extrai a versão original da imagem, sem compressão, ideal para 
-                      moodboards, referências de design e coleções pessoais.
+                      Nossa ferramenta detecta automaticamente a melhor resolução disponível do vídeo, priorizando 
+                      versões em HD e Full HD. Você sempre recebe a melhor qualidade possível do conteúdo original.
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">GIFs Animados</h3>
+                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Compatível com Celular e PC</h3>
                     <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      Muitos pins do Pinterest contêm GIFs animados com tutoriais, receitas e conteúdo 
-                      divertido. Baixe esses GIFs mantendo a animação completa e a qualidade original 
-                      do arquivo.
+                      Funciona perfeitamente em qualquer dispositivo: smartphones Android e iPhone, tablets e computadores. 
+                      Basta acessar pelo navegador, sem precisar instalar nenhum aplicativo.
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Compatibilidade Universal</h3>
+                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Seguro e Privado</h3>
                     <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      Funciona em qualquer navegador moderno: Chrome, Safari, Firefox, Edge. Compatível 
-                      com iPhone, Android, tablets, notebooks e desktops sem instalar nada.
+                      Não armazenamos seus dados pessoais nem os vídeos baixados. O processo é completamente seguro 
+                      e sua privacidade é respeitada em todas as etapas do download.
                     </p>
                   </div>
                 </div>

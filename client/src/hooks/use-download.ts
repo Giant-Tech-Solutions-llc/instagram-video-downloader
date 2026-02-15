@@ -112,6 +112,40 @@ export function useProcessPinterestDownload() {
   });
 }
 
+export function useProcessFacebookDownload() {
+  return useMutation<DownloadResponse, Error, { url: string }>({
+    mutationFn: async ({ url }) => {
+      const validatedInput = api.facebook.process.input.parse({ url });
+
+      const res = await fetch(api.facebook.process.path, {
+        method: api.facebook.process.method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validatedInput),
+      });
+
+      if (!res.ok) {
+        if (res.status === 400) {
+          const errorData = await res.json();
+          const parsed = api.facebook.process.responses[400].safeParse(errorData);
+          if (parsed.success) {
+            throw new Error(parsed.data.message);
+          }
+          throw new Error("Solicitação inválida.");
+        }
+        if (res.status === 429) {
+          throw new Error("Muitas solicitações. Tente novamente em instantes.");
+        }
+        if (res.status === 500) {
+          throw new Error("Erro no servidor. Tente novamente mais tarde.");
+        }
+        throw new Error("Ocorreu um erro desconhecido.");
+      }
+
+      return api.facebook.process.responses[200].parse(await res.json());
+    },
+  });
+}
+
 export function useStats() {
   return useQuery({
     queryKey: [api.stats.get.path],

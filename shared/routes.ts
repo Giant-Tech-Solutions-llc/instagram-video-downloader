@@ -83,6 +83,33 @@ export const api = {
       },
     },
   },
+  facebook: {
+    process: {
+      method: 'POST' as const,
+      path: '/api/facebook/process' as const,
+      input: z.object({
+        url: z.string().url({ message: "Por favor, insira uma URL válida do Facebook" }),
+      }),
+      responses: {
+        200: z.object({
+          url: z.string(),
+          thumbnail: z.string().optional(),
+          filename: z.string().optional(),
+          type: z.enum(['video', 'image']),
+        }),
+        400: z.object({
+          message: z.string(),
+          field: z.string().optional(),
+        }),
+        429: z.object({
+          message: z.string(),
+        }),
+        500: z.object({
+          message: z.string(),
+        }),
+      },
+    },
+  },
   stats: {
     get: {
       method: 'GET' as const,

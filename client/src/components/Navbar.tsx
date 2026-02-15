@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { SiTiktok, SiInstagram, SiPinterest } from "react-icons/si";
+import { SiTiktok, SiInstagram, SiPinterest, SiFacebook } from "react-icons/si";
 import { cn } from "@/lib/utils";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
@@ -54,6 +54,19 @@ export function Navbar() {
             >
               <SiPinterest className="w-4 h-4" />
               <span className="hidden sm:inline">Pinterest</span>
+            </Link>
+            <Link
+              href="/facebook"
+              data-testid="link-nav-facebook"
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors",
+                location === "/facebook"
+                  ? "text-[#E6195E] bg-[#E6195E]/5"
+                  : "text-black/50 hover:text-black"
+              )}
+            >
+              <SiFacebook className="w-4 h-4" />
+              <span className="hidden sm:inline">Facebook</span>
             </Link>
           </div>
         </div>

@@ -390,6 +390,177 @@ export async function registerRoutes(
     }
   });
 
+  app.post('/api/facebook/process', async (req, res) => {
+    try {
+      const inputSchema = z.object({
+        url: z.string().url({ message: "Por favor, insira uma URL válida do Facebook" })
+      });
+      const parsed = inputSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: parsed.error.errors[0]?.message || "URL inválida." });
+      }
+      let url = parsed.data.url;
+      if (!url.includes('facebook.com') && !url.includes('fb.watch') && !url.includes('fb.com') && !url.includes('m.facebook.com')) {
+        return res.status(400).json({ message: "URL inválida. Por favor, use um link do Facebook." });
+      }
+
+      console.log(`Processing Facebook download for URL: ${url}`);
+
+      const response = await axios.get(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
+        },
+        timeout: 15000,
+        maxRedirects: 5,
+      });
+
+      const $ = cheerio.load(response.data);
+
+      let videoUrl = $('meta[property="og:video"]').attr('content') ||
+                     $('meta[property="og:video:secure_url"]').attr('content') ||
+                     $('meta[property="og:video:url"]').attr('content');
+      let imageUrl = $('meta[property="og:image"]').attr('content');
+      let type: 'video' | 'image' = videoUrl ? 'video' : 'image';
+
+      if (!videoUrl) {
+        const html = response.data as string;
+
+        const hdMatch = html.match(/hd_src\s*:\s*"([^"]+)"/);
+        if (hdMatch && hdMatch[1]) {
+          videoUrl = hdMatch[1].replace(/\\u0025/g, '%').replace(/\\\//g, '/');
+          type = 'video';
+        }
+
+        if (!videoUrl) {
+          const sdMatch = html.match(/sd_src\s*:\s*"([^"]+)"/);
+          if (sdMatch && sdMatch[1]) {
+            videoUrl = sdMatch[1].replace(/\\u0025/g, '%').replace(/\\\//g, '/');
+            type = 'video';
+          }
+        }
+
+        if (!videoUrl) {
+          const videoMatch = html.match(/"playable_url_quality_hd"\s*:\s*"([^"]+)"/);
+          if (videoMatch && videoMatch[1]) {
+            videoUrl = videoMatch[1].replace(/\\u0025/g, '%').replace(/\\\//g, '/').replace(/\\u0026/g, '&');
+            type = 'video';
+          }
+        }
+
+        if (!videoUrl) {
+          const videoMatch2 = html.match(/"playable_url"\s*:\s*"([^"]+)"/);
+          if (videoMatch2 && videoMatch2[1]) {
+            videoUrl = videoMatch2[1].replace(/\\u0025/g, '%').replace(/\\\//g, '/').replace(/\\u0026/g, '&');
+            type = 'video';
+          }
+        }
+
+        if (!videoUrl) {
+          const scripts = $('script').map((i, el) => $(el).html()).get();
+          for (const scriptContent of scripts) {
+            if (!scriptContent) continue;
+            const fbVideoMatch = scriptContent.match(/"browser_native_(?:hd|sd)_url"\s*:\s*"([^"]+)"/);
+            if (fbVideoMatch && fbVideoMatch[1]) {
+              videoUrl = fbVideoMatch[1].replace(/\\u0025/g, '%').replace(/\\\//g, '/').replace(/\\u0026/g, '&');
+              type = 'video';
+              break;
+            }
+          }
+        }
+      }
+
+      const finalUrl = videoUrl || imageUrl;
+
+      if (!finalUrl) {
+        await storage.logDownload({ url, status: 'failed', format: 'unknown' });
+        return res.status(400).json({
+          message: "Não foi possível encontrar a mídia. Verifique se o link é de um vídeo ou foto pública do Facebook."
+        });
+      }
+
+      const format = type === 'video' ? 'mp4' : 'jpg';
+      await storage.logDownload({ url, status: 'success', format });
+
+      res.json({
+        url: finalUrl,
+        thumbnail: imageUrl,
+        filename: `facebook-${type}-${Date.now()}.${format}`,
+        type: type
+      });
+
+    } catch (error: any) {
+      console.error('Facebook process error:', error.message);
+      await storage.logDownload({ url: req.body.url || 'unknown', status: 'failed', format: 'error' });
+      res.status(500).json({ message: "Não foi possível processar o conteúdo do Facebook. Verifique se o link está correto e se o conteúdo é público." });
+    }
+  });
+
+  app.get('/api/facebook/download', async (req, res) => {
+    try {
+      const downloadUrl = req.query.url as string;
+      const filename = (req.query.filename as string) || 'facebook-download.mp4';
+
+      if (!downloadUrl) {
+        return res.status(400).json({ message: "URL de download não fornecida." });
+      }
+
+      let urlObj: URL;
+      try {
+        urlObj = new URL(downloadUrl);
+      } catch {
+        return res.status(400).json({ message: "URL inválida." });
+      }
+
+      const allowedDomains = ['fbcdn.net', 'facebook.com', 'fb.com', 'fbsbx.com', 'xx.fbcdn.net'];
+      const isAllowed = allowedDomains.some(domain => urlObj.hostname === domain || urlObj.hostname.endsWith('.' + domain));
+      if (!isAllowed) {
+        return res.status(403).json({ message: "Domínio não permitido." });
+      }
+
+      const mediaResponse = await axios.get(downloadUrl, {
+        responseType: 'stream',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Referer': 'https://www.facebook.com/',
+          'Accept': '*/*',
+          'Accept-Encoding': 'identity',
+        },
+        timeout: 30000,
+        maxRedirects: 5,
+      });
+
+      const contentType = mediaResponse.headers['content-type'] || 'application/octet-stream';
+      const contentLength = mediaResponse.headers['content-length'];
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      if (contentLength) {
+        res.setHeader('Content-Length', contentLength);
+      }
+      res.setHeader('Cache-Control', 'no-cache');
+
+      mediaResponse.data.pipe(res);
+
+      mediaResponse.data.on('error', (err: Error) => {
+        console.error('Facebook stream error:', err.message);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "Erro ao baixar o arquivo." });
+        }
+      });
+
+    } catch (error: any) {
+      console.error('Facebook download error:', error.message);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Erro ao processar o download do Facebook. Tente novamente." });
+      }
+    }
+  });
+
   app.get('/api/proxy-download', async (req, res) => {
     try {
       const downloadUrl = req.query.url as string;
