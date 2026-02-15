@@ -8,7 +8,7 @@ export default function Footer() {
           <div>
             <h3 className="font-bold mb-4">Baixar Vídeo Downloader</h3>
             <p className="text-sm text-muted-foreground">
-              A ferramenta mais rápida e segura para baixar conteúdo do Instagram e TikTok.
+              A ferramenta mais rápida e segura para baixar conteúdo do Instagram, TikTok e Pinterest.
             </p>
           </div>
           <div>
@@ -16,6 +16,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/" className="hover:underline">Baixar Vídeo Instagram</Link></li>
               <li><Link href="/tiktok" className="hover:underline">Baixar Vídeo TikTok</Link></li>
+              <li><Link href="/pinterest" className="hover:underline">Baixar do Pinterest</Link></li>
               <li><Link href="/como-funciona" className="hover:underline">Como Funciona</Link></li>
             </ul>
           </div>

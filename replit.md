@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is **InstaSaver** (branded as "Baixar Vídeo Instagram"), a web application that allows Brazilian users to download videos, reels, photos, stories, and highlights from Instagram. The app is entirely in Portuguese (pt-BR), targeting the Brazilian market with the SEO keyword "baixar video instagram." Users paste an Instagram URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
+This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights), TikTok (videos without watermark), and Pinterest (videos, images, GIFs). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
 
 ## User Preferences
 

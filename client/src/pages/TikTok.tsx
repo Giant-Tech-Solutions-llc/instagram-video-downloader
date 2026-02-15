@@ -21,7 +21,7 @@ import {
   Sparkles,
   ExternalLink
 } from "lucide-react";
-import { SiTiktok, SiInstagram } from "react-icons/si";
+import { SiTiktok, SiInstagram, SiPinterest } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
@@ -29,9 +29,14 @@ function isInstagramUrl(url: string): boolean {
   return url.includes('instagram.com');
 }
 
+function isPinterestUrl(url: string): boolean {
+  return url.includes('pinterest.com') || url.includes('pin.it');
+}
+
 export default function TikTok() {
   const [url, setUrl] = useState("");
   const [showInstagramHint, setShowInstagramHint] = useState(false);
+  const [showPinterestHint, setShowPinterestHint] = useState(false);
   const { toast } = useToast();
   const [, navigate] = useLocation();
   
@@ -53,8 +58,13 @@ export default function TikTok() {
     setUrl(value);
     if (isInstagramUrl(value)) {
       setShowInstagramHint(true);
+      setShowPinterestHint(false);
+    } else if (isPinterestUrl(value)) {
+      setShowPinterestHint(true);
+      setShowInstagramHint(false);
     } else {
       setShowInstagramHint(false);
+      setShowPinterestHint(false);
     }
   };
 
@@ -63,6 +73,10 @@ export default function TikTok() {
     if (!url) return;
     if (isInstagramUrl(url)) {
       setShowInstagramHint(true);
+      return;
+    }
+    if (isPinterestUrl(url)) {
+      setShowPinterestHint(true);
       return;
     }
     processMutation.mutate({ url });
@@ -182,6 +196,31 @@ export default function TikTok() {
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
                     >
                       Ir para Instagram <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Pinterest URL detected hint */}
+              <AnimatePresence>
+                {showPinterestHint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-700 border border-red-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
+                    data-testid="hint-pinterest-redirect"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SiPinterest className="w-5 h-5 flex-shrink-0" />
+                      <p className="font-medium">Este link é do Pinterest! Use nosso downloader de Pinterest.</p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/pinterest")}
+                      data-testid="button-go-pinterest"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
+                    >
+                      Ir para Pinterest <ExternalLink className="w-4 h-4" />
                     </button>
                   </motion.div>
                 )}
