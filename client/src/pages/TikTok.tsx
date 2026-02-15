@@ -209,7 +209,7 @@ export default function TikTok() {
 
                     <div className="space-y-4">
                       <a
-                        href={`/api/proxy-download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || "tiktok-download.mp4")}`}
+                        href={`/api/tiktok/download?url=${encodeURIComponent(url)}`}
                         data-testid="link-download-tiktok-result"
                         className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-[#E6195E] text-white font-black text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
                       >

@@ -217,6 +217,109 @@ export async function registerRoutes(
     }
   });
 
+  app.get('/api/tiktok/download', async (req, res) => {
+    try {
+      let tiktokUrl = req.query.url as string;
+      if (!tiktokUrl || (!tiktokUrl.includes('tiktok.com') && !tiktokUrl.includes('vm.tiktok.com'))) {
+        return res.status(400).json({ message: "URL inválida do TikTok." });
+      }
+
+      tiktokUrl = tiktokUrl.split('?')[0];
+      console.log(`TikTok direct download for: ${tiktokUrl}`);
+
+      const browserHeaders = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
+        'Referer': 'https://www.tiktok.com/'
+      };
+
+      const pageResponse = await axios.get(tiktokUrl, {
+        headers: browserHeaders,
+        timeout: 15000,
+        maxRedirects: 5,
+      });
+
+      const cookies = pageResponse.headers['set-cookie']?.map((c: string) => c.split(';')[0]).join('; ') || '';
+
+      const $ = cheerio.load(pageResponse.data);
+      let videoUrl: string | undefined;
+
+      videoUrl = $('meta[property="og:video"]').attr('content') ||
+                 $('meta[property="og:video:secure_url"]').attr('content');
+
+      if (!videoUrl) {
+        const scripts = $('script').map((i, el) => $(el).html()).get();
+        for (const scriptContent of scripts) {
+          if (!scriptContent) continue;
+          const downloadMatch = scriptContent.match(/"downloadAddr":"([^"]+)"/);
+          if (downloadMatch && downloadMatch[1]) {
+            videoUrl = decodeURIComponent(downloadMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&'));
+            break;
+          }
+          const playMatch = scriptContent.match(/"playAddr":"([^"]+)"/);
+          if (playMatch && playMatch[1]) {
+            videoUrl = decodeURIComponent(playMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&'));
+            break;
+          }
+        }
+      }
+
+      if (!videoUrl) {
+        videoUrl = $('video source').attr('src') || $('video').attr('src');
+      }
+
+      if (!videoUrl) {
+        return res.status(400).json({ message: "Não foi possível encontrar o vídeo. Verifique se o link é público." });
+      }
+
+      console.log(`Streaming TikTok video from CDN...`);
+      const mediaResponse = await axios.get(videoUrl, {
+        responseType: 'stream',
+        headers: {
+          'User-Agent': browserHeaders['User-Agent'],
+          'Referer': 'https://www.tiktok.com/',
+          'Accept': '*/*',
+          'Accept-Encoding': 'identity',
+          'Cookie': cookies,
+        },
+        timeout: 30000,
+        maxRedirects: 5,
+      });
+
+      const filename = `tiktok-video-${Date.now()}.mp4`;
+      const contentType = mediaResponse.headers['content-type'] || 'video/mp4';
+      const contentLength = mediaResponse.headers['content-length'];
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      if (contentLength) {
+        res.setHeader('Content-Length', contentLength);
+      }
+      res.setHeader('Cache-Control', 'no-cache');
+
+      mediaResponse.data.pipe(res);
+
+      mediaResponse.data.on('error', (err: Error) => {
+        console.error('TikTok stream error:', err.message);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "Erro ao baixar o vídeo." });
+        }
+      });
+
+    } catch (error: any) {
+      console.error('TikTok download error:', error.message);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Erro ao processar o download do TikTok. Tente novamente." });
+      }
+    }
+  });
+
   app.get('/api/proxy-download', async (req, res) => {
     try {
       const downloadUrl = req.query.url as string;
@@ -226,7 +329,7 @@ export async function registerRoutes(
         return res.status(400).json({ message: "URL de download não fornecida." });
       }
 
-      const allowedDomains = ['tiktok.com', 'tiktokcdn.com', 'tiktokv.com', 'instagram.com', 'cdninstagram.com', 'fbcdn.net'];
+      const allowedDomains = ['instagram.com', 'cdninstagram.com', 'fbcdn.net'];
       let urlObj: URL;
       try {
         urlObj = new URL(downloadUrl);
@@ -246,10 +349,9 @@ export async function registerRoutes(
         responseType: 'stream',
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Referer': urlObj.hostname.includes('tiktok') ? 'https://www.tiktok.com/' : 'https://www.instagram.com/',
+          'Referer': 'https://www.instagram.com/',
           'Accept': '*/*',
           'Accept-Encoding': 'identity',
-          'Range': req.headers.range || '',
         },
         timeout: 30000,
         maxRedirects: 5,
