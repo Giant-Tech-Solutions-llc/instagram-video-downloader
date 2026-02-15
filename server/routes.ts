@@ -116,6 +116,107 @@ export async function registerRoutes(
     }
   });
 
+  app.post('/api/tiktok/process', async (req, res) => {
+    try {
+      const inputSchema = z.object({
+        url: z.string().url({ message: "Por favor, insira uma URL válida do TikTok" })
+      });
+      const parsed = inputSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: parsed.error.errors[0]?.message || "URL inválida." });
+      }
+      let url = parsed.data.url;
+      if (!url.includes('tiktok.com') && !url.includes('vm.tiktok.com')) {
+        return res.status(400).json({ message: "URL inválida. Por favor, use um link do TikTok." });
+      }
+
+      url = url.split('?')[0];
+
+      console.log(`Processing TikTok download for URL: ${url}`);
+
+      const response = await axios.get(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
+          'Sec-Fetch-User': '?1',
+          'Upgrade-Insecure-Requests': '1',
+          'Referer': 'https://www.tiktok.com/'
+        },
+        timeout: 15000,
+        maxRedirects: 5
+      });
+
+      const $ = cheerio.load(response.data);
+
+      let videoUrl: string | undefined;
+      let imageUrl: string | undefined;
+      let type: 'video' | 'image' = 'video';
+
+      videoUrl = $('meta[property="og:video"]').attr('content') ||
+                 $('meta[property="og:video:secure_url"]').attr('content');
+      imageUrl = $('meta[property="og:image"]').attr('content');
+
+      if (!videoUrl) {
+        const scripts = $('script').map((i, el) => $(el).html()).get();
+        for (const scriptContent of scripts) {
+          if (!scriptContent) continue;
+
+          const downloadMatch = scriptContent.match(/"downloadAddr":"([^"]+)"/);
+          if (downloadMatch && downloadMatch[1]) {
+            videoUrl = decodeURIComponent(downloadMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&'));
+            break;
+          }
+
+          const playMatch = scriptContent.match(/"playAddr":"([^"]+)"/);
+          if (playMatch && playMatch[1]) {
+            videoUrl = decodeURIComponent(playMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&'));
+            break;
+          }
+
+          const videoSrcMatch = scriptContent.match(/"video":\s*\{[^}]*"playAddr":\s*"([^"]+)"/);
+          if (videoSrcMatch && videoSrcMatch[1]) {
+            videoUrl = decodeURIComponent(videoSrcMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&'));
+            break;
+          }
+        }
+      }
+
+      if (!videoUrl) {
+        videoUrl = $('video source').attr('src') || $('video').attr('src');
+      }
+
+      const finalUrl = videoUrl || imageUrl;
+
+      if (!finalUrl) {
+        await storage.logDownload({ url, status: 'failed', format: 'unknown' });
+        return res.status(400).json({
+          message: "Não foi possível encontrar o vídeo do TikTok. Verifique se o link está correto e se o vídeo é público. Tente novamente em alguns minutos."
+        });
+      }
+
+      if (videoUrl) type = 'video';
+      else type = 'image';
+
+      await storage.logDownload({ url, status: 'success', format: type === 'video' ? 'mp4' : 'jpg' });
+
+      res.json({
+        url: finalUrl,
+        thumbnail: imageUrl,
+        filename: `tiktok-${type}-${Date.now()}.${type === 'video' ? 'mp4' : 'jpg'}`,
+        type: type
+      });
+
+    } catch (error: any) {
+      console.error('TikTok download error:', error.message);
+      await storage.logDownload({ url: req.body.url || 'unknown', status: 'failed', format: 'error' });
+      res.status(500).json({ message: "O TikTok bloqueou a conexão temporariamente. Tente novamente em alguns minutos." });
+    }
+  });
+
   app.get('/api/stats', async (req, res) => {
     const recent = await storage.getRecentDownloads();
     res.json({
