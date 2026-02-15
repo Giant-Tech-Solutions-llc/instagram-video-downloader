@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Instagram } from "lucide-react";
+import logoPath from "@assets/Baixar_Vídeo_downloader_Logo_1771170363989.png";
 import { SiTiktok, SiYoutube, SiInstagram } from "react-icons/si";
 import { cn } from "@/lib/utils";
 
@@ -10,13 +10,8 @@ export function Navbar() {
     <nav className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 gap-4">
-          <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
-            <div className="bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white p-1.5 rounded-md group-hover:scale-105 transition-transform duration-200">
-              <Instagram className="w-5 h-5" />
-            </div>
-            <span className="font-display font-bold text-lg tracking-tight text-foreground">
-              Insta<span className="text-[#E6195E]">Saver</span>
-            </span>
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <img src={logoPath} alt="Baixar Vídeo Downloader" className="h-9" data-testid="img-logo" />
           </Link>
 
           <div className="flex items-center gap-1">
