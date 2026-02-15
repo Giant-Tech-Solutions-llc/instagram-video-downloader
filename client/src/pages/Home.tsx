@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useProcessDownload, useStats } from "@/hooks/use-download";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
+import socialIconsHero from "@/assets/images/social-icons-hero.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowRight, 
@@ -328,8 +329,8 @@ export default function Home() {
               <div className="md:w-1/2 relative">
                 <div className="w-full aspect-[4/5] bg-[#E6195E] rounded-[3rem] relative overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=1000&auto=format&fit=crop" 
-                    alt="How to use" 
+                    src={socialIconsHero}
+                    alt="Instagram e TikTok" 
                     className="w-full h-full object-cover opacity-80"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#E6195E]/80 to-transparent" />
