@@ -22,7 +22,9 @@ import {
   Heart,
   Clock,
   Infinity,
-  CheckCircle
+  CheckCircle,
+  Youtube,
+  Instagram
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -174,9 +176,10 @@ export default function Home() {
               <div className="mt-8 flex items-center justify-center gap-6 text-black/20">
                 <span className="text-xs font-bold uppercase tracking-widest text-black/40">Plataformas Suportadas:</span>
                 <div className="flex gap-4">
+                  <Instagram className="w-5 h-5" />
+                  <Youtube className="w-5 h-5" />
                   <Smartphone className="w-5 h-5" />
                   <Monitor className="w-5 h-5" />
-                  <PlayCircle className="w-5 h-5" />
                 </div>
               </div>
             </motion.div>
@@ -307,7 +310,7 @@ export default function Home() {
 
             <div className="grid md:grid-cols-4 gap-12">
               {[
-                { icon: <Zap className="w-8 h-8" />, title: "Alta Qualidade", desc: "Baixe vídeos em MP4 HD e fotos em alta resolução original." },
+                { icon: <Zap className="w-8 h-8" />, title: "Alta Qualidade", desc: "Baixe vídeos em MP4 HD e fotos em alta resolution original." },
                 { icon: <Clock className="w-8 h-8" />, title: "Download Rápido", desc: "Processamento instantâneo sem esperas ou anúncios abusivos." },
                 { icon: <Infinity className="w-8 h-8" />, title: "Ilimitado", desc: "Faça quantos downloads desejar sem limites diários." },
                 { icon: <Smartphone className="w-8 h-8" />, title: "Suporte Total", desc: "Funciona em todos os dispositivos iOS, Android e PC." }
