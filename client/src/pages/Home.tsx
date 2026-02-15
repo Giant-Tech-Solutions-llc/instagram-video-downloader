@@ -5,36 +5,40 @@ import Footer from "@/components/layout/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowRight, 
-  CheckCircle2, 
   Copy, 
   Download, 
   AlertCircle, 
   Loader2, 
   PlayCircle, 
   Smartphone, 
-  ShieldCheck, 
   Zap,
   Video,
   Camera,
   Clapperboard,
   History,
   Monitor,
-  Heart,
   Clock,
   Infinity,
   CheckCircle,
-  Youtube,
-  Instagram
+  ExternalLink
 } from "lucide-react";
+import { SiInstagram, SiTiktok } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 
 type DownloaderType = 'video' | 'foto' | 'reels' | 'historia' | 'destaques';
 
+function isTikTokUrl(url: string): boolean {
+  return url.includes('tiktok.com') || url.includes('vm.tiktok.com');
+}
+
 export default function Home() {
   const [url, setUrl] = useState("");
   const [activeTab, setActiveTab] = useState<DownloaderType>('video');
+  const [showTikTokHint, setShowTikTokHint] = useState(false);
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   
   const processMutation = useProcessDownload();
   const { data: stats } = useStats();
@@ -43,7 +47,7 @@ export default function Home() {
     { id: 'video' as const, label: 'Vídeo', icon: Video },
     { id: 'foto' as const, label: 'Foto', icon: Camera },
     { id: 'reels' as const, label: 'Reels', icon: Clapperboard },
-    { id: 'historia' as const, label: 'História', icon: History },
+    { id: 'historia' as const, label: 'Stories', icon: History },
     { id: 'destaques' as const, label: 'Destaques', icon: Monitor },
   ];
 
@@ -57,16 +61,29 @@ export default function Home() {
     }
   };
 
+  const handleUrlChange = (value: string) => {
+    setUrl(value);
+    if (isTikTokUrl(value)) {
+      setShowTikTokHint(true);
+    } else {
+      setShowTikTokHint(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!url) return;
+    if (isTikTokUrl(url)) {
+      setShowTikTokHint(true);
+      return;
+    }
     processMutation.mutate({ url });
   };
 
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      setUrl(text);
+      handleUrlChange(text);
       toast({
         title: "Link colado!",
         description: "Agora clique em Baixar para processar.",
@@ -99,6 +116,7 @@ export default function Home() {
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
+                    data-testid={`tab-${tab.id}`}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
                       "flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300",
@@ -121,7 +139,7 @@ export default function Home() {
                 Ferramenta 100% Gratuita
               </div>
               
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]" data-testid="text-page-title">
                 {getTitle().split(' ')[0]} <br />
                 <span className="text-[#E6195E]">{getTitle().split(' ').slice(1).join(' ')}</span>
               </h1>
@@ -143,13 +161,15 @@ export default function Home() {
                   <div className="relative flex-grow">
                     <input
                       type="url"
+                      data-testid="input-instagram-url"
                       placeholder="Insira o link do Instagram aqui..."
                       className="w-full h-20 pl-10 pr-32 rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-xl font-medium placeholder:text-black/20"
                       value={url}
-                      onChange={(e) => setUrl(e.target.value)}
+                      onChange={(e) => handleUrlChange(e.target.value)}
                     />
                     <button
                       type="button"
+                      data-testid="button-paste-instagram"
                       onClick={handlePaste}
                       className="absolute right-4 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-2xl bg-white border border-black/5 flex items-center gap-2 text-sm font-bold text-black/60 hover:text-[#E6195E] hover:border-[#E6195E]/20 transition-all shadow-sm active:scale-95"
                       title="Colar link"
@@ -160,26 +180,72 @@ export default function Home() {
                   </div>
                   <button
                     type="submit"
+                    data-testid="button-download-instagram"
                     disabled={processMutation.isPending || !url}
                     className="h-20 px-12 rounded-[1.8rem] bg-[#E6195E] text-white font-black text-2xl shadow-2xl shadow-[#E6195E]/30 hover:scale-[1.03] hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 min-w-[220px]"
                   >
                     {processMutation.isPending ? (
-                      <Loader2 className="w-8 h-8 animate-spin" />
+                      <>
+                        <Loader2 className="w-7 h-7 animate-spin" />
+                        <span className="text-lg">Processando...</span>
+                      </>
                     ) : (
                       "BAIXAR"
                     )}
                   </button>
                 </form>
               </div>
+
+              {/* TikTok URL detected hint */}
+              <AnimatePresence>
+                {showTikTokHint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 p-5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
+                    data-testid="hint-tiktok-redirect"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SiTiktok className="w-5 h-5 flex-shrink-0" />
+                      <p className="font-medium">Este link é do TikTok! Use nosso downloader especializado.</p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/tiktok")}
+                      data-testid="button-go-tiktok"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
+                    >
+                      Ir para TikTok <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {/* Error Message */}
+              <AnimatePresence>
+                {processMutation.isError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3 text-left max-w-4xl mx-auto"
+                    data-testid="text-error-instagram"
+                  >
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="font-medium">{processMutation.error.message}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
               {/* Platforms hint */}
               <div className="mt-8 flex items-center justify-center gap-6 text-black/20">
-                <span className="text-xs font-bold uppercase tracking-widest text-black/40">Plataformas Suportadas:</span>
-                <div className="flex gap-4">
-                  <Instagram className="w-5 h-5" />
-                  <Youtube className="w-5 h-5" />
-                  <Smartphone className="w-5 h-5" />
-                  <Monitor className="w-5 h-5" />
+                <span className="text-xs font-bold uppercase tracking-widest text-black/40">Formatos:</span>
+                <div className="flex gap-4 items-center">
+                  <span className="text-xs font-bold text-black/30">MP4 HD</span>
+                  <span className="text-black/10">|</span>
+                  <span className="text-xs font-bold text-black/30">JPG Original</span>
+                  <span className="text-black/10">|</span>
+                  <span className="text-xs font-bold text-black/30">Alta Qualidade</span>
                 </div>
               </div>
             </motion.div>
@@ -196,6 +262,7 @@ export default function Home() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="bg-card rounded-[2.5rem] border border-border/60 shadow-2xl shadow-black/5 overflow-hidden flex flex-col md:flex-row"
+                  data-testid="section-download-result"
                 >
                   <div className="md:w-1/2 bg-black/5 relative aspect-square md:aspect-auto">
                     {processMutation.data.thumbnail ? (
@@ -203,6 +270,7 @@ export default function Home() {
                         src={processMutation.data.thumbnail} 
                         alt="Preview" 
                         className="w-full h-full object-cover absolute inset-0"
+                        data-testid="img-download-preview"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
@@ -217,7 +285,7 @@ export default function Home() {
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-4">
                         <CheckCircle className="w-3 h-3" /> Sucesso
                       </div>
-                      <h3 className="text-3xl font-black font-display text-foreground mb-4 leading-tight">
+                      <h3 className="text-3xl font-black font-display text-foreground mb-4 leading-tight" data-testid="text-download-ready">
                         Download Pronto!
                       </h3>
                       <p className="text-muted-foreground text-lg">
@@ -228,6 +296,7 @@ export default function Home() {
                     <div className="space-y-4">
                       <a
                         href={`/api/proxy-download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || "instagram-download.mp4")}`}
+                        data-testid="link-download-instagram-result"
                         className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-[#E6195E] text-white font-black text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
                       >
                         <Download className="w-6 h-6" />
@@ -239,6 +308,7 @@ export default function Home() {
                           processMutation.reset();
                           setUrl("");
                         }}
+                        data-testid="button-download-another-instagram"
                         className="w-full py-4 text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
                       >
                         Baixar outro arquivo
@@ -272,7 +342,7 @@ export default function Home() {
                 <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Processo Simples</span>
                 <h2 className="text-5xl md:text-6xl font-display font-black text-[#1A1A1A] mb-12 leading-tight">
                   Como usar o <br />
-                  <span className="text-[#E6195E]">InstaSaver</span>
+                  <span className="text-[#E6195E]">Downloader</span>
                 </h2>
                 
                 <div className="space-y-10">
@@ -301,7 +371,7 @@ export default function Home() {
             <div className="text-center mb-24">
               <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Vantagens</span>
               <h2 className="text-5xl md:text-6xl font-display font-black mb-8 leading-tight">
-                Por que escolher o <span className="text-[#E6195E]">InstaSaver</span>?
+                Por que escolher o <span className="text-[#E6195E]">Baixar Vídeo</span>?
               </h2>
             </div>
 
@@ -346,7 +416,7 @@ export default function Home() {
                 },
                 {
                   q: "É possível baixar Reels com áudio?",
-                  a: "Sim! O InstaSaver baixa Reels completos com áudio e vídeo em alta definição, ideal para assistir offline ou compartilhar."
+                  a: "Sim! Nosso downloader baixa Reels completos com áudio e vídeo em alta definição, ideal para assistir offline ou compartilhar."
                 },
                 {
                   q: "Como baixar Stories e Destaques (Highlights)?",
@@ -402,7 +472,7 @@ export default function Home() {
                     <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Downloader de Reels e Stories</h3>
                     <p className="text-muted-foreground text-lg leading-relaxed font-medium">
                       Os Reels e Stories são conteúdos dinâmicos que muitas vezes queremos guardar para referência futura. 
-                      O InstaSaver captura o fluxo de vídeo e áudio de forma síncrona, entregando um arquivo pronto para 
+                      Nosso downloader captura o fluxo de vídeo e áudio de forma síncrona, entregando um arquivo pronto para 
                       reprodução em qualquer player de mídia moderno.
                     </p>
                   </div>

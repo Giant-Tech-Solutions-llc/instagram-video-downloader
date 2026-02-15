@@ -18,20 +18,27 @@ import {
   CheckCircle,
   Music,
   Film,
-  Sparkles
+  Sparkles,
+  ExternalLink
 } from "lucide-react";
-import { SiTiktok } from "react-icons/si";
+import { SiTiktok, SiInstagram } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
+
+function isInstagramUrl(url: string): boolean {
+  return url.includes('instagram.com');
+}
 
 export default function TikTok() {
   const [url, setUrl] = useState("");
+  const [showInstagramHint, setShowInstagramHint] = useState(false);
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   
   const processMutation = useProcessTikTokDownload();
 
-  // SEO meta tags
   if (typeof document !== 'undefined') {
-    document.title = "Baixar Vídeo TikTok Sem Marca D'Água - MP4 HD Grátis | InstaSaver";
+    document.title = "Baixar Vídeo TikTok Sem Marca D'Água - MP4 HD Grátis | Baixar Vídeo";
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
       metaDesc.setAttribute('content', "Baixe vídeos do TikTok sem marca d'água em MP4 HD grátis. Ferramenta online rápida e segura para salvar vídeos do TikTok no celular ou PC.");
@@ -42,16 +49,29 @@ export default function TikTok() {
     if (ogDesc) ogDesc.setAttribute('content', "Baixe vídeos do TikTok sem marca d'água em alta qualidade. 100% gratuito, sem login.");
   }
 
+  const handleUrlChange = (value: string) => {
+    setUrl(value);
+    if (isInstagramUrl(value)) {
+      setShowInstagramHint(true);
+    } else {
+      setShowInstagramHint(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!url) return;
+    if (isInstagramUrl(url)) {
+      setShowInstagramHint(true);
+      return;
+    }
     processMutation.mutate({ url });
   };
 
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      setUrl(text);
+      handleUrlChange(text);
       toast({
         title: "Link colado!",
         description: "Agora clique em Baixar para processar.",
@@ -111,7 +131,7 @@ export default function TikTok() {
                       placeholder="Insira o link do TikTok aqui..."
                       className="w-full h-20 pl-10 pr-32 rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-xl font-medium placeholder:text-black/20"
                       value={url}
-                      onChange={(e) => setUrl(e.target.value)}
+                      onChange={(e) => handleUrlChange(e.target.value)}
                     />
                     <button
                       type="button"
@@ -131,7 +151,10 @@ export default function TikTok() {
                     className="h-20 px-12 rounded-[1.8rem] bg-[#E6195E] text-white font-black text-2xl shadow-2xl shadow-[#E6195E]/30 hover:scale-[1.03] hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 min-w-[220px]"
                   >
                     {processMutation.isPending ? (
-                      <Loader2 className="w-8 h-8 animate-spin" />
+                      <>
+                        <Loader2 className="w-7 h-7 animate-spin" />
+                        <span className="text-lg">Processando...</span>
+                      </>
                     ) : (
                       "BAIXAR"
                     )}
@@ -139,6 +162,31 @@ export default function TikTok() {
                 </form>
               </div>
               
+              {/* Instagram URL detected hint */}
+              <AnimatePresence>
+                {showInstagramHint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 p-5 rounded-2xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
+                    data-testid="hint-instagram-redirect"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SiInstagram className="w-5 h-5 flex-shrink-0" />
+                      <p className="font-medium">Este link é do Instagram! Use nosso downloader de Instagram.</p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/")}
+                      data-testid="button-go-instagram"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
+                    >
+                      Ir para Instagram <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Error Message */}
               <AnimatePresence>
                 {processMutation.isError && (
@@ -149,7 +197,7 @@ export default function TikTok() {
                     className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3 text-left max-w-4xl mx-auto"
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="font-medium">{processMutation.error.message}</p>
+                    <p className="font-medium" data-testid="text-error-tiktok">{processMutation.error.message}</p>
                   </motion.div>
                 )}
               </AnimatePresence>

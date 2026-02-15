@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container max-w-4xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left flex-wrap">
           <div>
-            <h3 className="font-bold mb-4">Baixar Vídeo Instagram</h3>
+            <h3 className="font-bold mb-4">Baixar Vídeo Downloader</h3>
             <p className="text-sm text-muted-foreground">
               A ferramenta mais rápida e segura para baixar conteúdo do Instagram e TikTok.
             </p>
@@ -29,7 +29,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 pt-6 border-t text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Baixar Vídeo Instagram. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} Baixar Vídeo Downloader. Todos os direitos reservados.
         </div>
       </div>
     </footer>
