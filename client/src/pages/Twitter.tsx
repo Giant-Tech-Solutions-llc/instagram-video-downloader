@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProcessTikTokDownload, useStats } from "@/hooks/use-download";
+import { useProcessTwitterDownload } from "@/hooks/use-download";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,17 +16,21 @@ import {
   Infinity,
   Zap,
   CheckCircle,
-  Music,
+  Image,
   Film,
-  Sparkles,
+  FileImage,
   ExternalLink
 } from "lucide-react";
-import { SiTiktok, SiInstagram, SiPinterest, SiFacebook, SiX } from "react-icons/si";
+import { SiX, SiInstagram, SiTiktok, SiPinterest, SiFacebook } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
 function isInstagramUrl(url: string): boolean {
   return url.includes('instagram.com');
+}
+
+function isTikTokUrl(url: string): boolean {
+  return url.includes('tiktok.com') || url.includes('vm.tiktok.com');
 }
 
 function isPinterestUrl(url: string): boolean {
@@ -37,47 +41,38 @@ function isFacebookUrl(url: string): boolean {
   return url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com') || url.includes('m.facebook.com');
 }
 
-function isTwitterUrl(url: string): boolean {
-  return url.includes('twitter.com') || url.includes('x.com') || url.includes('t.co');
-}
-
-export default function TikTok() {
+export default function Twitter() {
   const [url, setUrl] = useState("");
-  const [showInstagramHint, setShowInstagramHint] = useState(false);
-  const [showPinterestHint, setShowPinterestHint] = useState(false);
-  const [showFacebookHint, setShowFacebookHint] = useState(false);
-  const [showTwitterHint, setShowTwitterHint] = useState(false);
+  const [showOtherPlatformHint, setShowOtherPlatformHint] = useState<'instagram' | 'tiktok' | 'pinterest' | 'facebook' | null>(null);
   const { toast } = useToast();
   const [, navigate] = useLocation();
   
-  const processMutation = useProcessTikTokDownload();
+  const processMutation = useProcessTwitterDownload();
 
   if (typeof document !== 'undefined') {
-    document.title = "Baixar Vídeo TikTok Sem Marca D'Água - MP4 HD Grátis | Baixar Vídeo";
+    document.title = "Baixar Vídeo e Imagem do Twitter/X - HD Grátis | Baixar Vídeo";
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
-      metaDesc.setAttribute('content', "Baixe vídeos do TikTok sem marca d'água em MP4 HD grátis. Ferramenta online rápida e segura para salvar vídeos do TikTok no celular ou PC.");
+      metaDesc.setAttribute('content', "Baixe vídeos, imagens e GIFs do Twitter/X em HD grátis. Ferramenta online rápida e segura para salvar vídeos do Twitter no celular ou PC.");
     }
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', "Baixar Vídeo TikTok Sem Marca D'Água - MP4 HD Grátis");
+    if (ogTitle) ogTitle.setAttribute('content', "Baixar Vídeo e Imagem do Twitter/X - HD Grátis");
     const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', "Baixe vídeos do TikTok sem marca d'água em alta qualidade. 100% gratuito, sem login.");
+    if (ogDesc) ogDesc.setAttribute('content', "Baixe vídeos, imagens e GIFs do Twitter/X em alta qualidade. 100% gratuito, sem login.");
   }
 
   const handleUrlChange = (value: string) => {
     setUrl(value);
-    setShowInstagramHint(false);
-    setShowPinterestHint(false);
-    setShowFacebookHint(false);
-    setShowTwitterHint(false);
     if (isInstagramUrl(value)) {
-      setShowInstagramHint(true);
+      setShowOtherPlatformHint('instagram');
+    } else if (isTikTokUrl(value)) {
+      setShowOtherPlatformHint('tiktok');
     } else if (isPinterestUrl(value)) {
-      setShowPinterestHint(true);
+      setShowOtherPlatformHint('pinterest');
     } else if (isFacebookUrl(value)) {
-      setShowFacebookHint(true);
-    } else if (isTwitterUrl(value)) {
-      setShowTwitterHint(true);
+      setShowOtherPlatformHint('facebook');
+    } else {
+      setShowOtherPlatformHint(null);
     }
   };
 
@@ -85,19 +80,19 @@ export default function TikTok() {
     e.preventDefault();
     if (!url) return;
     if (isInstagramUrl(url)) {
-      setShowInstagramHint(true);
+      setShowOtherPlatformHint('instagram');
+      return;
+    }
+    if (isTikTokUrl(url)) {
+      setShowOtherPlatformHint('tiktok');
       return;
     }
     if (isPinterestUrl(url)) {
-      setShowPinterestHint(true);
+      setShowOtherPlatformHint('pinterest');
       return;
     }
     if (isFacebookUrl(url)) {
-      setShowFacebookHint(true);
-      return;
-    }
-    if (isTwitterUrl(url)) {
-      setShowTwitterHint(true);
+      setShowOtherPlatformHint('facebook');
       return;
     }
     processMutation.mutate({ url });
@@ -125,7 +120,6 @@ export default function TikTok() {
       <Navbar />
 
       <main className="flex-grow">
-        {/* Hero Section */}
         <section className="relative pt-24 pb-32 px-4 overflow-hidden bg-[#F8F9FA]">
           <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
           
@@ -136,17 +130,17 @@ export default function TikTok() {
               transition={{ duration: 0.5 }}
             >
               <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-black/5 text-black/60 text-sm font-black uppercase tracking-wider mb-8 border border-black/5">
-                <SiTiktok className="w-4 h-4" />
-                Sem Marca D'Água
+                <SiX className="w-4 h-4" />
+                Vídeos, Imagens e GIFs
               </div>
               
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]">
-                Baixar Vídeo <br />
-                <span className="text-[#E6195E]">do TikTok</span>
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]" data-testid="text-twitter-title">
+                Baixar do <br />
+                <span className="text-[#E6195E]">Twitter / X</span>
               </h1>
               
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-16 font-medium leading-relaxed">
-                Baixe vídeos do TikTok sem marca d'água em MP4 HD. <br className="hidden md:block" /> 
+                Baixe vídeos, imagens e GIFs do Twitter/X em qualidade HD. <br className="hidden md:block" /> 
                 Rápido, gratuito e sem necessidade de login.
               </p>
             </motion.div>
@@ -162,15 +156,15 @@ export default function TikTok() {
                   <div className="relative flex-grow">
                     <input
                       type="url"
-                      data-testid="input-tiktok-url"
-                      placeholder="Insira o link do TikTok aqui..."
+                      data-testid="input-twitter-url"
+                      placeholder="Insira o link do Twitter/X aqui..."
                       className="w-full h-20 pl-10 pr-32 rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-xl font-medium placeholder:text-black/20"
                       value={url}
                       onChange={(e) => handleUrlChange(e.target.value)}
                     />
                     <button
                       type="button"
-                      data-testid="button-paste-tiktok"
+                      data-testid="button-paste-twitter"
                       onClick={handlePaste}
                       className="absolute right-4 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-2xl bg-white border border-black/5 flex items-center gap-2 text-sm font-bold text-black/60 hover:text-[#E6195E] hover:border-[#E6195E]/20 transition-all shadow-sm active:scale-95"
                       title="Colar link"
@@ -181,7 +175,7 @@ export default function TikTok() {
                   </div>
                   <button
                     type="submit"
-                    data-testid="button-download-tiktok"
+                    data-testid="button-download-twitter"
                     disabled={processMutation.isPending || !url}
                     className="h-20 px-12 rounded-[1.8rem] bg-[#E6195E] text-white font-black text-2xl shadow-2xl shadow-[#E6195E]/30 hover:scale-[1.03] hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 min-w-[220px]"
                   >
@@ -197,9 +191,8 @@ export default function TikTok() {
                 </form>
               </div>
               
-              {/* Instagram URL detected hint */}
               <AnimatePresence>
-                {showInstagramHint && (
+                {showOtherPlatformHint === 'instagram' && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -220,11 +213,28 @@ export default function TikTok() {
                     </button>
                   </motion.div>
                 )}
-              </AnimatePresence>
-
-              {/* Pinterest URL detected hint */}
-              <AnimatePresence>
-                {showPinterestHint && (
+                {showOtherPlatformHint === 'tiktok' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 p-5 rounded-2xl bg-gray-50 text-gray-700 border border-gray-200 flex items-center justify-between gap-3 max-w-4xl mx-auto"
+                    data-testid="hint-tiktok-redirect"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SiTiktok className="w-5 h-5 flex-shrink-0" />
+                      <p className="font-medium">Este link é do TikTok! Use nosso downloader de TikTok.</p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/tiktok")}
+                      data-testid="button-go-tiktok"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
+                    >
+                      Ir para TikTok <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+                {showOtherPlatformHint === 'pinterest' && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -245,7 +255,7 @@ export default function TikTok() {
                     </button>
                   </motion.div>
                 )}
-                {showFacebookHint && (
+                {showOtherPlatformHint === 'facebook' && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -266,30 +276,8 @@ export default function TikTok() {
                     </button>
                   </motion.div>
                 )}
-                {showTwitterHint && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-gray-50 text-gray-700 border border-gray-200 flex items-center justify-between gap-3 max-w-4xl mx-auto"
-                    data-testid="hint-twitter-redirect"
-                  >
-                    <div className="flex items-center gap-3">
-                      <SiX className="w-5 h-5 flex-shrink-0" />
-                      <p className="font-medium">Este link é do Twitter/X! Use nosso downloader de Twitter.</p>
-                    </div>
-                    <button
-                      onClick={() => navigate("/twitter")}
-                      data-testid="button-go-twitter"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
-                    >
-                      Ir para Twitter <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                )}
               </AnimatePresence>
 
-              {/* Error Message */}
               <AnimatePresence>
                 {processMutation.isError && (
                   <motion.div
@@ -299,7 +287,7 @@ export default function TikTok() {
                     className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3 text-left max-w-4xl mx-auto"
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="font-medium" data-testid="text-error-tiktok">{processMutation.error.message}</p>
+                    <p className="font-medium" data-testid="text-error-twitter">{processMutation.error.message}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -309,16 +297,15 @@ export default function TikTok() {
                 <div className="flex gap-4 items-center">
                   <span className="text-xs font-bold text-black/30">MP4 HD</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-xs font-bold text-black/30">Sem Marca D'Água</span>
+                  <span className="text-xs font-bold text-black/30">JPG Original</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-xs font-bold text-black/30">Alta Qualidade</span>
+                  <span className="text-xs font-bold text-black/30">GIF</span>
                 </div>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Result Section */}
         <AnimatePresence>
           {processMutation.isSuccess && processMutation.data && (
             <section className="py-12 bg-white border-b border-border/40">
@@ -335,10 +322,15 @@ export default function TikTok() {
                         src={processMutation.data.thumbnail} 
                         alt="Preview" 
                         className="w-full h-full object-cover absolute inset-0"
+                        data-testid="img-twitter-preview"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                        <PlayCircle className="w-16 h-16" />
+                        {processMutation.data.type === 'video' ? (
+                          <PlayCircle className="w-16 h-16" />
+                        ) : (
+                          <Image className="w-16 h-16" />
+                        )}
                       </div>
                     )}
                     <div className="absolute inset-0 bg-black/10" />
@@ -349,22 +341,22 @@ export default function TikTok() {
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-4">
                         <CheckCircle className="w-3 h-3" /> Sucesso
                       </div>
-                      <h3 className="text-3xl font-black font-display text-foreground mb-4 leading-tight">
+                      <h3 className="text-3xl font-black font-display text-foreground mb-4 leading-tight" data-testid="text-download-ready-twitter">
                         Download Pronto!
                       </h3>
                       <p className="text-muted-foreground text-lg">
-                        Seu vídeo do TikTok foi processado sem marca d'água.
+                        Seu {processMutation.data.type === 'video' ? 'vídeo' : 'imagem'} do Twitter/X está pronto para baixar.
                       </p>
                     </div>
 
                     <div className="space-y-4">
                       <a
-                        href={`/api/tiktok/download?url=${encodeURIComponent(url)}`}
-                        data-testid="link-download-tiktok-result"
+                        href={`/api/twitter/download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || 'twitter-download')}`}
+                        data-testid="link-download-twitter-result"
                         className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-[#E6195E] text-white font-black text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
                       >
                         <Download className="w-6 h-6" />
-                        BAIXAR MP4 HD
+                        BAIXAR {processMutation.data.type === 'video' ? 'VÍDEO' : 'IMAGEM'}
                       </a>
                       
                       <button
@@ -372,10 +364,10 @@ export default function TikTok() {
                           processMutation.reset();
                           setUrl("");
                         }}
-                        data-testid="button-download-another-tiktok"
+                        data-testid="button-download-another-twitter"
                         className="w-full py-4 text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
                       >
-                        Baixar outro vídeo
+                        Baixar outro conteúdo
                       </button>
                     </div>
                   </div>
@@ -385,17 +377,16 @@ export default function TikTok() {
           )}
         </AnimatePresence>
 
-        {/* How to use section */}
         <section className="py-32 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center gap-20">
               <div className="md:w-1/2 relative">
-                <div className="w-full aspect-[4/5] bg-[#1A1A1A] rounded-[3rem] relative overflow-hidden flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#E6195E]/20 via-transparent to-[#25F4EE]/20" />
+                <div className="w-full aspect-[4/5] bg-[#E6195E] rounded-[3rem] relative overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20" />
                   <div className="relative z-10 text-center">
-                    <SiTiktok className="w-24 h-24 text-white mx-auto mb-6" />
-                    <p className="text-white/60 text-xl font-bold">TikTok Downloader</p>
-                    <p className="text-white/30 text-sm mt-2">Sem Marca D'Água</p>
+                    <SiX className="w-24 h-24 text-white mx-auto mb-6" />
+                    <p className="text-white/80 text-xl font-bold">Twitter/X Downloader</p>
+                    <p className="text-white/50 text-sm mt-2">Vídeos, Imagens e GIFs</p>
                   </div>
                 </div>
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#E6195E]/10 rounded-full blur-3xl -z-10" />
@@ -405,14 +396,14 @@ export default function TikTok() {
                 <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Processo Simples</span>
                 <h2 className="text-5xl md:text-6xl font-display font-black text-[#1A1A1A] mb-12 leading-tight">
                   Como baixar <br />
-                  <span className="text-[#E6195E]">vídeos do TikTok</span>
+                  <span className="text-[#E6195E]">do Twitter/X</span>
                 </h2>
                 
                 <div className="space-y-10">
                   {[
-                    { step: "01", title: "Copie o Link", desc: "Abra o TikTok, encontre o vídeo desejado, toque em 'Compartilhar' e depois em 'Copiar Link'." },
-                    { step: "02", title: "Cole Aqui", desc: "Cole o link copiado no campo acima e clique no botão 'BAIXAR' para processar." },
-                    { step: "03", title: "Baixe em HD", desc: "O vídeo será processado sem marca d'água em MP4 HD. Clique para salvar no seu dispositivo." }
+                    { step: "01", title: "Copie o Link", desc: "Abra o Twitter/X, encontre o tweet com o vídeo, imagem ou GIF desejado e copie o link do tweet." },
+                    { step: "02", title: "Cole o Link", desc: "Cole o link copiado no campo acima e clique no botão 'BAIXAR' para processar." },
+                    { step: "03", title: "Baixe em HD", desc: "O conteúdo será processado na melhor qualidade disponível. Clique para salvar no seu dispositivo." }
                   ].map((item, i) => (
                     <div key={i} className="flex gap-8 group">
                       <div className="text-4xl font-display font-black text-black/5 group-hover:text-[#E6195E]/10 transition-colors">{item.step}</div>
@@ -428,22 +419,21 @@ export default function TikTok() {
           </div>
         </section>
 
-        {/* Features Section */}
         <section className="py-32 bg-[#1A1A1A] text-white rounded-[4rem] mx-4 my-8">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-24">
               <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Vantagens</span>
               <h2 className="text-5xl md:text-6xl font-display font-black mb-8 leading-tight">
-                Por que usar nosso <span className="text-[#E6195E]">TikTok Downloader</span>?
+                Por que usar nosso <span className="text-[#E6195E]">Twitter/X Downloader</span>?
               </h2>
             </div>
 
             <div className="grid md:grid-cols-4 gap-12">
               {[
-                { icon: <Sparkles className="w-8 h-8" />, title: "Sem Marca D'Água", desc: "Baixe vídeos do TikTok limpos, sem nenhuma marca d'água ou logo sobreposto." },
-                { icon: <Film className="w-8 h-8" />, title: "MP4 HD", desc: "Qualidade máxima em formato MP4 compatível com todos os dispositivos." },
-                { icon: <Infinity className="w-8 h-8" />, title: "100% Gratuito", desc: "Downloads ilimitados sem criar conta e sem pagar absolutamente nada." },
-                { icon: <Music className="w-8 h-8" />, title: "Com Áudio", desc: "O vídeo é baixado com a trilha sonora original incluída." }
+                { icon: <Film className="w-8 h-8" />, title: "Vídeos em HD", desc: "Baixe vídeos do Twitter/X em MP4 com a melhor qualidade disponível, incluindo HD e Full HD." },
+                { icon: <Image className="w-8 h-8" />, title: "Imagens Originais", desc: "Salve imagens na resolução original sem compressão. Fotos em qualidade máxima." },
+                { icon: <FileImage className="w-8 h-8" />, title: "GIFs Animados", desc: "Baixe GIFs animados do Twitter/X e salve como vídeo MP4 de alta qualidade." },
+                { icon: <Infinity className="w-8 h-8" />, title: "100% Gratuito", desc: "Downloads ilimitados sem criar conta e sem pagar nada. Totalmente grátis." }
               ].map((feature, i) => (
                 <div key={i} className="text-center group">
                   <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center mx-auto mb-8 border border-white/5 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-500">
@@ -457,7 +447,6 @@ export default function TikTok() {
           </div>
         </section>
 
-        {/* FAQ Section */}
         <section className="py-32 bg-white" id="faq">
           <div className="max-w-4xl mx-auto px-4">
             <div className="mb-20">
@@ -470,28 +459,28 @@ export default function TikTok() {
             <div className="space-y-6">
               {[
                 {
-                  q: "Como baixar vídeos do TikTok sem marca d'água?",
-                  a: "Copie o link do vídeo no TikTok, cole no campo acima e clique em 'BAIXAR'. Nosso sistema processa o vídeo e remove a marca d'água automaticamente, entregando um arquivo MP4 limpo em alta definição."
+                  q: "Como baixar vídeos do Twitter/X?",
+                  a: "Copie o link do tweet que contém o vídeo (clique em compartilhar e depois em 'Copiar link'), cole no campo acima e clique em 'BAIXAR'. Nosso sistema processa o vídeo e entrega um arquivo MP4 em alta definição."
                 },
                 {
-                  q: "Preciso instalar algum aplicativo?",
-                  a: "Não! Nossa ferramenta é 100% online. Funciona diretamente no navegador do seu celular, tablet ou computador, sem necessidade de instalar nenhum app."
+                  q: "Posso baixar vídeos do Twitter/X em HD?",
+                  a: "Sim! Nosso downloader detecta automaticamente a melhor qualidade disponível, selecionando sempre a versão em maior resolução do vídeo."
                 },
                 {
-                  q: "O download é gratuito?",
-                  a: "Sim, completamente gratuito e ilimitado. Você pode baixar quantos vídeos do TikTok quiser sem pagar nada e sem criar nenhuma conta."
+                  q: "Funciona com links do X.com?",
+                  a: "Sim! Nossa ferramenta funciona tanto com links do twitter.com quanto do x.com. Os dois domínios são totalmente suportados."
                 },
                 {
-                  q: "Funciona no iPhone e Android?",
-                  a: "Sim! Funciona em qualquer dispositivo com navegador: iPhone (Safari), Android (Chrome), tablets e computadores (Windows, Mac, Linux)."
+                  q: "Posso baixar GIFs do Twitter?",
+                  a: "Sim! GIFs animados do Twitter são baixados como vídeos MP4, mantendo a qualidade e animação originais."
                 },
                 {
-                  q: "Em qual formato o vídeo é baixado?",
-                  a: "Os vídeos são baixados no formato MP4 em alta definição (HD), com áudio incluso. É o formato mais compatível e reproduzível em qualquer dispositivo."
+                  q: "Posso baixar imagens do Twitter?",
+                  a: "Sim! Você pode baixar imagens na qualidade original, sem nenhuma compressão adicional."
                 },
                 {
-                  q: "Posso baixar vídeos privados do TikTok?",
-                  a: "Não, nossa ferramenta só funciona com vídeos públicos do TikTok. Vídeos de contas privadas não podem ser acessados por motivos de privacidade."
+                  q: "Funciona com tweets protegidos?",
+                  a: "Não, nossa ferramenta só funciona com tweets públicos. Conteúdo de contas privadas ou protegidas não pode ser acessado."
                 }
               ].map((item, i) => (
                 <div key={i} className="bg-[#F8F9FA] rounded-[2rem] border border-black/5 overflow-hidden">
@@ -509,49 +498,24 @@ export default function TikTok() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
 
-            {/* SEO Content */}
-            <div className="mt-32 space-y-16 border-t border-black/5 pt-32">
-              <div className="prose prose-slate max-w-none">
-                <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block text-center">Guia Completo</span>
-                <h2 className="text-4xl md:text-5xl font-black text-[#1A1A1A] text-center mb-16">TikTok Video Downloader</h2>
-                
-                <div className="grid md:grid-cols-2 gap-16">
-                  <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Baixar Vídeos Sem Marca D'Água</h3>
-                    <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      Nosso downloader de TikTok remove automaticamente a marca d'água dos vídeos, 
-                      entregando um arquivo MP4 limpo e em alta resolução. Ideal para criadores de conteúdo 
-                      que desejam repostar ou salvar vídeos inspiradores.
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Qualidade MP4 HD</h3>
-                    <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      Os vídeos são baixados na melhor qualidade disponível no TikTok, em formato MP4 
-                      com áudio original. Compatível com todos os players de mídia e redes sociais para 
-                      repostagem.
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Download Rápido e Seguro</h3>
-                    <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      O processamento é feito em segundos nos nossos servidores seguros. Não armazenamos 
-                      nenhum dado pessoal ou histórico de downloads. Sua privacidade é nossa prioridade.
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">Compatibilidade Universal</h3>
-                    <p className="text-muted-foreground text-lg leading-relaxed font-medium">
-                      Funciona em qualquer navegador moderno: Chrome, Safari, Firefox, Edge. Compatível 
-                      com iPhone, Android, tablets, notebooks e desktops sem instalar nada.
-                    </p>
-                  </div>
-                </div>
-              </div>
+        <section className="py-24 bg-[#F8F9FA]">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="prose prose-lg max-w-none">
+              <h2 className="text-3xl font-display font-black text-[#1A1A1A] mb-6">
+                Downloader de Vídeos do Twitter/X - Gratuito e Online
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                O <strong>Baixar Vídeo Downloader</strong> é a ferramenta mais rápida e fácil para baixar vídeos, imagens e GIFs do Twitter (agora X) diretamente no seu dispositivo. Funciona em qualquer navegador, seja no celular Android, iPhone, tablet ou computador.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Nossa ferramenta suporta todos os tipos de conteúdo do Twitter/X, incluindo vídeos em HD, imagens em alta resolução e GIFs animados. O processo é simples: copie o link do tweet, cole no campo de download e clique em baixar. Em poucos segundos, seu conteúdo estará pronto.
+              </p>
+              <p className="text-muted-foreground leading-relaxed">
+                Não é necessário criar conta, instalar nenhum aplicativo ou pagar qualquer valor. O serviço é 100% gratuito e ilimitado, permitindo que você baixe quantos vídeos e imagens quiser do Twitter/X.
+              </p>
             </div>
           </div>
         </section>

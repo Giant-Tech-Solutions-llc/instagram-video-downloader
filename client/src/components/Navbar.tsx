@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { SiTiktok, SiInstagram, SiPinterest, SiFacebook } from "react-icons/si";
+import { SiTiktok, SiInstagram, SiPinterest, SiFacebook, SiX } from "react-icons/si";
 import { cn } from "@/lib/utils";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
@@ -67,6 +67,19 @@ export function Navbar() {
             >
               <SiFacebook className="w-4 h-4" />
               <span className="hidden sm:inline">Facebook</span>
+            </Link>
+            <Link
+              href="/twitter"
+              data-testid="link-nav-twitter"
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors",
+                location === "/twitter"
+                  ? "text-[#E6195E] bg-[#E6195E]/5"
+                  : "text-black/50 hover:text-black"
+              )}
+            >
+              <SiX className="w-4 h-4" />
+              <span className="hidden sm:inline">Twitter</span>
             </Link>
           </div>
         </div>

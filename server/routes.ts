@@ -561,6 +561,206 @@ export async function registerRoutes(
     }
   });
 
+  app.post('/api/twitter/process', async (req, res) => {
+    try {
+      const inputSchema = z.object({
+        url: z.string().url({ message: "Por favor, insira uma URL válida do Twitter/X" })
+      });
+      const parsed = inputSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: parsed.error.errors[0]?.message || "URL inválida." });
+      }
+      let url = parsed.data.url;
+
+      if (!url.includes('twitter.com') && !url.includes('x.com') && !url.includes('t.co')) {
+        return res.status(400).json({ message: "URL inválida. Por favor, use um link do Twitter/X." });
+      }
+
+      console.log(`Processing Twitter/X download for URL: ${url}`);
+
+      url = url.replace('x.com', 'twitter.com');
+      const tweetIdMatch = url.match(/status\/(\d+)/);
+
+      if (tweetIdMatch && tweetIdMatch[1]) {
+        const tweetId = tweetIdMatch[1];
+
+        try {
+          const syndicationUrl = `https://cdn.syndication.twimg.com/tweet-result?id=${tweetId}&lang=en&token=x`;
+          const synResponse = await axios.get(syndicationUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Accept': 'application/json',
+              'Referer': 'https://platform.twitter.com/',
+            },
+            timeout: 15000,
+          });
+
+          const tweetData = synResponse.data;
+
+          if (tweetData?.mediaDetails && tweetData.mediaDetails.length > 0) {
+            const media = tweetData.mediaDetails[0];
+
+            if (media.type === 'video' || media.type === 'animated_gif') {
+              const variants = media.video_info?.variants || [];
+              const mp4Variants = variants
+                .filter((v: any) => v.content_type === 'video/mp4')
+                .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+
+              if (mp4Variants.length > 0) {
+                const videoUrl = mp4Variants[0].url;
+                const thumbnail = media.media_url_https;
+                const format = media.type === 'animated_gif' ? 'gif' : 'mp4';
+
+                await storage.logDownload({ url: parsed.data.url, status: 'success', format });
+
+                return res.json({
+                  url: videoUrl,
+                  thumbnail,
+                  filename: `twitter-${media.type === 'animated_gif' ? 'gif' : 'video'}-${Date.now()}.mp4`,
+                  type: 'video' as const
+                });
+              }
+            }
+
+            if (media.type === 'photo') {
+              const imageUrl = media.media_url_https + '?name=orig';
+              await storage.logDownload({ url: parsed.data.url, status: 'success', format: 'jpg' });
+
+              return res.json({
+                url: imageUrl,
+                thumbnail: media.media_url_https,
+                filename: `twitter-image-${Date.now()}.jpg`,
+                type: 'image' as const
+              });
+            }
+          }
+
+          if (tweetData?.photos && tweetData.photos.length > 0) {
+            const photo = tweetData.photos[0];
+            const imageUrl = photo.url + '?name=orig';
+            await storage.logDownload({ url: parsed.data.url, status: 'success', format: 'jpg' });
+
+            return res.json({
+              url: imageUrl,
+              thumbnail: photo.url,
+              filename: `twitter-image-${Date.now()}.jpg`,
+              type: 'image' as const
+            });
+          }
+        } catch (synErr: any) {
+          console.error('Twitter syndication API error:', synErr.message);
+        }
+      }
+
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+          },
+          timeout: 15000,
+          maxRedirects: 5,
+        });
+
+        const $ = cheerio.load(response.data);
+
+        let videoUrl = $('meta[property="og:video"]').attr('content') ||
+                       $('meta[property="og:video:secure_url"]').attr('content') ||
+                       $('meta[property="og:video:url"]').attr('content');
+        let imageUrl = $('meta[property="og:image"]').attr('content');
+        let type: 'video' | 'image' = videoUrl ? 'video' : 'image';
+
+        const finalUrl = videoUrl || imageUrl;
+
+        if (finalUrl) {
+          const format = type === 'video' ? 'mp4' : 'jpg';
+          await storage.logDownload({ url: parsed.data.url, status: 'success', format });
+
+          return res.json({
+            url: finalUrl,
+            thumbnail: imageUrl,
+            filename: `twitter-${type}-${Date.now()}.${format}`,
+            type
+          });
+        }
+      } catch (ogErr: any) {
+        console.error('Twitter OG scraping fallback error:', ogErr.message);
+      }
+
+      await storage.logDownload({ url: parsed.data.url, status: 'failed', format: 'unknown' });
+      return res.status(400).json({
+        message: "Não foi possível encontrar a mídia. Verifique se o tweet é público e contém vídeo, imagem ou GIF."
+      });
+
+    } catch (error: any) {
+      console.error('Twitter process error:', error.message);
+      await storage.logDownload({ url: req.body.url || 'unknown', status: 'failed', format: 'error' });
+      res.status(500).json({ message: "Não foi possível processar o conteúdo do Twitter/X. Verifique se o link está correto e se o tweet é público." });
+    }
+  });
+
+  app.get('/api/twitter/download', async (req, res) => {
+    try {
+      const downloadUrl = req.query.url as string;
+      const filename = (req.query.filename as string) || 'twitter-download.mp4';
+
+      if (!downloadUrl) {
+        return res.status(400).json({ message: "URL de download não fornecida." });
+      }
+
+      let urlObj: URL;
+      try {
+        urlObj = new URL(downloadUrl);
+      } catch {
+        return res.status(400).json({ message: "URL inválida." });
+      }
+
+      const allowedDomains = ['twimg.com', 'twitter.com', 'x.com', 'video.twimg.com', 'pbs.twimg.com', 'ton.twitter.com', 'abs.twimg.com'];
+      const isAllowed = allowedDomains.some(domain => urlObj.hostname === domain || urlObj.hostname.endsWith('.' + domain));
+      if (!isAllowed) {
+        return res.status(403).json({ message: "Domínio não permitido." });
+      }
+
+      const mediaResponse = await axios.get(downloadUrl, {
+        responseType: 'stream',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Referer': 'https://twitter.com/',
+          'Accept': '*/*',
+          'Accept-Encoding': 'identity',
+        },
+        timeout: 30000,
+        maxRedirects: 5,
+      });
+
+      const contentType = mediaResponse.headers['content-type'] || 'application/octet-stream';
+      const contentLength = mediaResponse.headers['content-length'];
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      if (contentLength) {
+        res.setHeader('Content-Length', contentLength);
+      }
+      res.setHeader('Cache-Control', 'no-cache');
+
+      mediaResponse.data.pipe(res);
+
+      mediaResponse.data.on('error', (err: Error) => {
+        console.error('Twitter stream error:', err.message);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "Erro ao baixar o arquivo." });
+        }
+      });
+
+    } catch (error: any) {
+      console.error('Twitter download error:', error.message);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Erro ao processar o download do Twitter/X. Tente novamente." });
+      }
+    }
+  });
+
   app.get('/api/proxy-download', async (req, res) => {
     try {
       const downloadUrl = req.query.url as string;

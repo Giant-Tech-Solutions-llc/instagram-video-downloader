@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights), TikTok (videos without watermark), Pinterest (videos, images, GIFs), and Facebook (videos, images). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
+This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights), TikTok (videos without watermark), Pinterest (videos, images, GIFs), Facebook (videos, images), and Twitter/X (videos, images, GIFs). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
 
 ## User Preferences
 
@@ -25,7 +25,7 @@ The project uses a single repository with three main directories:
 - **Animations:** Framer Motion for loading states and reveal animations
 - **Fonts:** Inter (body) and Outfit (headings) from Google Fonts
 - **Build Tool:** Vite with React plugin, path aliases (`@/` → `client/src/`, `@shared/` → `shared/`)
-- **Pages:** Home (main downloader), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), 404 page
+- **Pages:** Home (Instagram downloader), TikTok (`/tiktok`), Pinterest (`/pinterest`), Facebook (`/facebook`), Twitter/X (`/twitter`), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), 404 page
 
 ### Backend Architecture
 - **Framework:** Express.js running on Node.js with TypeScript (executed via `tsx`)

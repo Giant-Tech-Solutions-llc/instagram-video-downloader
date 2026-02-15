@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import TikTok from "@/pages/TikTok";
 import Pinterest from "@/pages/Pinterest";
 import Facebook from "@/pages/Facebook";
+import Twitter from "@/pages/Twitter";
 import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Contact from "@/pages/Contact";
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/tiktok" component={TikTok} />
       <Route path="/pinterest" component={Pinterest} />
       <Route path="/facebook" component={Facebook} />
+      <Route path="/twitter" component={Twitter} />
       <Route path="/termos" component={TermsOfUse} />
       <Route path="/privacidade" component={PrivacyPolicy} />
       <Route path="/contato" component={Contact} />

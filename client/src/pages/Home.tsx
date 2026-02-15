@@ -23,7 +23,7 @@ import {
   CheckCircle,
   ExternalLink
 } from "lucide-react";
-import { SiInstagram, SiTiktok, SiPinterest, SiFacebook } from "react-icons/si";
+import { SiInstagram, SiTiktok, SiPinterest, SiFacebook, SiX } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -42,12 +42,17 @@ function isFacebookUrl(url: string): boolean {
   return url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com') || url.includes('m.facebook.com');
 }
 
+function isTwitterUrl(url: string): boolean {
+  return url.includes('twitter.com') || url.includes('x.com') || url.includes('t.co');
+}
+
 export default function Home() {
   const [url, setUrl] = useState("");
   const [activeTab, setActiveTab] = useState<DownloaderType>('video');
   const [showTikTokHint, setShowTikTokHint] = useState(false);
   const [showPinterestHint, setShowPinterestHint] = useState(false);
   const [showFacebookHint, setShowFacebookHint] = useState(false);
+  const [showTwitterHint, setShowTwitterHint] = useState(false);
   const { toast } = useToast();
   const [, navigate] = useLocation();
   
@@ -77,12 +82,15 @@ export default function Home() {
     setShowTikTokHint(false);
     setShowPinterestHint(false);
     setShowFacebookHint(false);
+    setShowTwitterHint(false);
     if (isTikTokUrl(value)) {
       setShowTikTokHint(true);
     } else if (isPinterestUrl(value)) {
       setShowPinterestHint(true);
     } else if (isFacebookUrl(value)) {
       setShowFacebookHint(true);
+    } else if (isTwitterUrl(value)) {
+      setShowTwitterHint(true);
     }
   };
 
@@ -99,6 +107,10 @@ export default function Home() {
     }
     if (isFacebookUrl(url)) {
       setShowFacebookHint(true);
+      return;
+    }
+    if (isTwitterUrl(url)) {
+      setShowTwitterHint(true);
       return;
     }
     processMutation.mutate({ url });
@@ -286,6 +298,27 @@ export default function Home() {
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
                     >
                       Ir para Facebook <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+                {showTwitterHint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 p-5 rounded-2xl bg-gray-50 text-gray-700 border border-gray-200 flex items-center justify-between gap-3 max-w-4xl mx-auto"
+                    data-testid="hint-twitter-redirect"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SiX className="w-5 h-5 flex-shrink-0" />
+                      <p className="font-medium">Este link é do Twitter/X! Use nosso downloader de Twitter.</p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/twitter")}
+                      data-testid="button-go-twitter"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
+                    >
+                      Ir para Twitter <ExternalLink className="w-4 h-4" />
                     </button>
                   </motion.div>
                 )}
