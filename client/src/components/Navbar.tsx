@@ -3,6 +3,8 @@ import logoPath from "@assets/Baixar_Vídeo_downloader_Logo_1771170363989.png";
 import { SiTiktok, SiYoutube, SiInstagram } from "react-icons/si";
 import { cn } from "@/lib/utils";
 
+import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
+
 export function Navbar() {
   const [location] = useLocation();
 
@@ -11,7 +13,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 gap-4">
           <Link href="/" className="flex items-center flex-shrink-0">
-            <img src={logoPath} alt="Baixar Vídeo Downloader" className="h-9" data-testid="img-logo" />
+            <img src={Baixar_V_deo_downloader_Logo} alt="Baixar Vídeo Downloader" className="h-9" data-testid="img-logo" />
           </Link>
 
           <div className="flex items-center gap-1">
