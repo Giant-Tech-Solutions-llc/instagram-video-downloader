@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { z } from "zod";
 
-// Type definitions inferred from the schema
 export type DownloadResponse = z.infer<typeof api.download.process.responses[200]>;
 export type DownloadError = z.infer<typeof api.download.process.responses[400]>;
 export type StatsResponse = z.infer<typeof api.stats.get.responses[200]>;
@@ -10,7 +9,6 @@ export type StatsResponse = z.infer<typeof api.stats.get.responses[200]>;
 export function useProcessDownload() {
   return useMutation<DownloadResponse, Error, { url: string }>({
     mutationFn: async ({ url }) => {
-      // Validate input before sending
       const validatedInput = api.download.process.input.parse({ url });
 
       const res = await fetch(api.download.process.path, {
@@ -20,10 +18,8 @@ export function useProcessDownload() {
       });
 
       if (!res.ok) {
-        // Handle specific error codes
         if (res.status === 400) {
           const errorData = await res.json();
-          // Attempt to parse with schema, fallback to generic message
           const parsed = api.download.process.responses[400].safeParse(errorData);
           if (parsed.success) {
             throw new Error(parsed.data.message);
@@ -44,142 +40,6 @@ export function useProcessDownload() {
   });
 }
 
-export function useProcessTikTokDownload() {
-  return useMutation<DownloadResponse, Error, { url: string }>({
-    mutationFn: async ({ url }) => {
-      const validatedInput = api.tiktok.process.input.parse({ url });
-
-      const res = await fetch(api.tiktok.process.path, {
-        method: api.tiktok.process.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validatedInput),
-      });
-
-      if (!res.ok) {
-        if (res.status === 400) {
-          const errorData = await res.json();
-          const parsed = api.tiktok.process.responses[400].safeParse(errorData);
-          if (parsed.success) {
-            throw new Error(parsed.data.message);
-          }
-          throw new Error("Solicitação inválida.");
-        }
-        if (res.status === 429) {
-          throw new Error("Muitas solicitações. Tente novamente em instantes.");
-        }
-        if (res.status === 500) {
-          throw new Error("Erro no servidor. Tente novamente mais tarde.");
-        }
-        throw new Error("Ocorreu um erro desconhecido.");
-      }
-
-      return api.tiktok.process.responses[200].parse(await res.json());
-    },
-  });
-}
-
-export function useProcessPinterestDownload() {
-  return useMutation<DownloadResponse, Error, { url: string }>({
-    mutationFn: async ({ url }) => {
-      const validatedInput = api.pinterest.process.input.parse({ url });
-
-      const res = await fetch(api.pinterest.process.path, {
-        method: api.pinterest.process.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validatedInput),
-      });
-
-      if (!res.ok) {
-        if (res.status === 400) {
-          const errorData = await res.json();
-          const parsed = api.pinterest.process.responses[400].safeParse(errorData);
-          if (parsed.success) {
-            throw new Error(parsed.data.message);
-          }
-          throw new Error("Solicitação inválida.");
-        }
-        if (res.status === 429) {
-          throw new Error("Muitas solicitações. Tente novamente em instantes.");
-        }
-        if (res.status === 500) {
-          throw new Error("Erro no servidor. Tente novamente mais tarde.");
-        }
-        throw new Error("Ocorreu um erro desconhecido.");
-      }
-
-      return api.pinterest.process.responses[200].parse(await res.json());
-    },
-  });
-}
-
-export function useProcessFacebookDownload() {
-  return useMutation<DownloadResponse, Error, { url: string }>({
-    mutationFn: async ({ url }) => {
-      const validatedInput = api.facebook.process.input.parse({ url });
-
-      const res = await fetch(api.facebook.process.path, {
-        method: api.facebook.process.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validatedInput),
-      });
-
-      if (!res.ok) {
-        if (res.status === 400) {
-          const errorData = await res.json();
-          const parsed = api.facebook.process.responses[400].safeParse(errorData);
-          if (parsed.success) {
-            throw new Error(parsed.data.message);
-          }
-          throw new Error("Solicitação inválida.");
-        }
-        if (res.status === 429) {
-          throw new Error("Muitas solicitações. Tente novamente em instantes.");
-        }
-        if (res.status === 500) {
-          throw new Error("Erro no servidor. Tente novamente mais tarde.");
-        }
-        throw new Error("Ocorreu um erro desconhecido.");
-      }
-
-      return api.facebook.process.responses[200].parse(await res.json());
-    },
-  });
-}
-
-export function useProcessTwitterDownload() {
-  return useMutation<DownloadResponse, Error, { url: string }>({
-    mutationFn: async ({ url }) => {
-      const validatedInput = api.twitter.process.input.parse({ url });
-
-      const res = await fetch(api.twitter.process.path, {
-        method: api.twitter.process.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validatedInput),
-      });
-
-      if (!res.ok) {
-        if (res.status === 400) {
-          const errorData = await res.json();
-          const parsed = api.twitter.process.responses[400].safeParse(errorData);
-          if (parsed.success) {
-            throw new Error(parsed.data.message);
-          }
-          throw new Error("Solicitação inválida.");
-        }
-        if (res.status === 429) {
-          throw new Error("Muitas solicitações. Tente novamente em instantes.");
-        }
-        if (res.status === 500) {
-          throw new Error("Erro no servidor. Tente novamente mais tarde.");
-        }
-        throw new Error("Ocorreu um erro desconhecido.");
-      }
-
-      return api.twitter.process.responses[200].parse(await res.json());
-    },
-  });
-}
-
 export function useStats() {
   return useQuery({
     queryKey: [api.stats.get.path],
@@ -188,7 +48,6 @@ export function useStats() {
       if (!res.ok) throw new Error("Falha ao carregar estatísticas");
       return api.stats.get.responses[200].parse(await res.json());
     },
-    // Refresh stats occasionally to show activity
     refetchInterval: 30000, 
   });
 }

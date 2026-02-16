@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights), TikTok (videos without watermark), Pinterest (videos, images, GIFs), Facebook (videos, images), and Twitter/X (videos, images, GIFs). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
+This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and Express backend, using PostgreSQL for logging download activity.
 
 ## User Preferences
 
@@ -25,13 +25,13 @@ The project uses a single repository with three main directories:
 - **Animations:** Framer Motion for loading states and reveal animations
 - **Fonts:** Inter (body) and Outfit (headings) from Google Fonts
 - **Build Tool:** Vite with React plugin, path aliases (`@/` → `client/src/`, `@shared/` → `shared/`)
-- **Pages:** Home (Instagram downloader), TikTok (`/tiktok`), Pinterest (`/pinterest`), Facebook (`/facebook`), Twitter/X (`/twitter`), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), 404 page
+- **Pages:** Home (Instagram downloader), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), How it Works (`/como-funciona`), 404 page
 
 ### Backend Architecture
 - **Framework:** Express.js running on Node.js with TypeScript (executed via `tsx`)
 - **HTTP Server:** Node's `createServer` wrapping Express
 - **API Pattern:** RESTful endpoints defined in `server/routes.ts`
-- **Core Endpoint:** `POST /api/download/process` — accepts an Instagram URL, scrapes the page using axios + cheerio to extract video/image URLs from Open Graph meta tags and embedded JSON
+- **Core Endpoint:** `POST /api/download/process` — accepts an Instagram URL, scrapes the page using axios + cheerio to extract video/image URLs from Open Graph meta tags and embedded JSON. Additional endpoints: `GET /api/proxy-download` for proxied file downloads and `GET /api/stats` for download statistics.
 - **Web Scraping:** Uses axios for HTTP requests with browser-like headers and cheerio for HTML parsing
 - **Development:** Vite dev server middleware is used in development mode for HMR; in production, static files are served from `dist/public`
 - **Build:** Custom build script (`script/build.ts`) uses Vite for client and esbuild for server, outputting to `dist/`

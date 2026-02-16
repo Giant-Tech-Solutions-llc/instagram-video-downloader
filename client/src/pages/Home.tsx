@@ -20,41 +20,17 @@ import {
   Monitor,
   Clock,
   Infinity,
-  CheckCircle,
-  ExternalLink
+  CheckCircle
 } from "lucide-react";
-import { SiInstagram, SiTiktok, SiPinterest, SiFacebook, SiX } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 
 type DownloaderType = 'video' | 'foto' | 'reels' | 'historia' | 'destaques';
 
-function isTikTokUrl(url: string): boolean {
-  return url.includes('tiktok.com') || url.includes('vm.tiktok.com');
-}
-
-function isPinterestUrl(url: string): boolean {
-  return url.includes('pinterest.com') || url.includes('pin.it');
-}
-
-function isFacebookUrl(url: string): boolean {
-  return url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com') || url.includes('m.facebook.com');
-}
-
-function isTwitterUrl(url: string): boolean {
-  return url.includes('twitter.com') || url.includes('x.com') || url.includes('t.co');
-}
-
 export default function Home() {
   const [url, setUrl] = useState("");
   const [activeTab, setActiveTab] = useState<DownloaderType>('video');
-  const [showTikTokHint, setShowTikTokHint] = useState(false);
-  const [showPinterestHint, setShowPinterestHint] = useState(false);
-  const [showFacebookHint, setShowFacebookHint] = useState(false);
-  const [showTwitterHint, setShowTwitterHint] = useState(false);
   const { toast } = useToast();
-  const [, navigate] = useLocation();
   
   const processMutation = useProcessDownload();
   const { data: stats } = useStats();
@@ -77,60 +53,10 @@ export default function Home() {
     }
   };
 
-  const handleUrlChange = (value: string) => {
-    setUrl(value);
-    setShowTikTokHint(false);
-    setShowPinterestHint(false);
-    setShowFacebookHint(false);
-    setShowTwitterHint(false);
-    if (isTikTokUrl(value)) {
-      setShowTikTokHint(true);
-    } else if (isPinterestUrl(value)) {
-      setShowPinterestHint(true);
-    } else if (isFacebookUrl(value)) {
-      setShowFacebookHint(true);
-    } else if (isTwitterUrl(value)) {
-      setShowTwitterHint(true);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!url) return;
-    if (isTikTokUrl(url)) {
-      setShowTikTokHint(true);
-      return;
-    }
-    if (isPinterestUrl(url)) {
-      setShowPinterestHint(true);
-      return;
-    }
-    if (isFacebookUrl(url)) {
-      setShowFacebookHint(true);
-      return;
-    }
-    if (isTwitterUrl(url)) {
-      setShowTwitterHint(true);
-      return;
-    }
     processMutation.mutate({ url });
-  };
-
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      handleUrlChange(text);
-      toast({
-        title: "Link colado!",
-        description: "Agora clique em Baixar para processar.",
-      });
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao colar",
-        description: "Não foi possível acessar a área de transferência.",
-      });
-    }
   };
 
   return (
@@ -201,12 +127,27 @@ export default function Home() {
                       placeholder="Insira o link do Instagram aqui..."
                       className="w-full h-20 pl-10 pr-32 rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-xl font-medium placeholder:text-black/20"
                       value={url}
-                      onChange={(e) => handleUrlChange(e.target.value)}
+                      onChange={(e) => setUrl(e.target.value)}
                     />
                     <button
                       type="button"
                       data-testid="button-paste-instagram"
-                      onClick={handlePaste}
+                      onClick={async () => {
+                        try {
+                          const text = await navigator.clipboard.readText();
+                          setUrl(text);
+                          toast({
+                            title: "Link colado!",
+                            description: "Agora clique em Baixar para processar.",
+                          });
+                        } catch (err) {
+                          toast({
+                            variant: "destructive",
+                            title: "Erro ao colar",
+                            description: "Não foi possível acessar a área de transferência.",
+                          });
+                        }
+                      }}
                       className="absolute right-4 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-2xl bg-white border border-black/5 flex items-center gap-2 text-sm font-bold text-black/60 hover:text-[#E6195E] hover:border-[#E6195E]/20 transition-all shadow-sm active:scale-95"
                       title="Colar link"
                     >
@@ -232,98 +173,6 @@ export default function Home() {
                 </form>
               </div>
 
-              {/* TikTok URL detected hint */}
-              <AnimatePresence>
-                {showTikTokHint && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
-                    data-testid="hint-tiktok-redirect"
-                  >
-                    <div className="flex items-center gap-3">
-                      <SiTiktok className="w-5 h-5 flex-shrink-0" />
-                      <p className="font-medium">Este link é do TikTok! Use nosso downloader especializado.</p>
-                    </div>
-                    <button
-                      onClick={() => navigate("/tiktok")}
-                      data-testid="button-go-tiktok"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
-                    >
-                      Ir para TikTok <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Pinterest URL detected hint */}
-              <AnimatePresence>
-                {showPinterestHint && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-700 border border-red-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
-                    data-testid="hint-pinterest-redirect"
-                  >
-                    <div className="flex items-center gap-3">
-                      <SiPinterest className="w-5 h-5 flex-shrink-0" />
-                      <p className="font-medium">Este link é do Pinterest! Use nosso downloader de Pinterest.</p>
-                    </div>
-                    <button
-                      onClick={() => navigate("/pinterest")}
-                      data-testid="button-go-pinterest"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
-                    >
-                      Ir para Pinterest <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                )}
-                {showFacebookHint && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-between gap-3 max-w-4xl mx-auto"
-                    data-testid="hint-facebook-redirect"
-                  >
-                    <div className="flex items-center gap-3">
-                      <SiFacebook className="w-5 h-5 flex-shrink-0" />
-                      <p className="font-medium">Este link é do Facebook! Use nosso downloader de Facebook.</p>
-                    </div>
-                    <button
-                      onClick={() => navigate("/facebook")}
-                      data-testid="button-go-facebook"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
-                    >
-                      Ir para Facebook <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                )}
-                {showTwitterHint && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-gray-50 text-gray-700 border border-gray-200 flex items-center justify-between gap-3 max-w-4xl mx-auto"
-                    data-testid="hint-twitter-redirect"
-                  >
-                    <div className="flex items-center gap-3">
-                      <SiX className="w-5 h-5 flex-shrink-0" />
-                      <p className="font-medium">Este link é do Twitter/X! Use nosso downloader de Twitter.</p>
-                    </div>
-                    <button
-                      onClick={() => navigate("/twitter")}
-                      data-testid="button-go-twitter"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6195E] text-white font-bold text-sm hover:brightness-110 transition-all flex-shrink-0"
-                    >
-                      Ir para Twitter <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              
               {/* Error Message */}
               <AnimatePresence>
                 {processMutation.isError && (
@@ -432,7 +281,7 @@ export default function Home() {
                 <div className="w-full aspect-[4/5] bg-[#E6195E] rounded-[3rem] relative overflow-hidden">
                   <img 
                     src={socialIconsHero}
-                    alt="Instagram e TikTok" 
+                    alt="Instagram" 
                     className="w-full h-full object-cover opacity-80"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#E6195E]/80 to-transparent" />
