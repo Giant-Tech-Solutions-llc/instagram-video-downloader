@@ -1,0 +1,393 @@
+import {
+  Video,
+  Camera,
+  Clapperboard,
+  History,
+  UserCircle,
+  Music,
+  Star,
+  LayoutGrid,
+  Lock,
+  MonitorUp,
+  ShieldCheck,
+  Radio,
+  type LucideIcon,
+} from "lucide-react";
+
+export interface ToolConfig {
+  id: string;
+  slug: string;
+  title: string;
+  shortTitle: string;
+  heroTitle: string;
+  heroHighlight: string;
+  subtitle: string;
+  icon: LucideIcon;
+  placeholder: string;
+  seoTitle: string;
+  seoDescription: string;
+  features: { title: string; desc: string }[];
+  faqs: { q: string; a: string }[];
+  seoContent: { title: string; text: string }[];
+}
+
+export const tools: ToolConfig[] = [
+  {
+    id: "video",
+    slug: "/",
+    title: "Baixar Vídeo do Instagram",
+    shortTitle: "Vídeo",
+    heroTitle: "Baixar Vídeo",
+    heroHighlight: "do Instagram",
+    subtitle: "Baixe vídeos do Instagram em alta qualidade MP4. Rápido, gratuito e sem cadastro.",
+    icon: Video,
+    placeholder: "Cole o link do vídeo do Instagram aqui...",
+    seoTitle: "Baixar Vídeo do Instagram Online Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Baixe vídeos do Instagram em MP4 HD grátis. Ferramenta rápida e segura para salvar vídeos do Instagram no seu dispositivo.",
+    features: [
+      { title: "MP4 em Alta Qualidade", desc: "Baixe vídeos na resolução original sem perda de qualidade." },
+      { title: "Download Instantâneo", desc: "Processamento rápido sem filas de espera." },
+      { title: "100% Gratuito", desc: "Sem limites de downloads e sem necessidade de cadastro." },
+      { title: "Compatível com Todos", desc: "Funciona em celular, tablet e computador." },
+    ],
+    faqs: [
+      { q: "Como baixar vídeos do Instagram?", a: "Copie o link do vídeo do Instagram, cole no campo acima e clique em 'BAIXAR'. O vídeo será processado e o link de download aparecerá instantaneamente." },
+      { q: "Os vídeos são baixados em HD?", a: "Sim! Nosso sistema baixa os vídeos na resolução original disponível no Instagram, geralmente em HD ou Full HD." },
+      { q: "Preciso instalar algum aplicativo?", a: "Não! Nossa ferramenta funciona diretamente no navegador, sem necessidade de instalar nenhum app ou extensão." },
+      { q: "Posso baixar vídeos de perfis privados?", a: "Não, nossa ferramenta só consegue acessar conteúdos de perfis públicos do Instagram." },
+    ],
+    seoContent: [
+      { title: "Como Funciona o Download de Vídeos", text: "Nossa tecnologia de extração de vídeo garante que você receba o arquivo MP4 original sem compressão adicional. Ideal para criadores de conteúdo e usuários que buscam alta fidelidade visual." },
+      { title: "Segurança e Privacidade", text: "Não armazenamos seus dados pessoais nem os vídeos baixados. Todo o processamento é feito de forma segura e os links são temporários." },
+    ],
+  },
+  {
+    id: "reels",
+    slug: "/baixar-reels-instagram",
+    title: "Baixar Reels do Instagram",
+    shortTitle: "Reels",
+    heroTitle: "Baixar Reels",
+    heroHighlight: "do Instagram",
+    subtitle: "Salve Reels do Instagram em MP4 HD com áudio. Rápido e gratuito.",
+    icon: Clapperboard,
+    placeholder: "Cole o link do Reel do Instagram aqui...",
+    seoTitle: "Baixar Reels do Instagram Grátis em MP4 | Baixar Vídeo Downloader",
+    seoDescription: "Baixe Reels do Instagram com áudio em MP4 HD. Ferramenta gratuita para salvar Reels no celular ou computador.",
+    features: [
+      { title: "Reels com Áudio", desc: "Baixe Reels completos com áudio e vídeo sincronizados." },
+      { title: "Qualidade Original", desc: "Mantenha a qualidade HD original do Reel." },
+      { title: "Sem Marca d'Água", desc: "Download limpo sem marcas d'água adicionais." },
+      { title: "Rápido e Simples", desc: "Cole o link e baixe em segundos." },
+    ],
+    faqs: [
+      { q: "Como baixar Reels do Instagram?", a: "Abra o Reel no Instagram, toque nos três pontos e copie o link. Cole aqui e clique em BAIXAR." },
+      { q: "O áudio do Reel é incluído?", a: "Sim! O download inclui tanto o vídeo quanto o áudio original do Reel." },
+      { q: "Posso baixar Reels no celular?", a: "Sim, nossa ferramenta funciona perfeitamente em todos os navegadores móveis." },
+      { q: "Existe limite de downloads?", a: "Não! Você pode baixar quantos Reels quiser, sem limites diários." },
+    ],
+    seoContent: [
+      { title: "Download de Reels em Alta Qualidade", text: "Os Reels são o formato de conteúdo mais popular do Instagram. Com nossa ferramenta, você pode salvar qualquer Reel público em MP4 HD com áudio perfeito para assistir offline." },
+      { title: "Compatibilidade Universal", text: "Os arquivos MP4 baixados funcionam em qualquer dispositivo e player de mídia, incluindo iPhone, Android, Windows e Mac." },
+    ],
+  },
+  {
+    id: "stories",
+    slug: "/baixar-stories-instagram",
+    title: "Baixar Stories do Instagram",
+    shortTitle: "Stories",
+    heroTitle: "Baixar Stories",
+    heroHighlight: "do Instagram",
+    subtitle: "Salve Stories do Instagram antes que expirem. Download rápido em HD.",
+    icon: History,
+    placeholder: "Cole o link do Story do Instagram aqui...",
+    seoTitle: "Baixar Stories do Instagram Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Salve Stories do Instagram em HD antes que desapareçam. Ferramenta gratuita para baixar Stories de perfis públicos.",
+    features: [
+      { title: "Salve Antes de Expirar", desc: "Baixe Stories antes que desapareçam em 24 horas." },
+      { title: "Vídeo e Foto", desc: "Suporte para Stories em formato de vídeo e imagem." },
+      { title: "Qualidade HD", desc: "Download na melhor qualidade disponível." },
+      { title: "Anônimo", desc: "Baixe Stories sem que o dono do perfil saiba." },
+    ],
+    faqs: [
+      { q: "Como baixar Stories do Instagram?", a: "Copie o link do Story compartilhável e cole no campo acima. Nosso sistema processará e disponibilizará o download." },
+      { q: "Posso baixar Stories de qualquer perfil?", a: "Apenas de perfis públicos. Stories de perfis privados não podem ser acessados por nossa ferramenta." },
+      { q: "Os Stories baixados têm boa qualidade?", a: "Sim, baixamos na resolução original que o Instagram disponibiliza." },
+      { q: "O dono do perfil sabe que baixei o Story?", a: "Não, o download é feito de forma anônima através do nosso servidor." },
+    ],
+    seoContent: [
+      { title: "Salve Stories Importantes", text: "Stories do Instagram desaparecem após 24 horas. Com nossa ferramenta, você pode salvar aqueles momentos importantes antes que sejam perdidos para sempre." },
+      { title: "Download Anônimo e Seguro", text: "Todo o processamento é feito pelos nossos servidores, garantindo que o download seja anônimo e que seus dados permaneçam seguros." },
+    ],
+  },
+  {
+    id: "foto",
+    slug: "/baixar-fotos-instagram",
+    title: "Baixar Fotos do Instagram",
+    shortTitle: "Fotos",
+    heroTitle: "Baixar Fotos",
+    heroHighlight: "do Instagram",
+    subtitle: "Salve fotos do Instagram em alta resolução JPG. Qualidade original garantida.",
+    icon: Camera,
+    placeholder: "Cole o link da foto do Instagram aqui...",
+    seoTitle: "Baixar Fotos do Instagram em HD Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Baixe fotos do Instagram em resolução original HD. Ferramenta gratuita para salvar imagens do Instagram.",
+    features: [
+      { title: "Resolução Original", desc: "Baixe fotos na resolução máxima disponível no Instagram." },
+      { title: "Formato JPG", desc: "Imagens salvas em JPG de alta qualidade." },
+      { title: "Download Rápido", desc: "Processamento instantâneo em segundos." },
+      { title: "Sem Compressão", desc: "Sem perda de qualidade na imagem baixada." },
+    ],
+    faqs: [
+      { q: "Como baixar fotos do Instagram?", a: "Copie o link da publicação com a foto, cole no campo acima e clique em BAIXAR. A imagem será disponibilizada em resolução original." },
+      { q: "A foto é baixada em alta qualidade?", a: "Sim! Baixamos a imagem na resolução original que foi publicada no Instagram." },
+      { q: "Posso baixar fotos de carrossel?", a: "Sim, mas para carrossel completo recomendamos usar nossa ferramenta específica de Carrossel." },
+      { q: "Funciona em qualquer dispositivo?", a: "Sim, funciona em celulares, tablets e computadores com qualquer navegador." },
+    ],
+    seoContent: [
+      { title: "Fotos em Qualidade Máxima", text: "O Instagram comprime as fotos para exibição na plataforma. Nossa ferramenta extrai a versão de maior resolução disponível, garantindo fotos nítidas e detalhadas." },
+      { title: "Ideal para Inspiração", text: "Perfeito para designers, fotógrafos e criadores de conteúdo que precisam salvar referências visuais do Instagram." },
+    ],
+  },
+  {
+    id: "profile-picture",
+    slug: "/baixar-foto-perfil-instagram",
+    title: "Baixar Foto de Perfil do Instagram",
+    shortTitle: "Foto de Perfil",
+    heroTitle: "Baixar Foto de Perfil",
+    heroHighlight: "do Instagram",
+    subtitle: "Veja e baixe fotos de perfil do Instagram em tamanho completo e alta resolução.",
+    icon: UserCircle,
+    placeholder: "Cole o link do perfil do Instagram aqui...",
+    seoTitle: "Baixar Foto de Perfil do Instagram em HD | Baixar Vídeo Downloader",
+    seoDescription: "Veja e baixe fotos de perfil do Instagram em tamanho completo HD. Amplie e salve a foto de perfil de qualquer usuário público.",
+    features: [
+      { title: "Tamanho Completo", desc: "Veja a foto de perfil em tamanho grande sem limitações." },
+      { title: "Alta Resolução", desc: "Download na maior resolução disponível." },
+      { title: "Qualquer Perfil Público", desc: "Funciona com qualquer perfil público do Instagram." },
+      { title: "Sem Cadastro", desc: "Use gratuitamente sem precisar criar conta." },
+    ],
+    faqs: [
+      { q: "Como ver a foto de perfil em tamanho grande?", a: "Cole o link do perfil do Instagram e nossa ferramenta irá extrair a foto de perfil em tamanho completo para você visualizar e baixar." },
+      { q: "A foto é baixada em boa qualidade?", a: "Sim, extraímos a versão de maior resolução disponível da foto de perfil." },
+      { q: "Funciona com perfis privados?", a: "A foto de perfil é sempre pública no Instagram, então funciona com qualquer perfil." },
+      { q: "O dono do perfil é notificado?", a: "Não, o download é totalmente anônimo." },
+    ],
+    seoContent: [
+      { title: "Amplie Fotos de Perfil", text: "No Instagram, as fotos de perfil aparecem em tamanho reduzido. Nossa ferramenta permite visualizar e baixar a versão em tamanho completo." },
+      { title: "Uso Simples e Rápido", text: "Basta colar o link do perfil e em segundos você terá acesso à foto de perfil em alta resolução." },
+    ],
+  },
+  {
+    id: "audio",
+    slug: "/extrair-audio-instagram",
+    title: "Extrair Áudio/MP3 do Instagram",
+    shortTitle: "Áudio/MP3",
+    heroTitle: "Extrair Áudio",
+    heroHighlight: "do Instagram",
+    subtitle: "Extraia o áudio de vídeos e Reels do Instagram em formato MP3.",
+    icon: Music,
+    placeholder: "Cole o link do vídeo/Reel do Instagram aqui...",
+    seoTitle: "Extrair Áudio MP3 do Instagram Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Extraia áudio de vídeos e Reels do Instagram em MP3. Salve músicas e áudios do Instagram gratuitamente.",
+    features: [
+      { title: "Extração de Áudio", desc: "Extraia apenas o áudio de qualquer vídeo ou Reel." },
+      { title: "Qualidade de Áudio", desc: "Áudio extraído na melhor qualidade disponível." },
+      { title: "Músicas e Sons", desc: "Salve músicas, podcasts e efeitos sonoros." },
+      { title: "Processo Rápido", desc: "Extração instantânea sem demora." },
+    ],
+    faqs: [
+      { q: "Como extrair áudio de vídeos do Instagram?", a: "Cole o link do vídeo ou Reel e nossa ferramenta extrairá o áudio automaticamente para download." },
+      { q: "Em qual formato o áudio é salvo?", a: "O áudio é extraído do vídeo original. O formato depende da fonte, geralmente compatível com todos os players." },
+      { q: "Posso extrair áudio de Reels?", a: "Sim! Funciona perfeitamente com Reels, vídeos de feed e IGTV." },
+      { q: "A qualidade do áudio é boa?", a: "Sim, o áudio é extraído na qualidade original do vídeo, sem recompressão." },
+    ],
+    seoContent: [
+      { title: "Salve Músicas e Sons", text: "Encontrou uma música incrível em um Reel? Com nossa ferramenta de extração de áudio, você pode salvar o áudio de qualquer vídeo do Instagram." },
+      { title: "Uso Pessoal", text: "Ideal para salvar áudios para uso pessoal, como músicas de fundo, podcasts e efeitos sonoros interessantes." },
+    ],
+  },
+  {
+    id: "highlights",
+    slug: "/baixar-destaques-instagram",
+    title: "Baixar Destaques do Instagram",
+    shortTitle: "Destaques",
+    heroTitle: "Baixar Destaques",
+    heroHighlight: "do Instagram",
+    subtitle: "Baixe Highlights (Destaques) do Instagram em alta qualidade.",
+    icon: Star,
+    placeholder: "Cole o link dos Destaques do Instagram aqui...",
+    seoTitle: "Baixar Destaques (Highlights) do Instagram | Baixar Vídeo Downloader",
+    seoDescription: "Baixe Destaques e Highlights do Instagram em HD. Salve coleções inteiras de Highlights de perfis públicos.",
+    features: [
+      { title: "Highlights Completos", desc: "Baixe Destaques individuais ou coleções completas." },
+      { title: "Vídeos e Fotos", desc: "Suporte para todos os tipos de mídia em Destaques." },
+      { title: "Alta Qualidade", desc: "Download na resolução original do conteúdo." },
+      { title: "Sem Expiração", desc: "Diferente dos Stories, Destaques ficam sempre disponíveis." },
+    ],
+    faqs: [
+      { q: "Como baixar Destaques do Instagram?", a: "Copie o link do Destaque desejado e cole no campo acima. Nosso sistema processará e disponibilizará o download." },
+      { q: "Posso baixar todos os Destaques de um perfil?", a: "Você pode baixar cada Destaque individualmente copiando seu respectivo link." },
+      { q: "Os Destaques são baixados com qualidade?", a: "Sim, na resolução original disponível no Instagram." },
+      { q: "Funciona com perfis privados?", a: "Não, apenas Destaques de perfis públicos podem ser acessados." },
+    ],
+    seoContent: [
+      { title: "Salve Destaques Importantes", text: "Destaques (Highlights) são coleções permanentes de Stories no Instagram. Com nossa ferramenta, você pode baixar e guardar esses conteúdos no seu dispositivo." },
+      { title: "Ideal para Pesquisa", text: "Perfeito para quem precisa analisar conteúdo de marcas, influenciadores ou concorrentes." },
+    ],
+  },
+  {
+    id: "carousel",
+    slug: "/baixar-carrossel-instagram",
+    title: "Baixar Carrossel do Instagram",
+    shortTitle: "Carrossel",
+    heroTitle: "Baixar Carrossel",
+    heroHighlight: "do Instagram",
+    subtitle: "Baixe todas as fotos e vídeos de posts em carrossel do Instagram.",
+    icon: LayoutGrid,
+    placeholder: "Cole o link do post carrossel do Instagram aqui...",
+    seoTitle: "Baixar Carrossel do Instagram Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Baixe todas as imagens e vídeos de posts em carrossel do Instagram. Salve o conteúdo completo do post.",
+    features: [
+      { title: "Post Completo", desc: "Baixe todas as mídias do carrossel de uma vez." },
+      { title: "Fotos e Vídeos", desc: "Suporte para carrossel com mix de fotos e vídeos." },
+      { title: "Resolução Original", desc: "Cada arquivo é baixado na qualidade máxima." },
+      { title: "Simples de Usar", desc: "Cole o link e baixe todo o conteúdo do post." },
+    ],
+    faqs: [
+      { q: "Como baixar um carrossel completo?", a: "Cole o link do post e nossa ferramenta identificará e disponibilizará o download de todas as mídias do carrossel." },
+      { q: "Posso baixar fotos e vídeos misturados?", a: "Sim! Se o carrossel contém fotos e vídeos, todos os formatos serão processados." },
+      { q: "Quantas imagens posso baixar por carrossel?", a: "Todos os itens do carrossel serão disponibilizados, independente da quantidade." },
+      { q: "A qualidade é mantida?", a: "Sim, cada arquivo é baixado na resolução original do Instagram." },
+    ],
+    seoContent: [
+      { title: "Download de Posts Completos", text: "Posts em carrossel podem conter até 10 fotos e vídeos. Nossa ferramenta processa o link e extrai todas as mídias disponíveis no post." },
+      { title: "Perfeito para Criadores", text: "Ideal para criadores de conteúdo que precisam salvar referências de posts bem-sucedidos para inspiração." },
+    ],
+  },
+  {
+    id: "private",
+    slug: "/baixar-conteudo-privado-instagram",
+    title: "Baixar Conteúdo Privado do Instagram",
+    shortTitle: "Privado",
+    heroTitle: "Baixar Conteúdo",
+    heroHighlight: "Privado do Instagram",
+    subtitle: "Baixe conteúdo de perfis privados do Instagram que você segue.",
+    icon: Lock,
+    placeholder: "Cole o link do conteúdo do Instagram aqui...",
+    seoTitle: "Baixar Conteúdo Privado do Instagram | Baixar Vídeo Downloader",
+    seoDescription: "Baixe vídeos e fotos de perfis privados do Instagram que você segue. Salve conteúdo privado de forma segura.",
+    features: [
+      { title: "Perfis que Você Segue", desc: "Acesse conteúdo de perfis privados que você já segue." },
+      { title: "Download Seguro", desc: "Seus dados são protegidos durante todo o processo." },
+      { title: "Vídeos e Fotos", desc: "Suporte para todos os tipos de mídia privada." },
+      { title: "Alta Qualidade", desc: "Download na resolução original do conteúdo." },
+    ],
+    faqs: [
+      { q: "Posso baixar de qualquer perfil privado?", a: "Nossa ferramenta processa links do Instagram. Para conteúdo privado, o link precisa ser acessível. Recomendamos copiar o link diretamente do app quando logado." },
+      { q: "É seguro baixar conteúdo privado?", a: "Sim, todo o processamento é feito de forma segura. Não armazenamos seus dados ou credenciais." },
+      { q: "Preciso fazer login?", a: "Não é necessário fazer login em nossa ferramenta. Basta colar o link do conteúdo." },
+      { q: "Quais formatos são suportados?", a: "Suportamos vídeos (MP4), fotos (JPG) e outros formatos disponíveis no Instagram." },
+    ],
+    seoContent: [
+      { title: "Acesse Conteúdo que Você Segue", text: "Se você já segue um perfil privado e tem acesso ao conteúdo, nossa ferramenta pode ajudá-lo a baixar vídeos e fotos para acesso offline." },
+      { title: "Privacidade Garantida", text: "Não solicitamos suas credenciais do Instagram. Todo o processamento é feito através do link que você compartilha." },
+    ],
+  },
+  {
+    id: "hd4k",
+    slug: "/baixar-hd-4k-instagram",
+    title: "Baixar em HD/4K do Instagram",
+    shortTitle: "HD/4K",
+    heroTitle: "Baixar em HD/4K",
+    heroHighlight: "do Instagram",
+    subtitle: "Baixe vídeos e fotos do Instagram na máxima resolução HD e 4K disponível.",
+    icon: MonitorUp,
+    placeholder: "Cole o link do conteúdo HD do Instagram aqui...",
+    seoTitle: "Baixar Instagram em HD 4K Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Baixe vídeos e fotos do Instagram em resolução HD e 4K. Qualidade máxima garantida sem compressão.",
+    features: [
+      { title: "Resolução Máxima", desc: "Baixe na maior resolução disponível, até 4K quando possível." },
+      { title: "Sem Compressão", desc: "Download direto sem compressão adicional." },
+      { title: "Vídeos e Fotos", desc: "Suporte HD/4K para vídeos e imagens." },
+      { title: "Qualidade Profissional", desc: "Ideal para uso profissional e edição." },
+    ],
+    faqs: [
+      { q: "Os vídeos do Instagram estão disponíveis em 4K?", a: "O Instagram suporta vídeos em alta resolução. Nossa ferramenta baixa na maior qualidade disponível, que pode ser HD (1080p) ou superior dependendo do upload original." },
+      { q: "As fotos são baixadas em resolução máxima?", a: "Sim! Extraímos a versão de maior resolução que o Instagram disponibiliza para cada imagem." },
+      { q: "Qual a diferença para o download normal?", a: "Nossa ferramenta HD/4K prioriza a extração da versão de maior qualidade disponível, ideal para quem precisa de resolução profissional." },
+      { q: "Funciona com Reels em HD?", a: "Sim! Reels, vídeos de feed e Stories podem ser baixados em alta definição." },
+    ],
+    seoContent: [
+      { title: "Qualidade Profissional", text: "Para criadores de conteúdo e profissionais que precisam de máxima qualidade, nossa ferramenta HD/4K extrai a versão de maior resolução disponível no Instagram." },
+      { title: "Sem Perda de Qualidade", text: "O download é feito diretamente dos servidores do Instagram, sem recompressão ou redução de qualidade." },
+    ],
+  },
+  {
+    id: "no-watermark",
+    slug: "/baixar-sem-marca-dagua-instagram",
+    title: "Baixar sem Marca d'Água do Instagram",
+    shortTitle: "Sem Marca d'Água",
+    heroTitle: "Baixar sem",
+    heroHighlight: "Marca d'Água",
+    subtitle: "Baixe vídeos e fotos do Instagram limpos, sem marcas d'água ou logos.",
+    icon: ShieldCheck,
+    placeholder: "Cole o link do conteúdo do Instagram aqui...",
+    seoTitle: "Baixar Instagram sem Marca d'Água Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Baixe vídeos e fotos do Instagram sem marca d'água. Download limpo e em alta qualidade.",
+    features: [
+      { title: "Sem Marca d'Água", desc: "Download limpo sem logos ou watermarks adicionais." },
+      { title: "Conteúdo Original", desc: "O arquivo baixado é idêntico ao original." },
+      { title: "Todos os Formatos", desc: "Vídeos, fotos, Reels e Stories sem marcas." },
+      { title: "Qualidade Preservada", desc: "Sem alterações na qualidade do arquivo original." },
+    ],
+    faqs: [
+      { q: "O Instagram adiciona marca d'água?", a: "O Instagram não adiciona marcas d'água nos conteúdos. Nossa ferramenta garante que o download seja feito diretamente do arquivo original, sem adições." },
+      { q: "Os Reels baixados têm marca d'água?", a: "Quando você baixa pelo nosso site, o Reel vem sem a marca d'água que aparece ao salvar pelo app do Instagram." },
+      { q: "A qualidade é afetada?", a: "Não! O arquivo baixado mantém a qualidade original sem nenhuma alteração." },
+      { q: "Funciona com todos os tipos de conteúdo?", a: "Sim, vídeos, fotos, Reels, Stories e Destaques são todos baixados sem marcas d'água." },
+    ],
+    seoContent: [
+      { title: "Download Limpo e Profissional", text: "Ao contrário de salvar pelo app do Instagram (que adiciona marca d'água em Reels), nossa ferramenta extrai o arquivo original sem nenhuma adição." },
+      { title: "Ideal para Compartilhar", text: "Perfeito para quem quer compartilhar conteúdo em outras plataformas sem marcas d'água visíveis." },
+    ],
+  },
+  {
+    id: "live",
+    slug: "/baixar-live-instagram",
+    title: "Baixar Live do Instagram",
+    shortTitle: "Live",
+    heroTitle: "Baixar Live",
+    heroHighlight: "do Instagram",
+    subtitle: "Baixe transmissões ao vivo (Lives) do Instagram para assistir depois.",
+    icon: Radio,
+    placeholder: "Cole o link da Live do Instagram aqui...",
+    seoTitle: "Baixar Live do Instagram Grátis | Baixar Vídeo Downloader",
+    seoDescription: "Baixe Lives e transmissões ao vivo do Instagram. Salve gravações de Lives para assistir offline.",
+    features: [
+      { title: "Lives Gravadas", desc: "Baixe Lives que foram compartilhadas como replays." },
+      { title: "Vídeo Completo", desc: "Download da Live inteira com áudio." },
+      { title: "Qualidade HD", desc: "Resolução original da transmissão." },
+      { title: "Assista Offline", desc: "Salve e assista quando e onde quiser." },
+    ],
+    faqs: [
+      { q: "Posso baixar uma Live ao vivo?", a: "Nossa ferramenta funciona com gravações de Lives que foram compartilhadas como replay no perfil do criador. Lives em andamento não podem ser baixadas." },
+      { q: "O vídeo inclui o áudio?", a: "Sim! O download inclui o vídeo completo com áudio da Live." },
+      { q: "Qual a qualidade do download?", a: "A Live é baixada na resolução em que foi transmitida, geralmente em HD." },
+      { q: "Onde encontro o link da Live?", a: "Quando um criador salva a Live no perfil (como IGTV ou vídeo), você pode copiar o link dessa publicação." },
+    ],
+    seoContent: [
+      { title: "Salve Lives Importantes", text: "Lives do Instagram são conteúdos valiosos que muitas vezes não ficam disponíveis por muito tempo. Com nossa ferramenta, você pode salvar replays de Lives para assistir quando quiser." },
+      { title: "Perfeito para Eventos", text: "Ideal para quem quer guardar Lives de eventos, aulas, workshops e entrevistas realizadas no Instagram." },
+    ],
+  },
+];
+
+export function getToolBySlug(slug: string): ToolConfig | undefined {
+  return tools.find(t => t.slug === slug);
+}
+
+export function getToolById(id: string): ToolConfig | undefined {
+  return tools.find(t => t.id === id);
+}
+
+export const toolsExceptMain = tools.filter(t => t.slug !== "/");
