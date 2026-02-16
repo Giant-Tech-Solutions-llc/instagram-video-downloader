@@ -11,16 +11,17 @@ import {
   AlertCircle,
   Loader2,
   PlayCircle,
-  Smartphone,
-  Zap,
-  Clock,
-  Infinity,
   CheckCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import type { ToolConfig } from "@/lib/tools-config";
 import { tools } from "@/lib/tools-config";
 
-export default function Home() {
+interface ToolPageLayoutProps {
+  tool: ToolConfig;
+}
+
+export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
   const processMutation = useProcessDownload();
@@ -53,14 +54,22 @@ export default function Home() {
                 Ferramenta 100% Gratuita
               </div>
 
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]" data-testid="text-page-title">
-                Baixar Vídeo <br />
-                <span className="text-[#E6195E]">do Instagram</span>
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-[#E6195E]/10 flex items-center justify-center">
+                  <tool.icon className="w-7 h-7 text-[#E6195E]" />
+                </div>
+              </div>
+
+              <h1
+                className="text-5xl md:text-6xl lg:text-7xl font-display font-black text-[#1A1A1A] mb-8 tracking-tighter leading-[0.95]"
+                data-testid="text-page-title"
+              >
+                {tool.heroTitle} <br />
+                <span className="text-[#E6195E]">{tool.heroHighlight}</span>
               </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-16 font-medium leading-relaxed">
-                A solução definitiva para salvar conteúdos do Instagram. <br className="hidden md:block" />
-                Rápido, seguro e em alta qualidade com apenas um clique.
+                {tool.subtitle}
               </p>
             </motion.div>
 
@@ -75,15 +84,15 @@ export default function Home() {
                   <div className="relative flex-grow">
                     <input
                       type="url"
-                      data-testid="input-instagram-url"
-                      placeholder="Insira o link do Instagram aqui..."
+                      data-testid={`input-${tool.id}-url`}
+                      placeholder={tool.placeholder}
                       className="w-full h-20 pl-10 pr-32 rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-xl font-medium placeholder:text-black/20"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                     />
                     <button
                       type="button"
-                      data-testid="button-paste-instagram"
+                      data-testid={`button-paste-${tool.id}`}
                       onClick={async () => {
                         try {
                           const text = await navigator.clipboard.readText();
@@ -109,7 +118,7 @@ export default function Home() {
                   </div>
                   <button
                     type="submit"
-                    data-testid="button-download-instagram"
+                    data-testid={`button-download-${tool.id}`}
                     disabled={processMutation.isPending || !url}
                     className="h-20 px-12 rounded-[1.8rem] bg-[#E6195E] text-white font-black text-2xl shadow-2xl shadow-[#E6195E]/30 hover:scale-[1.03] hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 min-w-[220px]"
                   >
@@ -132,7 +141,7 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3 text-left max-w-4xl mx-auto"
-                    data-testid="text-error-instagram"
+                    data-testid={`text-error-${tool.id}`}
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="font-medium">{processMutation.error.message}</p>
@@ -186,7 +195,10 @@ export default function Home() {
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-4">
                         <CheckCircle className="w-3 h-3" /> Sucesso
                       </div>
-                      <h3 className="text-3xl font-black font-display text-foreground mb-4 leading-tight" data-testid="text-download-ready">
+                      <h3
+                        className="text-3xl font-black font-display text-foreground mb-4 leading-tight"
+                        data-testid="text-download-ready"
+                      >
                         Download Pronto!
                       </h3>
                       <p className="text-muted-foreground text-lg">
@@ -197,7 +209,7 @@ export default function Home() {
                     <div className="space-y-4">
                       <a
                         href={`/api/proxy-download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || "instagram-download.mp4")}`}
-                        data-testid="link-download-instagram-result"
+                        data-testid={`link-download-${tool.id}-result`}
                         className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-[#E6195E] text-white font-black text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
                       >
                         <Download className="w-6 h-6" />
@@ -209,7 +221,7 @@ export default function Home() {
                           processMutation.reset();
                           setUrl("");
                         }}
-                        data-testid="button-download-another-instagram"
+                        data-testid={`button-download-another-${tool.id}`}
                         className="w-full py-4 text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
                       >
                         Baixar outro arquivo
@@ -222,32 +234,24 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        <section className="py-24 bg-white">
+        <section className="py-32 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-16">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Nossas Ferramentas</span>
+            <div className="text-center mb-24">
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Recursos</span>
               <h2 className="text-5xl md:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
-                Todas as Ferramentas <span className="text-[#E6195E]">Instagram</span>
+                Por que usar esta <span className="text-[#E6195E]">ferramenta</span>?
               </h2>
-              <p className="text-xl text-muted-foreground mt-6 max-w-2xl mx-auto font-medium">
-                Escolha a ferramenta ideal para o tipo de conteúdo que deseja baixar.
-              </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {tools.map((t) => (
-                <Link
-                  key={t.id}
-                  href={t.slug}
-                  data-testid={`home-tool-${t.id}`}
-                  className="group p-6 rounded-[1.5rem] bg-[#F8F9FA] border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
-                >
-                  <div className="w-14 h-14 rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-300">
-                    <t.icon className="w-6 h-6 text-[#E6195E] group-hover:text-white transition-colors" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {tool.features.map((feature, i) => (
+                <div key={i} className="text-center group p-8 rounded-[2rem] bg-[#F8F9FA] border border-black/5">
+                  <div className="w-16 h-16 rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-500">
+                    <tool.icon className="w-7 h-7 text-[#E6195E] group-hover:text-white transition-colors" />
                   </div>
-                  <h3 className="text-sm font-black text-[#1A1A1A] mb-1">{t.shortTitle}</h3>
-                  <p className="text-xs text-muted-foreground font-medium leading-relaxed line-clamp-2">{t.subtitle}</p>
-                </Link>
+                  <h3 className="text-lg font-black mb-3 text-[#1A1A1A]">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed text-sm font-medium">{feature.desc}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -257,49 +261,21 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-16">
               <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Processo Simples</span>
-              <h2 className="text-5xl md:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
+              <h2 className="text-4xl md:text-5xl font-display font-black text-[#1A1A1A] leading-tight">
                 Como usar o <span className="text-[#E6195E]">Downloader</span>
               </h2>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { step: "01", title: "Encontre o Conteúdo", desc: "Abra o Instagram e encontre o vídeo, reel, foto ou story que deseja salvar e copie o link." },
-                { step: "02", title: "Cole o Link", desc: "Cole o link copiado no campo de busca acima e aguarde o processamento rápido." },
-                { step: "03", title: "Baixe Agora", desc: "Clique no botão de download e salve o arquivo em alta qualidade no seu dispositivo." },
+                { step: "01", title: "Copie o Link", desc: "Abra o Instagram, encontre o conteúdo desejado e copie o link de compartilhamento." },
+                { step: "02", title: "Cole Aqui", desc: "Cole o link copiado no campo de busca acima e clique no botão BAIXAR." },
+                { step: "03", title: "Baixe o Arquivo", desc: "Aguarde o processamento e clique para baixar o arquivo no seu dispositivo." },
               ].map((item, i) => (
                 <div key={i} className="text-center p-8 rounded-[2rem] bg-white border border-black/5">
                   <div className="text-5xl font-display font-black text-[#E6195E]/10 mb-4">{item.step}</div>
                   <h3 className="text-xl font-black mb-3 text-[#1A1A1A]">{item.title}</h3>
                   <p className="text-muted-foreground leading-relaxed font-medium">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-32 bg-[#1A1A1A] text-white rounded-[4rem] mx-4 my-8">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-24">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Vantagens</span>
-              <h2 className="text-5xl md:text-6xl font-display font-black mb-8 leading-tight">
-                Por que escolher o <span className="text-[#E6195E]">Baixar Vídeo</span>?
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-12">
-              {[
-                { icon: <Zap className="w-8 h-8" />, title: "Alta Qualidade", desc: "Baixe vídeos em MP4 HD e fotos em resolução original." },
-                { icon: <Clock className="w-8 h-8" />, title: "Download Rápido", desc: "Processamento instantâneo sem esperas ou anúncios abusivos." },
-                { icon: <Infinity className="w-8 h-8" />, title: "Ilimitado", desc: "Faça quantos downloads desejar sem limites diários." },
-                { icon: <Smartphone className="w-8 h-8" />, title: "Suporte Total", desc: "Funciona em todos os dispositivos iOS, Android e PC." },
-              ].map((feature, i) => (
-                <div key={i} className="text-center group">
-                  <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center mx-auto mb-8 border border-white/5 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-500">
-                    <div className="text-[#E6195E] group-hover:text-white transition-colors">{feature.icon}</div>
-                  </div>
-                  <h3 className="text-xl font-black mb-4">{feature.title}</h3>
-                  <p className="text-white/40 leading-relaxed text-sm">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -316,32 +292,7 @@ export default function Home() {
             </div>
 
             <div className="space-y-6">
-              {[
-                {
-                  q: "Como baixar vídeos do Instagram?",
-                  a: "Copie o link do vídeo, cole no campo acima e clique em 'BAIXAR'. O vídeo será processado e o link de download em MP4 aparecerá instantaneamente.",
-                },
-                {
-                  q: "Como baixar Fotos do Instagram em alta qualidade?",
-                  a: "Basta colar o link da publicação da foto. Nosso sistema extrai a imagem em sua resolução original (HD), permitindo que você salve em JPG sem perda de nitidez.",
-                },
-                {
-                  q: "É possível baixar Reels com áudio?",
-                  a: "Sim! Nosso downloader baixa Reels completos com áudio e vídeo em alta definição, ideal para assistir offline ou compartilhar.",
-                },
-                {
-                  q: "Como baixar Stories e Destaques (Highlights)?",
-                  a: "Copie o link do Story ou do Destaque desejado. Lembre-se que Stories expiram em 24h, então baixe-os enquanto ainda estão visíveis no perfil público.",
-                },
-                {
-                  q: "O serviço é gratuito e ilimitado?",
-                  a: "Com certeza. Você pode realizar downloads ilimitados de vídeos, fotos e reels sem pagar nada e sem precisar criar uma conta.",
-                },
-                {
-                  q: "Quais ferramentas estão disponíveis?",
-                  a: "Oferecemos 12 ferramentas especializadas: Vídeo, Reels, Stories, Fotos, Foto de Perfil, Áudio/MP3, Destaques, Carrossel, Conteúdo Privado, HD/4K, Sem Marca d'Água e Live.",
-                },
-              ].map((item, i) => (
+              {tool.faqs.map((item, i) => (
                 <div key={i} className="bg-[#F8F9FA] rounded-[2rem] border border-black/5 overflow-hidden">
                   <details className="group">
                     <summary className="flex justify-between items-center font-black cursor-pointer list-none p-8 text-xl text-[#1A1A1A] hover:text-[#E6195E] transition-colors">
@@ -355,6 +306,47 @@ export default function Home() {
                     </div>
                   </details>
                 </div>
+              ))}
+            </div>
+
+            <div className="mt-32 space-y-16 border-t border-black/5 pt-32">
+              <div className="prose prose-slate max-w-none">
+                <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block text-center">Saiba Mais</span>
+                <h2 className="text-4xl md:text-5xl font-black text-[#1A1A1A] text-center mb-16">{tool.title}</h2>
+
+                <div className="grid md:grid-cols-2 gap-16">
+                  {tool.seoContent.map((content, i) => (
+                    <div key={i}>
+                      <h3 className="text-2xl font-black text-[#1A1A1A] mb-4">{content.title}</h3>
+                      <p className="text-muted-foreground text-lg leading-relaxed font-medium">{content.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-24 bg-[#1A1A1A] text-white rounded-[4rem] mx-4 my-8">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-sm mb-4 block">Todas as Ferramentas</span>
+              <h2 className="text-4xl md:text-5xl font-display font-black leading-tight">
+                Explore nossas <span className="text-[#E6195E]">ferramentas</span>
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {tools.filter(t => t.id !== tool.id).map((t) => (
+                <Link
+                  key={t.id}
+                  href={t.slug}
+                  data-testid={`link-tool-${t.id}`}
+                  className="group p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-[#E6195E]/10 hover:border-[#E6195E]/20 transition-all text-center"
+                >
+                  <t.icon className="w-8 h-8 text-[#E6195E] mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-bold text-white/80 group-hover:text-white transition-colors">{t.shortTitle}</span>
+                </Link>
               ))}
             </div>
           </div>

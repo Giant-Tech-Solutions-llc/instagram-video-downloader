@@ -1,8 +1,16 @@
-import { Link } from "wouter";
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { ChevronDown, Menu, X } from "lucide-react";
+import { tools } from "@/lib/tools-config";
+import { cn } from "@/lib/utils";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
 
 export function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [location] = useLocation();
+
   return (
     <nav className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,6 +18,110 @@ export function Navbar() {
           <Link href="/" className="flex items-center flex-shrink-0">
             <img src={Baixar_V_deo_downloader_Logo} alt="Baixar Video Downloader" className="h-9" data-testid="img-logo" />
           </Link>
+
+          <div className="hidden md:flex items-center gap-1">
+            <div
+              className="relative"
+              onMouseEnter={() => setToolsOpen(true)}
+              onMouseLeave={() => setToolsOpen(false)}
+            >
+              <button
+                data-testid="button-tools-dropdown"
+                className={cn(
+                  "flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-bold transition-colors",
+                  toolsOpen ? "text-[#E6195E] bg-[#E6195E]/5" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
+                )}
+              >
+                Ferramentas
+                <ChevronDown className={cn("w-4 h-4 transition-transform", toolsOpen && "rotate-180")} />
+              </button>
+
+              <div
+                className={cn(
+                  "absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-all duration-200",
+                  toolsOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
+                )}
+              >
+                <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 border border-black/5 p-3 w-[420px] grid grid-cols-2 gap-1">
+                  {tools.map((t) => (
+                    <Link
+                      key={t.id}
+                      href={t.slug}
+                      data-testid={`nav-link-${t.id}`}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors",
+                        location === t.slug
+                          ? "text-[#E6195E] bg-[#E6195E]/5"
+                          : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
+                      )}
+                    >
+                      <t.icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{t.shortTitle}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <Link
+              href="/como-funciona"
+              data-testid="nav-link-como-funciona"
+              className={cn(
+                "px-4 py-2 rounded-xl text-sm font-bold transition-colors",
+                location === "/como-funciona" ? "text-[#E6195E]" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
+              )}
+            >
+              Como Funciona
+            </Link>
+          </div>
+
+          <button
+            data-testid="button-mobile-menu"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 rounded-xl text-[#1A1A1A]/60"
+          >
+            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        <div
+          className={cn(
+            "md:hidden overflow-hidden transition-all duration-300",
+            mobileOpen ? "max-h-[80vh] pb-6" : "max-h-0"
+          )}
+        >
+          <div className="pt-4 border-t border-black/5">
+            <p className="px-3 py-2 text-xs font-black uppercase tracking-widest text-black/30">Ferramentas</p>
+            <div className="grid grid-cols-2 gap-1">
+              {tools.map((t) => (
+                <Link
+                  key={t.id}
+                  href={t.slug}
+                  data-testid={`mobile-nav-link-${t.id}`}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-colors",
+                    location === t.slug
+                      ? "text-[#E6195E] bg-[#E6195E]/5"
+                      : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
+                  )}
+                >
+                  <t.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">{t.shortTitle}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-black/5">
+              <Link
+                href="/como-funciona"
+                data-testid="mobile-nav-como-funciona"
+                onClick={() => setMobileOpen(false)}
+                className="block px-3 py-3 rounded-xl text-sm font-bold text-[#1A1A1A]/70 hover:text-[#E6195E]"
+              >
+                Como Funciona
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
