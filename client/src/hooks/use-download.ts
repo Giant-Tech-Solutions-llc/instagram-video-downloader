@@ -7,9 +7,9 @@ export type DownloadError = z.infer<typeof api.download.process.responses[400]>;
 export type StatsResponse = z.infer<typeof api.stats.get.responses[200]>;
 
 export function useProcessDownload() {
-  return useMutation<DownloadResponse, Error, { url: string }>({
-    mutationFn: async ({ url }) => {
-      const validatedInput = api.download.process.input.parse({ url });
+  return useMutation<DownloadResponse, Error, { url: string; toolType?: string }>({
+    mutationFn: async ({ url, toolType }) => {
+      const validatedInput = api.download.process.input.parse({ url, toolType });
 
       const res = await fetch(api.download.process.path, {
         method: api.download.process.method,
@@ -30,7 +30,11 @@ export function useProcessDownload() {
           throw new Error("Muitas solicitações. Tente novamente em instantes.");
         }
         if (res.status === 500) {
-          throw new Error("Erro no servidor. Tente novamente mais tarde.");
+          const errorData = await res.json().catch(() => null);
+          if (errorData?.message) {
+            throw new Error(errorData.message);
+          }
+          throw new Error("Erro temporário ao processar. Tente novamente em alguns minutos.");
         }
         throw new Error("Ocorreu um erro desconhecido.");
       }

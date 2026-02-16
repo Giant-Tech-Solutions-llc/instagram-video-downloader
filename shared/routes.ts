@@ -1,6 +1,13 @@
 import { z } from 'zod';
 import { insertDownloadSchema } from './schema';
 
+const mediaItemSchema = z.object({
+  url: z.string(),
+  thumbnail: z.string().optional(),
+  filename: z.string().optional(),
+  type: z.enum(['video', 'image']),
+});
+
 export const api = {
   download: {
     process: {
@@ -8,6 +15,7 @@ export const api = {
       path: '/api/download/process' as const,
       input: z.object({
         url: z.string().url({ message: "Por favor, insira uma URL válida do Instagram" }),
+        toolType: z.string().optional(),
       }),
       responses: {
         200: z.object({
@@ -15,6 +23,7 @@ export const api = {
           thumbnail: z.string().optional(),
           filename: z.string().optional(),
           type: z.enum(['video', 'image']),
+          items: z.array(mediaItemSchema).optional(),
         }),
         400: z.object({
           message: z.string(),

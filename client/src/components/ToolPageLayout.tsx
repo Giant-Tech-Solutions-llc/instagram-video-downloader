@@ -12,6 +12,7 @@ import {
   Loader2,
   PlayCircle,
   CheckCircle,
+  ImageIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { ToolConfig } from "@/lib/tools-config";
@@ -29,8 +30,10 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!url) return;
-    processMutation.mutate({ url });
+    processMutation.mutate({ url, toolType: tool.id });
   };
+
+  const hasMultipleItems = processMutation.isSuccess && processMutation.data?.items && processMutation.data.items.length > 1;
 
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
@@ -140,11 +143,14 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3 text-left max-w-4xl mx-auto"
+                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-start gap-3 text-left max-w-4xl mx-auto"
                     data-testid={`text-error-${tool.id}`}
                   >
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="font-medium">{processMutation.error.message}</p>
+                    <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold mb-1">Erro ao processar</p>
+                      <p className="font-medium text-sm text-red-500">{processMutation.error.message}</p>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -167,68 +173,132 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
           {processMutation.isSuccess && processMutation.data && (
             <section className="py-12 bg-white border-b border-border/40">
               <div className="max-w-4xl mx-auto px-4">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-card rounded-[2.5rem] border border-border/60 shadow-2xl shadow-black/5 overflow-hidden flex flex-col md:flex-row"
-                  data-testid="section-download-result"
-                >
-                  <div className="md:w-1/2 bg-black/5 relative aspect-square md:aspect-auto">
-                    {processMutation.data.thumbnail ? (
-                      <img
-                        src={processMutation.data.thumbnail}
-                        alt="Preview"
-                        className="w-full h-full object-cover absolute inset-0"
-                        data-testid="img-download-preview"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                        <PlayCircle className="w-16 h-16" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/10" />
-                  </div>
-
-                  <div className="p-12 md:w-1/2 flex flex-col justify-center">
-                    <div className="mb-8 text-center md:text-left">
+                {hasMultipleItems ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    data-testid="section-download-result"
+                  >
+                    <div className="text-center mb-8">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-4">
-                        <CheckCircle className="w-3 h-3" /> Sucesso
+                        <CheckCircle className="w-3 h-3" /> {processMutation.data.items!.length} itens encontrados
                       </div>
-                      <h3
-                        className="text-3xl font-black font-display text-foreground mb-4 leading-tight"
-                        data-testid="text-download-ready"
-                      >
-                        Download Pronto!
+                      <h3 className="text-3xl font-black font-display text-foreground leading-tight" data-testid="text-download-ready">
+                        Carrossel Pronto!
                       </h3>
-                      <p className="text-muted-foreground text-lg">
-                        Seu arquivo foi processado com sucesso e está pronto para baixar.
-                      </p>
+                      <p className="text-muted-foreground text-lg mt-2">Baixe cada item individualmente abaixo.</p>
                     </div>
 
-                    <div className="space-y-4">
-                      <a
-                        href={`/api/proxy-download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || "instagram-download.mp4")}`}
-                        data-testid={`link-download-${tool.id}-result`}
-                        className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-[#E6195E] text-white font-black text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
-                      >
-                        <Download className="w-6 h-6" />
-                        BAIXAR {processMutation.data.type === "video" ? "VÍDEO" : "IMAGEM"}
-                      </a>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {processMutation.data.items!.map((item, index) => (
+                        <div key={index} className="bg-card rounded-2xl border border-border/60 shadow-lg overflow-hidden">
+                          <div className="aspect-square bg-black/5 relative">
+                            {item.thumbnail ? (
+                              <img src={item.thumbnail} alt={`Item ${index + 1}`} className="w-full h-full object-cover" />
+                            ) : item.type === 'image' ? (
+                              <img src={item.url} alt={`Item ${index + 1}`} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                <PlayCircle className="w-12 h-12" />
+                              </div>
+                            )}
+                            <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-black/60 text-white text-xs font-bold">
+                              {item.type === 'video' ? 'MP4' : 'JPG'}
+                            </div>
+                          </div>
+                          <div className="p-3">
+                            <a
+                              href={`/api/proxy-download?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(item.filename || `instagram-${item.type}-${index + 1}.${item.type === 'video' ? 'mp4' : 'jpg'}`)}`}
+                              data-testid={`link-download-item-${index}`}
+                              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#E6195E] text-white font-bold text-sm shadow-lg shadow-[#E6195E]/20 hover:brightness-110 active:scale-95 transition-all"
+                            >
+                              <Download className="w-4 h-4" />
+                              Baixar {index + 1}
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
 
+                    <div className="text-center mt-6">
                       <button
-                        onClick={() => {
-                          processMutation.reset();
-                          setUrl("");
-                        }}
+                        onClick={() => { processMutation.reset(); setUrl(""); }}
                         data-testid={`button-download-another-${tool.id}`}
-                        className="w-full py-4 text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
+                        className="py-4 text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
                       >
                         Baixar outro arquivo
                       </button>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-card rounded-[2.5rem] border border-border/60 shadow-2xl shadow-black/5 overflow-hidden flex flex-col md:flex-row"
+                    data-testid="section-download-result"
+                  >
+                    <div className="md:w-1/2 bg-black/5 relative aspect-square md:aspect-auto">
+                      {processMutation.data.thumbnail ? (
+                        <img
+                          src={processMutation.data.thumbnail}
+                          alt="Preview"
+                          className="w-full h-full object-cover absolute inset-0"
+                          data-testid="img-download-preview"
+                        />
+                      ) : processMutation.data.type === 'image' ? (
+                        <img
+                          src={processMutation.data.url}
+                          alt="Preview"
+                          className="w-full h-full object-cover absolute inset-0"
+                          data-testid="img-download-preview"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                          <PlayCircle className="w-16 h-16" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/10" />
+                    </div>
+
+                    <div className="p-12 md:w-1/2 flex flex-col justify-center">
+                      <div className="mb-8 text-center md:text-left">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-4">
+                          <CheckCircle className="w-3 h-3" /> Sucesso
+                        </div>
+                        <h3
+                          className="text-3xl font-black font-display text-foreground mb-4 leading-tight"
+                          data-testid="text-download-ready"
+                        >
+                          Download Pronto!
+                        </h3>
+                        <p className="text-muted-foreground text-lg">
+                          Seu arquivo foi processado com sucesso e está pronto para baixar.
+                        </p>
+                      </div>
+
+                      <div className="space-y-4">
+                        <a
+                          href={`/api/proxy-download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || "instagram-download.mp4")}`}
+                          data-testid={`link-download-${tool.id}-result`}
+                          className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-[#E6195E] text-white font-black text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
+                        >
+                          <Download className="w-6 h-6" />
+                          BAIXAR {processMutation.data.type === "video" ? "VÍDEO" : "IMAGEM"}
+                        </a>
+
+                        <button
+                          onClick={() => { processMutation.reset(); setUrl(""); }}
+                          data-testid={`button-download-another-${tool.id}`}
+                          className="w-full py-4 text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
+                        >
+                          Baixar outro arquivo
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </div>
             </section>
           )}

@@ -28,7 +28,7 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!url) return;
-    processMutation.mutate({ url });
+    processMutation.mutate({ url, toolType: 'video' });
   };
 
   return (
@@ -131,11 +131,14 @@ export default function Home() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3 text-left max-w-4xl mx-auto"
+                    className="mt-6 p-5 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-start gap-3 text-left max-w-4xl mx-auto"
                     data-testid="text-error-instagram"
                   >
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="font-medium">{processMutation.error.message}</p>
+                    <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold mb-1">Erro ao processar</p>
+                      <p className="font-medium text-sm text-red-500">{processMutation.error.message}</p>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
