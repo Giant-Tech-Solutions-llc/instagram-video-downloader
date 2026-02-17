@@ -185,7 +185,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
               </AnimatePresence>
 
               <div className="mt-4 sm:mt-6 md:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-black/20">
-                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-black/40">No app required.</span>
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-black/40">No app required</span>
                 <div className="flex gap-2 sm:gap-4 items-center">
                   <span className="text-[10px] sm:text-xs font-bold text-black/30">No login needed.</span>
                   <span className="text-black/10">|</span>
