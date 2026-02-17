@@ -187,7 +187,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
               <div className="mt-4 sm:mt-6 md:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-black/20">
                 <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-black/40">Formatos:</span>
                 <div className="flex gap-2 sm:gap-4 items-center">
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">MP4 HD</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/30">No login needed.</span>
                   <span className="text-black/10">|</span>
                   <span className="text-[10px] sm:text-xs font-bold text-black/30">100%free</span>
                   <span className="text-black/10">|</span>
