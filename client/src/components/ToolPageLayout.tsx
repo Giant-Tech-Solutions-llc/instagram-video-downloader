@@ -189,7 +189,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                 <div className="flex gap-2 sm:gap-4 items-center">
                   <span className="text-[10px] sm:text-xs font-bold text-black/30">No login needed.</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">100%free</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/30">100% FREE</span>
                   <span className="text-black/10">|</span>
                   <span className="text-[10px] sm:text-xs font-bold text-black/30">Alta Qualidade</span>
                 </div>
