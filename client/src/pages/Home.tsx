@@ -82,7 +82,11 @@ export default function Home() {
                     key={item.slug}
                     href={item.slug}
                     data-testid={`quick-tool-${item.label.toLowerCase()}`}
-                    className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-black/5 text-xs sm:text-sm font-bold text-[#1A1A1A]/70 hover:text-[#E6195E] hover:border-[#E6195E]/20 hover:shadow-md hover:shadow-[#E6195E]/5 transition-all shadow-sm active:scale-95"
+                    className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 ${
+                      item.slug === "/"
+                        ? "bg-[#E6195E] text-white border-[#E6195E] shadow-lg shadow-[#E6195E]/20"
+                        : "bg-white border-black/5 text-[#1A1A1A]/70 hover:text-[#E6195E] hover:border-[#E6195E]/20 hover:shadow-md hover:shadow-[#E6195E]/5"
+                    }`}
                   >
                     <item.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     {item.label}
