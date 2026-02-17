@@ -43,7 +43,6 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
-
       <main className="flex-grow">
         <section className="relative pt-12 sm:pt-16 md:pt-24 pb-16 sm:pb-24 md:pb-32 px-4 overflow-hidden bg-[#F8F9FA]">
           <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
@@ -190,7 +189,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                 <div className="flex gap-2 sm:gap-4 items-center">
                   <span className="text-[10px] sm:text-xs font-bold text-black/30">MP4 HD</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">JPG Original</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/30">100%free</span>
                   <span className="text-black/10">|</span>
                   <span className="text-[10px] sm:text-xs font-bold text-black/30">Alta Qualidade</span>
                 </div>
@@ -452,7 +451,6 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
           </div>
         </section>
       </main>
-
       <Footer />
     </div>
   );
