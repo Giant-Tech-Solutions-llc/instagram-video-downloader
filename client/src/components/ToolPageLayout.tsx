@@ -6,12 +6,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import {
   ArrowRight,
+  Camera,
+  CheckCircle,
+  Clapperboard,
   Copy,
   Download,
   AlertCircle,
+  History,
   Loader2,
+  Music,
   PlayCircle,
-  CheckCircle,
+  Tv,
+  Video,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { ToolConfig } from "@/lib/tools-config";
@@ -70,9 +76,34 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                 <span className="text-[#E6195E]">{tool.heroHighlight}</span>
               </h1>
 
-              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 font-medium leading-relaxed px-2">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8 font-medium leading-relaxed px-2">
                 {tool.subtitle}
               </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 md:mb-16 px-2">
+                {[
+                  { label: "Vídeo", slug: "/", id: "video", icon: Video },
+                  { label: "Fotos", slug: "/baixar-fotos-instagram", id: "foto", icon: Camera },
+                  { label: "Stories", slug: "/baixar-stories-instagram", id: "stories", icon: History },
+                  { label: "Reels", slug: "/baixar-reels-instagram", id: "reels", icon: Clapperboard },
+                  { label: "IGTV", slug: "/baixar-igtv-instagram", id: "igtv", icon: Tv },
+                  { label: "MP3", slug: "/extrair-audio-instagram", id: "audio", icon: Music },
+                ].map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={item.slug}
+                    data-testid={`quick-tool-${item.label.toLowerCase()}`}
+                    className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 ${
+                      item.id === tool.id
+                        ? "bg-[#E6195E] text-white border-[#E6195E] shadow-lg shadow-[#E6195E]/20"
+                        : "bg-white border-black/5 text-[#1A1A1A]/70 hover:text-[#E6195E] hover:border-[#E6195E]/20 hover:shadow-md hover:shadow-[#E6195E]/5"
+                    }`}
+                  >
+                    <item.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </motion.div>
 
             <motion.div
