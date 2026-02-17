@@ -1,15 +1,27 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Globe, Menu, X } from "lucide-react";
 import { tools } from "@/lib/tools-config";
 import { cn } from "@/lib/utils";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
 
+const languages = [
+  { code: "pt", label: "Português", flag: "🇧🇷" },
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
+];
+
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState("pt");
   const [location] = useLocation();
+
+  const activeLang = languages.find((l) => l.code === currentLang) || languages[0];
 
   return (
     <nav className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
@@ -73,6 +85,53 @@ export function Navbar() {
             >
               Como Funciona
             </Link>
+
+            <div
+              className="relative"
+              onMouseEnter={() => setLangOpen(true)}
+              onMouseLeave={() => setLangOpen(false)}
+            >
+              <button
+                data-testid="button-lang-dropdown"
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-colors",
+                  langOpen ? "text-[#E6195E] bg-[#E6195E]/5" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
+                )}
+              >
+                <Globe className="w-4 h-4" />
+                <span className="text-base leading-none">{activeLang.flag}</span>
+                <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", langOpen && "rotate-180")} />
+              </button>
+
+              <div
+                className={cn(
+                  "absolute top-full right-0 pt-2 transition-all duration-200",
+                  langOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
+                )}
+              >
+                <div className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-black/5 p-1.5 min-w-[160px]">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      data-testid={`lang-option-${lang.code}`}
+                      onClick={() => {
+                        setCurrentLang(lang.code);
+                        setLangOpen(false);
+                      }}
+                      className={cn(
+                        "flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm font-semibold transition-colors",
+                        currentLang === lang.code
+                          ? "text-[#E6195E] bg-[#E6195E]/5"
+                          : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
+                      )}
+                    >
+                      <span className="text-base leading-none">{lang.flag}</span>
+                      {lang.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           <button
@@ -120,6 +179,28 @@ export function Navbar() {
               >
                 Como Funciona
               </Link>
+            </div>
+
+            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-black/5">
+              <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">Idioma</p>
+              <div className="flex flex-wrap gap-1.5 px-2">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    data-testid={`mobile-lang-${lang.code}`}
+                    onClick={() => setCurrentLang(lang.code)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors",
+                      currentLang === lang.code
+                        ? "text-[#E6195E] bg-[#E6195E]/5 border border-[#E6195E]/20"
+                        : "text-[#1A1A1A]/70 hover:text-[#E6195E] border border-black/5"
+                    )}
+                  >
+                    <span className="text-sm leading-none">{lang.flag}</span>
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
