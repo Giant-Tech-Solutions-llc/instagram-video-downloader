@@ -26,12 +26,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { tools } from "@/lib/tools-config";
 import { useLanguage } from "@/lib/i18n";
+import { getToolTranslation } from "@/lib/tools-i18n";
 
 export default function Home() {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
   const processMutation = useProcessDownload();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -271,20 +272,23 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {tools.map((tool) => (
-                <Link
-                  key={tool.id}
-                  href={tool.slug}
-                  data-testid={`home-tool-${tool.id}`}
-                  className="group p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-[#F8F9FA] border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
-                >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-300">
-                    <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#E6195E] group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-black text-[#1A1A1A] mb-1">{tool.shortTitle}</h3>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-relaxed line-clamp-2 hidden sm:block">{tool.subtitle}</p>
-                </Link>
-              ))}
+              {tools.map((tool) => {
+                const toolTr = getToolTranslation(tool.id, lang);
+                return (
+                  <Link
+                    key={tool.id}
+                    href={tool.slug}
+                    data-testid={`home-tool-${tool.id}`}
+                    className="group p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-[#F8F9FA] border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
+                  >
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-300">
+                      <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#E6195E] group-hover:text-white transition-colors" />
+                    </div>
+                    <h3 className="text-xs sm:text-sm font-black text-[#1A1A1A] mb-1">{toolTr?.shortTitle || tool.shortTitle}</h3>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-relaxed line-clamp-2 hidden sm:block">{toolTr?.subtitle || tool.subtitle}</p>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

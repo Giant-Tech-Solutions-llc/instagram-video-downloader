@@ -4,15 +4,16 @@ import { ChevronDown, Globe, Menu, X } from "lucide-react";
 import { tools } from "@/lib/tools-config";
 import { cn } from "@/lib/utils";
 import { useLanguage, type Lang } from "@/lib/i18n";
+import { getToolTranslation } from "@/lib/tools-i18n";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
 
-const languages: { code: Lang; label: string; flag: string }[] = [
-  { code: "pt", label: "Português", flag: "🇧🇷" },
-  { code: "en", label: "English", flag: "🇺🇸" },
-  { code: "es", label: "Español", flag: "🇪🇸" },
-  { code: "fr", label: "Français", flag: "🇫🇷" },
-  { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
+const languages: { code: Lang; label: string; abbr: string }[] = [
+  { code: "pt", label: "Português", abbr: "PT" },
+  { code: "en", label: "English", abbr: "EN" },
+  { code: "es", label: "Español", abbr: "ES" },
+  { code: "fr", label: "Français", abbr: "FR" },
+  { code: "hi", label: "हिन्दी", abbr: "HI" },
 ];
 
 export function Navbar() {
@@ -56,22 +57,25 @@ export function Navbar() {
                 )}
               >
                 <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 border border-black/5 p-3 w-[420px] grid grid-cols-2 gap-1">
-                  {tools.map((tool) => (
-                    <Link
-                      key={tool.id}
-                      href={tool.slug}
-                      data-testid={`nav-link-${tool.id}`}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors",
-                        location === tool.slug
-                          ? "text-[#E6195E] bg-[#E6195E]/5"
-                          : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
-                      )}
-                    >
-                      <tool.icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">{tool.shortTitle}</span>
-                    </Link>
-                  ))}
+                  {tools.map((tool) => {
+                    const toolTr = getToolTranslation(tool.id, lang);
+                    return (
+                      <Link
+                        key={tool.id}
+                        href={tool.slug}
+                        data-testid={`nav-link-${tool.id}`}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors",
+                          location === tool.slug
+                            ? "text-[#E6195E] bg-[#E6195E]/5"
+                            : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
+                        )}
+                      >
+                        <tool.icon className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">{toolTr?.shortTitle || tool.shortTitle}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -100,7 +104,7 @@ export function Navbar() {
                 )}
               >
                 <Globe className="w-4 h-4" />
-                <span className="text-base leading-none">{activeLang.flag}</span>
+                <span className="text-[10px] font-black tracking-wider bg-[#E6195E]/10 text-[#E6195E] rounded px-1.5 py-0.5 leading-none">{activeLang.abbr}</span>
                 <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", langOpen && "rotate-180")} />
               </button>
 
@@ -126,7 +130,7 @@ export function Navbar() {
                           : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
                       )}
                     >
-                      <span className="text-base leading-none">{l.flag}</span>
+                      <span className="text-[10px] font-black tracking-wider bg-[#E6195E]/10 text-[#E6195E] rounded px-1.5 py-0.5 leading-none">{l.abbr}</span>
                       {l.label}
                     </button>
                   ))}
@@ -153,23 +157,26 @@ export function Navbar() {
           <div className="pt-3 sm:pt-4 border-t border-black/5">
             <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">{t("nav.tools")}</p>
             <div className="grid grid-cols-2 gap-1">
-              {tools.map((tool) => (
-                <Link
-                  key={tool.id}
-                  href={tool.slug}
-                  data-testid={`mobile-nav-link-${tool.id}`}
-                  onClick={() => setMobileOpen(false)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-colors",
-                    location === tool.slug
-                      ? "text-[#E6195E] bg-[#E6195E]/5"
-                      : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
-                  )}
-                >
-                  <tool.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="truncate">{tool.shortTitle}</span>
-                </Link>
-              ))}
+              {tools.map((tool) => {
+                const toolTr = getToolTranslation(tool.id, lang);
+                return (
+                  <Link
+                    key={tool.id}
+                    href={tool.slug}
+                    data-testid={`mobile-nav-link-${tool.id}`}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-colors",
+                      location === tool.slug
+                        ? "text-[#E6195E] bg-[#E6195E]/5"
+                        : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
+                    )}
+                  >
+                    <tool.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="truncate">{toolTr?.shortTitle || tool.shortTitle}</span>
+                  </Link>
+                );
+              })}
             </div>
             <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-black/5">
               <Link
@@ -197,7 +204,7 @@ export function Navbar() {
                         : "text-[#1A1A1A]/70 hover:text-[#E6195E] border border-black/5"
                     )}
                   >
-                    <span className="text-sm leading-none">{l.flag}</span>
+                    <span className="text-[10px] font-black tracking-wider bg-[#E6195E]/10 text-[#E6195E] rounded px-1.5 py-0.5 leading-none">{l.abbr}</span>
                     {l.label}
                   </button>
                 ))}

@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { ToolConfig } from "@/lib/tools-config";
 import { tools } from "@/lib/tools-config";
 import { useLanguage } from "@/lib/i18n";
+import { getToolTranslation } from "@/lib/tools-i18n";
 
 interface ToolPageLayoutProps {
   tool: ToolConfig;
@@ -32,7 +33,8 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
   const processMutation = useProcessDownload();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const tt = getToolTranslation(tool.id, lang);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,12 +75,12 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-black text-[#1A1A1A] mb-4 sm:mb-6 md:mb-8 tracking-tighter leading-[0.95]"
                 data-testid="text-page-title"
               >
-                {tool.heroTitle} <br />
-                <span className="text-[#E6195E]">{tool.heroHighlight}</span>
+                {tt?.heroTitle || tool.heroTitle} <br />
+                <span className="text-[#E6195E]">{tt?.heroHighlight || tool.heroHighlight}</span>
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8 font-medium leading-relaxed px-2">
-                {tool.subtitle}
+                {tt?.subtitle || tool.subtitle}
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 md:mb-16 px-2">
@@ -119,7 +121,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                     <input
                       type="url"
                       data-testid={`input-${tool.id}-url`}
-                      placeholder={tool.placeholder}
+                      placeholder={tt?.placeholder || tool.placeholder}
                       className="w-full h-14 sm:h-16 md:h-20 pl-4 sm:pl-6 md:pl-10 pr-20 sm:pr-28 md:pr-32 rounded-xl sm:rounded-2xl md:rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-4 md:focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-sm sm:text-base md:text-xl font-medium placeholder:text-black/20"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
@@ -345,7 +347,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-              {tool.features.map((feature, i) => (
+              {(tt?.features || tool.features).map((feature, i) => (
                 <div key={i} className="text-center group p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2rem] bg-[#F8F9FA] border border-black/5">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-500">
                     <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#E6195E] group-hover:text-white transition-colors" />
@@ -393,7 +395,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
             </div>
 
             <div className="space-y-3 sm:space-y-4 md:space-y-6">
-              {tool.faqs.map((item, i) => (
+              {(tt?.faqs || tool.faqs).map((item, i) => (
                 <div key={i} className="bg-[#F8F9FA] rounded-xl sm:rounded-2xl md:rounded-[2rem] border border-black/5 overflow-hidden">
                   <details className="group">
                     <summary className="flex justify-between items-center gap-4 font-black cursor-pointer list-none p-4 sm:p-6 md:p-8 text-sm sm:text-base md:text-xl text-[#1A1A1A] hover:text-[#E6195E] transition-colors">
@@ -413,10 +415,10 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
             <div className="mt-16 sm:mt-24 md:mt-32 space-y-8 sm:space-y-12 md:space-y-16 border-t border-black/5 pt-16 sm:pt-24 md:pt-32">
               <div className="prose prose-slate max-w-none">
                 <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block text-center">{t("tool.seo")}</span>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#1A1A1A] text-center mb-8 sm:mb-12 md:mb-16">{tool.title}</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#1A1A1A] text-center mb-8 sm:mb-12 md:mb-16">{tt?.title || tool.title}</h2>
 
                 <div className="grid md:grid-cols-2 gap-8 sm:gap-12 md:gap-16">
-                  {tool.seoContent.map((content, i) => (
+                  {(tt?.seoContent || tool.seoContent).map((content, i) => (
                     <div key={i}>
                       <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#1A1A1A] mb-3 sm:mb-4">{content.title}</h3>
                       <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed font-medium">{content.text}</p>
@@ -438,17 +440,20 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {tools.filter(t => t.id !== tool.id).map((t) => (
-                <Link
-                  key={t.id}
-                  href={t.slug}
-                  data-testid={`link-tool-${t.id}`}
-                  className="group p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl bg-white/5 border border-white/5 hover:bg-[#E6195E]/10 hover:border-[#E6195E]/20 transition-all text-center"
-                >
-                  <t.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#E6195E] mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs sm:text-sm font-bold text-white/80 group-hover:text-white transition-colors">{t.shortTitle}</span>
-                </Link>
-              ))}
+              {tools.filter(otherTool => otherTool.id !== tool.id).map((otherTool) => {
+                const otherTt = getToolTranslation(otherTool.id, lang);
+                return (
+                  <Link
+                    key={otherTool.id}
+                    href={otherTool.slug}
+                    data-testid={`link-tool-${otherTool.id}`}
+                    className="group p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl bg-white/5 border border-white/5 hover:bg-[#E6195E]/10 hover:border-[#E6195E]/20 transition-all text-center"
+                  >
+                    <otherTool.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#E6195E] mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs sm:text-sm font-bold text-white/80 group-hover:text-white transition-colors">{otherTt?.shortTitle || otherTool.shortTitle}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

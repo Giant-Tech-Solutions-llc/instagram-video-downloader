@@ -4,15 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Contact() {
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Mensagem enviada!",
-      description: "Entraremos em contato o mais breve possível.",
+      title: t("contact.toast.title"),
+      description: t("contact.toast.desc"),
     });
   };
 
@@ -23,10 +25,10 @@ export default function Contact() {
         <section className="pt-12 sm:pt-16 md:pt-20 pb-10 sm:pb-12 md:pb-16 bg-[#F8F9FA]">
           <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black mb-4 text-[#1A1A1A] tracking-tighter">
-              Contato
+              {t("contact.title")}
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-medium">
-              Tem alguma dúvida ou sugestão? Entre em contato conosco.
+              {t("contact.desc")}
             </p>
           </div>
         </section>
@@ -35,19 +37,19 @@ export default function Contact() {
           <div className="max-w-xl mx-auto px-4 sm:px-6">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 bg-white p-5 sm:p-6 md:p-8 rounded-2xl border border-black/5 shadow-sm" data-testid="form-contact">
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-xs sm:text-sm font-bold text-[#1A1A1A]">Nome</label>
-                <Input placeholder="Seu nome" required data-testid="input-contact-name" className="h-11 sm:h-12 text-sm sm:text-base" />
+                <label className="text-xs sm:text-sm font-bold text-[#1A1A1A]">{t("contact.name")}</label>
+                <Input placeholder={t("contact.name.placeholder")} required data-testid="input-contact-name" className="h-11 sm:h-12 text-sm sm:text-base" />
               </div>
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-xs sm:text-sm font-bold text-[#1A1A1A]">E-mail</label>
-                <Input type="email" placeholder="seu@email.com" required data-testid="input-contact-email" className="h-11 sm:h-12 text-sm sm:text-base" />
+                <label className="text-xs sm:text-sm font-bold text-[#1A1A1A]">{t("contact.email")}</label>
+                <Input type="email" placeholder={t("contact.email.placeholder")} required data-testid="input-contact-email" className="h-11 sm:h-12 text-sm sm:text-base" />
               </div>
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-xs sm:text-sm font-bold text-[#1A1A1A]">Mensagem</label>
-                <Textarea placeholder="Como podemos ajudar?" className="min-h-[100px] sm:min-h-[120px] text-sm sm:text-base" required data-testid="input-contact-message" />
+                <label className="text-xs sm:text-sm font-bold text-[#1A1A1A]">{t("contact.message")}</label>
+                <Textarea placeholder={t("contact.message.placeholder")} className="min-h-[100px] sm:min-h-[120px] text-sm sm:text-base" required data-testid="input-contact-message" />
               </div>
               <Button type="submit" className="w-full h-11 sm:h-12 text-sm sm:text-base font-bold bg-[#E6195E] hover:bg-[#E6195E]/90" data-testid="button-send-contact">
-                Enviar Mensagem
+                {t("contact.send")}
               </Button>
             </form>
           </div>

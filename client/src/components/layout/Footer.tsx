@@ -1,9 +1,10 @@
 import { Link } from "wouter";
 import { tools } from "@/lib/tools-config";
 import { useLanguage } from "@/lib/i18n";
+import { getToolTranslation } from "@/lib/tools-i18n";
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   return (
     <footer className="mt-12 sm:mt-16 md:mt-20 py-10 sm:py-12 md:py-16 border-t bg-[#1A1A1A] text-white">
@@ -18,17 +19,20 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-2">
             <h4 className="font-black text-xs sm:text-sm uppercase tracking-widest mb-4 sm:mb-6 text-[#E6195E]">{t("footer.tools")}</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 sm:gap-x-8 gap-y-1.5 sm:gap-y-2">
-              {tools.map((tool) => (
-                <Link
-                  key={tool.id}
-                  href={tool.slug}
-                  data-testid={`footer-link-${tool.id}`}
-                  className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-white/50 hover:text-[#E6195E] transition-colors py-1"
-                >
-                  <tool.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                  <span className="truncate">{tool.shortTitle}</span>
-                </Link>
-              ))}
+              {tools.map((tool) => {
+                const toolTr = getToolTranslation(tool.id, lang);
+                return (
+                  <Link
+                    key={tool.id}
+                    href={tool.slug}
+                    data-testid={`footer-link-${tool.id}`}
+                    className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-white/50 hover:text-[#E6195E] transition-colors py-1"
+                  >
+                    <tool.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                    <span className="truncate">{toolTr?.shortTitle || tool.shortTitle}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
           <div>
