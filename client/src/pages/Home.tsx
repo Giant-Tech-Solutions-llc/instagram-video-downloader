@@ -6,16 +6,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import {
   ArrowRight,
+  Camera,
+  CheckCircle,
+  Clapperboard,
+  Clock,
   Copy,
   Download,
   AlertCircle,
+  History,
+  Infinity,
   Loader2,
+  Music,
   PlayCircle,
   Smartphone,
+  Tv,
+  Video,
   Zap,
-  Clock,
-  Infinity,
-  CheckCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { tools } from "@/lib/tools-config";
@@ -58,10 +64,31 @@ export default function Home() {
                 <span className="text-[#E6195E]">do Instagram</span>
               </h1>
 
-              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 font-medium leading-relaxed px-2">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8 font-medium leading-relaxed px-2">
                 A solução definitiva para salvar conteúdos do Instagram. <br className="hidden md:block" />
                 Rápido, seguro e em alta qualidade com apenas um clique.
               </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 md:mb-16 px-2">
+                {[
+                  { label: "Vídeo", slug: "/", icon: Video },
+                  { label: "Fotos", slug: "/baixar-fotos-instagram", icon: Camera },
+                  { label: "Stories", slug: "/baixar-stories-instagram", icon: History },
+                  { label: "Reels", slug: "/baixar-reels-instagram", icon: Clapperboard },
+                  { label: "IGTV", slug: "/baixar-igtv-instagram", icon: Tv },
+                  { label: "MP3", slug: "/extrair-audio-instagram", icon: Music },
+                ].map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={item.slug}
+                    data-testid={`quick-tool-${item.label.toLowerCase()}`}
+                    className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-black/5 text-xs sm:text-sm font-bold text-[#1A1A1A]/70 hover:text-[#E6195E] hover:border-[#E6195E]/20 hover:shadow-md hover:shadow-[#E6195E]/5 transition-all shadow-sm active:scale-95"
+                  >
+                    <item.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </motion.div>
 
             <motion.div
