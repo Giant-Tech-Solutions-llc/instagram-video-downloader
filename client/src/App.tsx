@@ -19,7 +19,7 @@ import CarouselDownloader from "@/pages/tools/CarouselDownloader";
 import PrivateDownloader from "@/pages/tools/PrivateDownloader";
 import HD4KDownloader from "@/pages/tools/HD4KDownloader";
 import NoWatermarkDownloader from "@/pages/tools/NoWatermarkDownloader";
-import LiveDownloader from "@/pages/tools/LiveDownloader";
+import IGTVDownloader from "@/pages/tools/IGTVDownloader";
 
 function Router() {
   return (
@@ -35,7 +35,7 @@ function Router() {
       <Route path="/baixar-conteudo-privado-instagram" component={PrivateDownloader} />
       <Route path="/baixar-hd-4k-instagram" component={HD4KDownloader} />
       <Route path="/baixar-sem-marca-dagua-instagram" component={NoWatermarkDownloader} />
-      <Route path="/baixar-live-instagram" component={LiveDownloader} />
+      <Route path="/baixar-igtv-instagram" component={IGTVDownloader} />
       <Route path="/termos" component={TermsOfUse} />
       <Route path="/privacidade" component={PrivacyPolicy} />
       <Route path="/contato" component={Contact} />

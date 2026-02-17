@@ -342,7 +342,7 @@ export default function Home() {
                 },
                 {
                   q: "Quais ferramentas estão disponíveis?",
-                  a: "Oferecemos 12 ferramentas especializadas: Vídeo, Reels, Stories, Fotos, Foto de Perfil, Áudio/MP3, Destaques, Carrossel, Conteúdo Privado, HD/4K, Sem Marca d'Água e Live.",
+                  a: "Oferecemos 12 ferramentas especializadas: Vídeo, Reels, Stories, Fotos, Foto de Perfil, Áudio/MP3, Destaques, Carrossel, Conteúdo Privado, HD/4K, Sem Marca d'Água e IGTV.",
                 },
               ].map((item, i) => (
                 <div key={i} className="bg-[#F8F9FA] rounded-xl sm:rounded-2xl md:rounded-[2rem] border border-black/5 overflow-hidden">

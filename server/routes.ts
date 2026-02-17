@@ -383,7 +383,7 @@ function getErrorMessage(toolType?: string): string {
     'profile-picture': 'Não foi possível encontrar a foto de perfil. Verifique se o nome de usuário está correto e se o perfil existe.',
     'highlights': 'Não foi possível acessar o Destaque. Verifique se o perfil é público e se o link está correto.',
     'carousel': 'Não foi possível extrair as mídias do carrossel. Verifique se o link do post está correto e se o perfil é público.',
-    'live': 'Não foi possível acessar a Live. Apenas Lives salvas como replay podem ser baixadas.',
+    'igtv': 'Não foi possível acessar o vídeo IGTV. Verifique se o link é de um vídeo IGTV público e tente novamente.',
   };
   return messages[toolType || ''] || 'Não foi possível encontrar a mídia. Verifique se o link está correto e se o perfil é público. O Instagram pode estar bloqueando temporariamente, tente novamente em alguns minutos.';
 }
