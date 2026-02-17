@@ -3,10 +3,11 @@ import { Link, useLocation } from "wouter";
 import { ChevronDown, Globe, Menu, X } from "lucide-react";
 import { tools } from "@/lib/tools-config";
 import { cn } from "@/lib/utils";
+import { useLanguage, type Lang } from "@/lib/i18n";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
 
-const languages = [
+const languages: { code: Lang; label: string; flag: string }[] = [
   { code: "pt", label: "Português", flag: "🇧🇷" },
   { code: "en", label: "English", flag: "🇺🇸" },
   { code: "es", label: "Español", flag: "🇪🇸" },
@@ -18,10 +19,10 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState("pt");
   const [location] = useLocation();
+  const { lang, setLang, t } = useLanguage();
 
-  const activeLang = languages.find((l) => l.code === currentLang) || languages[0];
+  const activeLang = languages.find((l) => l.code === lang) || languages[0];
 
   return (
     <nav className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
@@ -44,7 +45,7 @@ export function Navbar() {
                   toolsOpen ? "text-[#E6195E] bg-[#E6195E]/5" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
                 )}
               >
-                Ferramentas
+                {t("nav.tools")}
                 <ChevronDown className={cn("w-4 h-4 transition-transform", toolsOpen && "rotate-180")} />
               </button>
 
@@ -55,20 +56,20 @@ export function Navbar() {
                 )}
               >
                 <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 border border-black/5 p-3 w-[420px] grid grid-cols-2 gap-1">
-                  {tools.map((t) => (
+                  {tools.map((tool) => (
                     <Link
-                      key={t.id}
-                      href={t.slug}
-                      data-testid={`nav-link-${t.id}`}
+                      key={tool.id}
+                      href={tool.slug}
+                      data-testid={`nav-link-${tool.id}`}
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors",
-                        location === t.slug
+                        location === tool.slug
                           ? "text-[#E6195E] bg-[#E6195E]/5"
                           : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
                       )}
                     >
-                      <t.icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">{t.shortTitle}</span>
+                      <tool.icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{tool.shortTitle}</span>
                     </Link>
                   ))}
                 </div>
@@ -83,7 +84,7 @@ export function Navbar() {
                 location === "/como-funciona" ? "text-[#E6195E]" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
               )}
             >
-              Como Funciona
+              {t("nav.how")}
             </Link>
 
             <div
@@ -110,23 +111,23 @@ export function Navbar() {
                 )}
               >
                 <div className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-black/5 p-1.5 min-w-[160px]">
-                  {languages.map((lang) => (
+                  {languages.map((l) => (
                     <button
-                      key={lang.code}
-                      data-testid={`lang-option-${lang.code}`}
+                      key={l.code}
+                      data-testid={`lang-option-${l.code}`}
                       onClick={() => {
-                        setCurrentLang(lang.code);
+                        setLang(l.code);
                         setLangOpen(false);
                       }}
                       className={cn(
                         "flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm font-semibold transition-colors",
-                        currentLang === lang.code
+                        lang === l.code
                           ? "text-[#E6195E] bg-[#E6195E]/5"
                           : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
                       )}
                     >
-                      <span className="text-base leading-none">{lang.flag}</span>
-                      {lang.label}
+                      <span className="text-base leading-none">{l.flag}</span>
+                      {l.label}
                     </button>
                   ))}
                 </div>
@@ -150,23 +151,23 @@ export function Navbar() {
           )}
         >
           <div className="pt-3 sm:pt-4 border-t border-black/5">
-            <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">Ferramentas</p>
+            <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">{t("nav.tools")}</p>
             <div className="grid grid-cols-2 gap-1">
-              {tools.map((t) => (
+              {tools.map((tool) => (
                 <Link
-                  key={t.id}
-                  href={t.slug}
-                  data-testid={`mobile-nav-link-${t.id}`}
+                  key={tool.id}
+                  href={tool.slug}
+                  data-testid={`mobile-nav-link-${tool.id}`}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     "flex items-center gap-2 px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-colors",
-                    location === t.slug
+                    location === tool.slug
                       ? "text-[#E6195E] bg-[#E6195E]/5"
                       : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
                   )}
                 >
-                  <t.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="truncate">{t.shortTitle}</span>
+                  <tool.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="truncate">{tool.shortTitle}</span>
                 </Link>
               ))}
             </div>
@@ -177,27 +178,27 @@ export function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="block px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-[#1A1A1A]/70 hover:text-[#E6195E]"
               >
-                Como Funciona
+                {t("nav.how")}
               </Link>
             </div>
 
             <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-black/5">
-              <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">Idioma</p>
+              <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">{t("nav.lang")}</p>
               <div className="flex flex-wrap gap-1.5 px-2">
-                {languages.map((lang) => (
+                {languages.map((l) => (
                   <button
-                    key={lang.code}
-                    data-testid={`mobile-lang-${lang.code}`}
-                    onClick={() => setCurrentLang(lang.code)}
+                    key={l.code}
+                    data-testid={`mobile-lang-${l.code}`}
+                    onClick={() => setLang(l.code)}
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors",
-                      currentLang === lang.code
+                      lang === l.code
                         ? "text-[#E6195E] bg-[#E6195E]/5 border border-[#E6195E]/20"
                         : "text-[#1A1A1A]/70 hover:text-[#E6195E] border border-black/5"
                     )}
                   >
-                    <span className="text-sm leading-none">{lang.flag}</span>
-                    {lang.label}
+                    <span className="text-sm leading-none">{l.flag}</span>
+                    {l.label}
                   </button>
                 ))}
               </div>

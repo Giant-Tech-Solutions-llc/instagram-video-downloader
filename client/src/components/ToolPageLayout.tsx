@@ -22,6 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import type { ToolConfig } from "@/lib/tools-config";
 import { tools } from "@/lib/tools-config";
+import { useLanguage } from "@/lib/i18n";
 
 interface ToolPageLayoutProps {
   tool: ToolConfig;
@@ -31,6 +32,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
   const processMutation = useProcessDownload();
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +60,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E6195E] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E6195E]"></span>
                 </span>
-                Ferramenta 100% Gratuita
+                {t("badge.free")}
               </div>
 
               <div className="flex items-center justify-center gap-3 mb-4 sm:mb-6">
@@ -81,12 +83,12 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
 
               <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 md:mb-16 px-2">
                 {[
-                  { label: "Vídeo", slug: "/", id: "video", icon: Video },
-                  { label: "Fotos", slug: "/baixar-fotos-instagram", id: "foto", icon: Camera },
-                  { label: "Stories", slug: "/baixar-stories-instagram", id: "stories", icon: History },
-                  { label: "Reels", slug: "/baixar-reels-instagram", id: "reels", icon: Clapperboard },
-                  { label: "IGTV", slug: "/baixar-igtv-instagram", id: "igtv", icon: Tv },
-                  { label: "MP3", slug: "/extrair-audio-instagram", id: "audio", icon: Music },
+                  { label: t("quick.video"), slug: "/", id: "video", icon: Video },
+                  { label: t("quick.fotos"), slug: "/baixar-fotos-instagram", id: "foto", icon: Camera },
+                  { label: t("quick.stories"), slug: "/baixar-stories-instagram", id: "stories", icon: History },
+                  { label: t("quick.reels"), slug: "/baixar-reels-instagram", id: "reels", icon: Clapperboard },
+                  { label: t("quick.igtv"), slug: "/baixar-igtv-instagram", id: "igtv", icon: Tv },
+                  { label: t("quick.mp3"), slug: "/extrair-audio-instagram", id: "audio", icon: Music },
                 ].map((item) => (
                   <Link
                     key={item.slug}
@@ -130,22 +132,22 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                           const text = await navigator.clipboard.readText();
                           setUrl(text);
                           toast({
-                            title: "Link colado!",
-                            description: "Agora clique em Baixar para processar.",
+                            title: t("toast.pasted"),
+                            description: t("toast.pasted.desc"),
                           });
                         } catch {
                           toast({
                             variant: "destructive",
-                            title: "Erro ao colar",
-                            description: "Não foi possível acessar a área de transferência.",
+                            title: t("toast.paste.error"),
+                            description: t("toast.paste.error.desc"),
                           });
                         }
                       }}
                       className="absolute right-2 sm:right-3 md:right-4 top-1/2 -translate-y-1/2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl md:rounded-2xl bg-white border border-black/5 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-black/60 hover:text-[#E6195E] hover:border-[#E6195E]/20 transition-all shadow-sm active:scale-95"
-                      title="Colar link"
+                      title={t("btn.paste.title")}
                     >
                       <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span className="hidden sm:inline">Colar</span>
+                      <span className="hidden sm:inline">{t("btn.paste")}</span>
                     </button>
                   </div>
                   <button
@@ -157,10 +159,10 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                     {processMutation.isPending ? (
                       <>
                         <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 animate-spin" />
-                        <span className="text-sm sm:text-base md:text-lg">Processando...</span>
+                        <span className="text-sm sm:text-base md:text-lg">{t("btn.processing")}</span>
                       </>
                     ) : (
-                      "BAIXAR"
+                      t("btn.download")
                     )}
                   </button>
                 </form>
@@ -177,7 +179,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold mb-1 text-sm sm:text-base">Erro ao processar</p>
+                      <p className="font-bold mb-1 text-sm sm:text-base">{t("error.title")}</p>
                       <p className="font-medium text-xs sm:text-sm text-red-500">{processMutation.error.message}</p>
                     </div>
                   </motion.div>
@@ -185,13 +187,13 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
               </AnimatePresence>
 
               <div className="mt-4 sm:mt-6 md:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-black/20">
-                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-black/40">No app required</span>
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-black/40">{t("formats.label")}</span>
                 <div className="flex gap-2 sm:gap-4 items-center">
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">No login needed.</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/30">{t("formats.nologin")}</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">100% FREE</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/30">{t("formats.free")}</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">Alta Qualidade</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/30">{t("formats.quality")}</span>
                 </div>
               </div>
             </motion.div>
@@ -211,12 +213,12 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                   >
                     <div className="text-center mb-6 sm:mb-8">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-3 sm:mb-4">
-                        <CheckCircle className="w-3 h-3" /> {processMutation.data.items!.length} itens encontrados
+                        <CheckCircle className="w-3 h-3" /> {processMutation.data.items!.length} {t("result.items_found")}
                       </div>
                       <h3 className="text-2xl sm:text-3xl font-black font-display text-foreground leading-tight" data-testid="text-download-ready">
-                        Carrossel Pronto!
+                        {t("result.carousel")}
                       </h3>
-                      <p className="text-muted-foreground text-sm sm:text-base md:text-lg mt-2">Baixe cada item individualmente abaixo.</p>
+                      <p className="text-muted-foreground text-sm sm:text-base md:text-lg mt-2">{t("result.download_each")}</p>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -243,7 +245,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                               className="flex items-center justify-center gap-1.5 sm:gap-2 w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-[#E6195E] text-white font-bold text-xs sm:text-sm shadow-lg shadow-[#E6195E]/20 hover:brightness-110 active:scale-95 transition-all"
                             >
                               <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              Baixar {index + 1}
+                              {t("result.download_item")} {index + 1}
                             </a>
                           </div>
                         </div>
@@ -256,7 +258,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                         data-testid={`button-download-another-${tool.id}`}
                         className="py-3 sm:py-4 text-xs sm:text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
                       >
-                        Baixar outro arquivo
+                        {t("result.another")}
                       </button>
                     </div>
                   </motion.div>
@@ -294,16 +296,16 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                     <div className="p-6 sm:p-8 md:p-12 md:w-1/2 flex flex-col justify-center">
                       <div className="mb-6 sm:mb-8 text-center md:text-left">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold mb-3 sm:mb-4">
-                          <CheckCircle className="w-3 h-3" /> Sucesso
+                          <CheckCircle className="w-3 h-3" /> {t("result.success")}
                         </div>
                         <h3
                           className="text-2xl sm:text-3xl font-black font-display text-foreground mb-3 sm:mb-4 leading-tight"
                           data-testid="text-download-ready"
                         >
-                          Download Pronto!
+                          {t("result.ready")}
                         </h3>
                         <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
-                          Seu arquivo foi processado com sucesso e está pronto para baixar.
+                          {t("result.desc")}
                         </p>
                       </div>
 
@@ -314,7 +316,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                           className="flex items-center justify-center gap-2 sm:gap-3 w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl bg-[#E6195E] text-white font-black text-base sm:text-lg md:text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
                         >
                           <Download className="w-5 h-5 sm:w-6 sm:h-6" />
-                          BAIXAR {processMutation.data.type === "video" ? "VÍDEO" : "IMAGEM"}
+                          {processMutation.data.type === "video" ? t("result.download_video") : t("result.download_image")}
                         </a>
 
                         <button
@@ -322,7 +324,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                           data-testid={`button-download-another-${tool.id}`}
                           className="w-full py-3 sm:py-4 text-xs sm:text-sm font-bold text-black/40 hover:text-black transition-colors uppercase tracking-widest"
                         >
-                          Baixar outro arquivo
+                          {t("result.another")}
                         </button>
                       </div>
                     </div>
@@ -336,9 +338,9 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
         <section className="py-16 sm:py-24 md:py-32 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-12 sm:mb-16 md:mb-24">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">Recursos</span>
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{t("tool.resources")}</span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
-                Por que usar esta <span className="text-[#E6195E]">ferramenta</span>?
+                {t("tool.why.title1")} <span className="text-[#E6195E]">{t("tool.why.title2")}</span>?
               </h2>
             </div>
 
@@ -359,17 +361,17 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
         <section className="py-16 sm:py-20 md:py-24 bg-[#F8F9FA]">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-10 sm:mb-16">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">Processo Simples</span>
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{t("tool.steps")}</span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-[#1A1A1A] leading-tight">
-                Como usar o <span className="text-[#E6195E]">Downloader</span>
+                {t("tool.steps.title1")} <span className="text-[#E6195E]">{t("tool.steps.title2")}</span>
               </h2>
             </div>
 
             <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {[
-                { step: "01", title: "Copie o Link", desc: "Abra o Instagram, encontre o conteúdo desejado e copie o link de compartilhamento." },
-                { step: "02", title: "Cole Aqui", desc: "Cole o link copiado no campo de busca acima e clique no botão BAIXAR." },
-                { step: "03", title: "Baixe o Arquivo", desc: "Aguarde o processamento e clique para baixar o arquivo no seu dispositivo." },
+                { step: "01", title: t("tool.step1.title"), desc: t("tool.step1.desc") },
+                { step: "02", title: t("tool.step2.title"), desc: t("tool.step2.desc") },
+                { step: "03", title: t("tool.step3.title"), desc: t("tool.step3.desc") },
               ].map((item, i) => (
                 <div key={i} className="text-center p-6 sm:p-8 rounded-2xl sm:rounded-[2rem] bg-white border border-black/5">
                   <div className="text-4xl sm:text-5xl font-display font-black text-[#E6195E]/10 mb-3 sm:mb-4">{item.step}</div>
@@ -384,9 +386,9 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
         <section className="py-16 sm:py-24 md:py-32 bg-white" id="faq">
           <div className="max-w-4xl mx-auto px-4">
             <div className="mb-10 sm:mb-16 md:mb-20">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">Suporte</span>
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{t("tool.faq")}</span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
-                Perguntas <span className="text-[#E6195E]">Frequentes</span>
+                {t("tool.faq.title1")} <span className="text-[#E6195E]">{t("tool.faq.title2")}</span>
               </h2>
             </div>
 
@@ -410,7 +412,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
 
             <div className="mt-16 sm:mt-24 md:mt-32 space-y-8 sm:space-y-12 md:space-y-16 border-t border-black/5 pt-16 sm:pt-24 md:pt-32">
               <div className="prose prose-slate max-w-none">
-                <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block text-center">Saiba Mais</span>
+                <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block text-center">{t("tool.seo")}</span>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#1A1A1A] text-center mb-8 sm:mb-12 md:mb-16">{tool.title}</h2>
 
                 <div className="grid md:grid-cols-2 gap-8 sm:gap-12 md:gap-16">
@@ -429,9 +431,9 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
         <section className="py-16 sm:py-20 md:py-24 bg-[#1A1A1A] text-white rounded-2xl sm:rounded-3xl md:rounded-[4rem] mx-2 sm:mx-4 my-4 sm:my-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-10 sm:mb-16">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">Todas as Ferramentas</span>
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{t("tool.explore")}</span>
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-black leading-tight">
-                Explore nossas <span className="text-[#E6195E]">ferramentas</span>
+                {t("tool.explore.title1")} <span className="text-[#E6195E]">{t("tool.explore.title2")}</span>
               </h2>
             </div>
 
