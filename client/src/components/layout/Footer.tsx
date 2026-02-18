@@ -39,6 +39,7 @@ export default function Footer() {
             <h4 className="font-black text-xs sm:text-sm uppercase tracking-widest mb-4 sm:mb-6 text-[#E6195E]">{t("footer.links")}</h4>
             <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
               <li><Link href="/como-funciona" data-testid="footer-link-como-funciona" className="text-white/50 hover:text-[#E6195E] transition-colors">{t("footer.how")}</Link></li>
+              <li><Link href="/blog" data-testid="footer-link-blog" className="text-white/50 hover:text-[#E6195E] transition-colors">Blog</Link></li>
               <li><Link href="/termos" data-testid="footer-link-termos" className="text-white/50 hover:text-[#E6195E] transition-colors">{t("footer.terms")}</Link></li>
               <li><Link href="/privacidade" data-testid="footer-link-privacidade" className="text-white/50 hover:text-[#E6195E] transition-colors">{t("footer.privacy")}</Link></li>
               <li><Link href="/contato" data-testid="footer-link-contato" className="text-white/50 hover:text-[#E6195E] transition-colors">{t("footer.contact")}</Link></li>

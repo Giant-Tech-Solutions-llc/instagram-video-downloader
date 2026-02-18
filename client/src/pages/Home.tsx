@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { tools } from "@/lib/tools-config";
+import { blogPosts as blogPostsData } from "@/lib/blog-config";
 import { useLanguage } from "@/lib/i18n";
 import { getToolTranslation } from "@/lib/tools-i18n";
 
@@ -342,6 +343,43 @@ export default function Home() {
                   <p className="text-white/40 leading-relaxed text-xs sm:text-sm">{feature.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20 md:py-24 bg-[#F8F9FA]">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-10 sm:mb-14">
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{t("blog.section")}</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-[#1A1A1A] leading-tight">
+                {t("blog.section.title1")} <span className="text-[#E6195E]">{t("blog.section.title2")}</span>
+              </h2>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {blogPostsData.slice(0, 3).map((post) => (
+                <Link key={post.slug} href={`/blog/${post.slug}`} data-testid={`home-blog-${post.slug}`}>
+                  <div className="group bg-white rounded-2xl border border-black/5 overflow-hidden hover:shadow-lg hover:shadow-[#E6195E]/5 hover:border-[#E6195E]/20 transition-all h-full">
+                    <img src={post.featuredImage} alt={post.title} className="w-full h-40 sm:h-44 object-cover" loading="lazy" />
+                    <div className="p-4 sm:p-5">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#E6195E]">{post.category}</span>
+                      <h3 className="text-sm sm:text-base font-black text-[#1A1A1A] mt-1.5 mb-2 leading-snug group-hover:text-[#E6195E] transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground font-medium line-clamp-2">{post.excerpt}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <Link href="/blog" data-testid="home-blog-viewall">
+                <span className="inline-flex items-center gap-2 text-sm font-bold text-[#E6195E] hover:underline">
+                  {t("blog.viewall")}
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
             </div>
           </div>
         </section>

@@ -91,6 +91,17 @@ export function Navbar() {
               {t("nav.how")}
             </Link>
 
+            <Link
+              href="/blog"
+              data-testid="nav-link-blog"
+              className={cn(
+                "px-4 py-2 rounded-xl text-sm font-bold transition-colors",
+                location.startsWith("/blog") ? "text-[#E6195E]" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
+              )}
+            >
+              Blog
+            </Link>
+
             <div
               className="relative"
               onMouseEnter={() => setLangOpen(true)}
@@ -186,6 +197,14 @@ export function Navbar() {
                 className="block px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-[#1A1A1A]/70 hover:text-[#E6195E]"
               >
                 {t("nav.how")}
+              </Link>
+              <Link
+                href="/blog"
+                data-testid="mobile-nav-blog"
+                onClick={() => setMobileOpen(false)}
+                className="block px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-[#1A1A1A]/70 hover:text-[#E6195E]"
+              >
+                Blog
               </Link>
             </div>
 

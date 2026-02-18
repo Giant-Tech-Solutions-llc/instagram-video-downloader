@@ -9,6 +9,8 @@ import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Contact from "@/pages/Contact";
 import ComoFunciona from "@/pages/ComoFunciona";
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
 import NotFound from "@/pages/not-found";
 import ReelsDownloader from "@/pages/tools/ReelsDownloader";
 import StoriesDownloader from "@/pages/tools/StoriesDownloader";
@@ -41,6 +43,8 @@ function Router() {
       <Route path="/privacidade" component={PrivacyPolicy} />
       <Route path="/contato" component={Contact} />
       <Route path="/como-funciona" component={ComoFunciona} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
       <Route component={NotFound} />
     </Switch>
   );
