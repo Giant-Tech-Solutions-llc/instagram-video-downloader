@@ -362,7 +362,7 @@ export default function Home() {
                   <div className="group bg-white rounded-2xl border border-black/5 overflow-hidden hover:shadow-lg hover:shadow-[#E6195E]/5 hover:border-[#E6195E]/20 transition-all h-full">
                     <img src={post.featuredImage} alt={post.title} className="w-full h-40 sm:h-44 object-cover" loading="lazy" />
                     <div className="p-4 sm:p-5">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-[#E6195E]">{post.category}</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#E6195E]">{t(`blog.cat.${post.category.toLowerCase()}`)}</span>
                       <h3 className="text-sm sm:text-base font-black text-[#1A1A1A] mt-1.5 mb-2 leading-snug group-hover:text-[#E6195E] transition-colors line-clamp-2">
                         {post.title}
                       </h3>

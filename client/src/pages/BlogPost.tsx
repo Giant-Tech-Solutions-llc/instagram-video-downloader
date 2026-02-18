@@ -22,7 +22,8 @@ import { ArrowRight, Calendar, Clock, RefreshCw, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function BlogPost() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const dateLocale: Record<string, string> = { pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", hi: "hi-IN" };
   const { slug } = useParams<{ slug: string }>();
   const post = slug ? getBlogPostBySlug(slug) : undefined;
 
@@ -106,7 +107,7 @@ export default function BlogPost() {
                 <BreadcrumbList>
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                      <Link href="/">Início</Link>
+                      <Link href="/">{t("nav.home")}</Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
@@ -124,7 +125,7 @@ export default function BlogPost() {
 
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#E6195E] bg-[#E6195E]/5 px-2.5 py-1 rounded-full">
-                  {post.category}
+                  {t(`blog.cat.${post.category.toLowerCase()}`)}
                 </span>
                 <span className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground font-medium">
                   <Clock className="w-3 h-3" />
@@ -147,7 +148,7 @@ export default function BlogPost() {
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
                   <time dateTime={post.publishDate}>
-                    {new Date(post.publishDate).toLocaleDateString("pt-BR", {
+                    {new Date(post.publishDate).toLocaleDateString(dateLocale[lang] || "pt-BR", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
@@ -158,7 +159,7 @@ export default function BlogPost() {
                   <RefreshCw className="w-3.5 h-3.5" />
                   {t("blog.updated")}{" "}
                   <time dateTime={post.updatedDate}>
-                    {new Date(post.updatedDate).toLocaleDateString("pt-BR", {
+                    {new Date(post.updatedDate).toLocaleDateString(dateLocale[lang] || "pt-BR", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
@@ -264,7 +265,7 @@ export default function BlogPost() {
                           />
                           <div className="p-4 sm:p-5">
                             <span className="text-[10px] font-black uppercase tracking-wider text-[#E6195E]">
-                              {related.category}
+                              {t(`blog.cat.${related.category.toLowerCase()}`)}
                             </span>
                             <h3 className="text-sm sm:text-base font-black text-[#1A1A1A] mt-1.5 leading-snug group-hover:text-[#E6195E] transition-colors line-clamp-2">
                               {related.title}

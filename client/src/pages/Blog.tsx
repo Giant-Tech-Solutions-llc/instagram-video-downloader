@@ -7,7 +7,8 @@ import { useLanguage } from "@/lib/i18n";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 
 export default function Blog() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const dateLocale: Record<string, string> = { pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", hi: "hi-IN" };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
@@ -67,7 +68,7 @@ export default function Blog() {
                       <div className="p-5 sm:p-6 md:p-8 flex flex-col justify-center">
                         <div className="flex items-center gap-3 mb-3">
                           <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#E6195E] bg-[#E6195E]/5 px-2.5 py-1 rounded-full">
-                            {post.category}
+                            {t(`blog.cat.${post.category.toLowerCase()}`)}
                           </span>
                           <span className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground font-medium">
                             <Clock className="w-3 h-3" />
@@ -84,7 +85,7 @@ export default function Blog() {
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <Calendar className="w-3.5 h-3.5" />
                             <time dateTime={post.publishDate}>
-                              {new Date(post.publishDate).toLocaleDateString("pt-BR", {
+                              {new Date(post.publishDate).toLocaleDateString(dateLocale[lang] || "pt-BR", {
                                 day: "numeric",
                                 month: "long",
                                 year: "numeric",
