@@ -190,6 +190,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "blog.cat.tutoriais": "Tutoriais",
     "blog.cat.dicas": "Dicas",
     "blog.cat.noticias": "Notícias",
+    "notfound.title": "Página não encontrada",
+    "notfound.desc": "Ops! A página que você está procurando não existe ou foi movida.",
+    "notfound.back": "Voltar para o Início",
   },
   en: {
     "badge.free": "100% Free Tool",
@@ -378,6 +381,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "blog.cat.tutoriais": "Tutorials",
     "blog.cat.dicas": "Tips",
     "blog.cat.noticias": "News",
+    "notfound.title": "Page not found",
+    "notfound.desc": "Oops! The page you are looking for does not exist or has been moved.",
+    "notfound.back": "Back to Home",
   },
   es: {
     "badge.free": "Herramienta 100% Gratuita",
@@ -566,6 +572,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "blog.cat.tutoriais": "Tutoriales",
     "blog.cat.dicas": "Consejos",
     "blog.cat.noticias": "Noticias",
+    "notfound.title": "Página no encontrada",
+    "notfound.desc": "La página que buscas no existe o ha sido movida.",
+    "notfound.back": "Volver al Inicio",
   },
   fr: {
     "badge.free": "Outil 100% Gratuit",
@@ -754,6 +763,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "blog.cat.tutoriais": "Tutoriels",
     "blog.cat.dicas": "Astuces",
     "blog.cat.noticias": "Actualités",
+    "notfound.title": "Page introuvable",
+    "notfound.desc": "Oups ! La page que vous recherchez n'existe pas ou a été déplacée.",
+    "notfound.back": "Retour à l'accueil",
   },
   hi: {
     "badge.free": "100% मुफ्त टूल",
@@ -942,6 +954,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "blog.cat.tutoriais": "ट्यूटोरियल",
     "blog.cat.dicas": "टिप्स",
     "blog.cat.noticias": "समाचार",
+    "notfound.title": "पेज नहीं मिला",
+    "notfound.desc": "जिस पेज को आप ढूंढ रहे हैं वह मौजूद नहीं है या स्थानांतरित कर दिया गया है।",
+    "notfound.back": "होम पर वापस जाएं",
   },
 };
 

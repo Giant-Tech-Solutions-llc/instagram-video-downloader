@@ -1,4 +1,13 @@
 import { useEffect } from "react";
+import { useLanguage } from "@/lib/i18n";
+
+const ogLocaleMap: Record<string, string> = {
+  pt: "pt_BR",
+  en: "en_US",
+  es: "es_ES",
+  fr: "fr_FR",
+  hi: "hi_IN",
+};
 
 interface SeoProps {
   title: string;
@@ -16,6 +25,8 @@ interface SeoProps {
 }
 
 export function Seo({ title, description, canonical, ogImage, ogType = "website", article, jsonLd }: SeoProps) {
+  const { lang } = useLanguage();
+
   useEffect(() => {
     document.title = title;
 
@@ -48,7 +59,7 @@ export function Seo({ title, description, canonical, ogImage, ogType = "website"
     setMeta("og:type", ogType, true);
     setMeta("og:url", canonicalUrl, true);
     if (ogImage) setMeta("og:image", ogImage, true);
-    setMeta("og:locale", "pt_BR", true);
+    setMeta("og:locale", ogLocaleMap[lang] || "pt_BR", true);
     setMeta("og:site_name", "Baixar Vídeo Instagram", true);
 
     setMeta("twitter:card", "summary_large_image");
@@ -81,7 +92,7 @@ export function Seo({ title, description, canonical, ogImage, ogType = "website"
       const ldScripts = document.querySelectorAll('script[data-seo-jsonld]');
       ldScripts.forEach((el) => el.remove());
     };
-  }, [title, description, canonical, ogImage, ogType, article, jsonLd]);
+  }, [title, description, canonical, ogImage, ogType, article, jsonLd, lang]);
 
   return null;
 }
