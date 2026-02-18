@@ -2,7 +2,6 @@ import { useParams, Link, Redirect } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Seo } from "@/components/Seo";
-import { useLanguage } from "@/lib/i18n";
 import { getBlogPostBySlug, getRelatedPosts } from "@/lib/blog-config";
 import {
   Accordion,
@@ -22,8 +21,6 @@ import { ArrowRight, Calendar, Clock, RefreshCw, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function BlogPost() {
-  const { t, lang } = useLanguage();
-  const dateLocale: Record<string, string> = { pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", hi: "hi-IN" };
   const { slug } = useParams<{ slug: string }>();
   const post = slug ? getBlogPostBySlug(slug) : undefined;
 
@@ -107,7 +104,7 @@ export default function BlogPost() {
                 <BreadcrumbList>
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                      <Link href="/">{t("nav.home")}</Link>
+                      <Link href="/">Início</Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
@@ -125,11 +122,11 @@ export default function BlogPost() {
 
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#E6195E] bg-[#E6195E]/5 px-2.5 py-1 rounded-full">
-                  {t(`blog.cat.${post.category.toLowerCase()}`)}
+                  {post.category}
                 </span>
                 <span className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground font-medium">
                   <Clock className="w-3 h-3" />
-                  {post.readTime} {t("blog.readtime")}
+                  {post.readTime} de leitura
                 </span>
               </div>
 
@@ -148,7 +145,7 @@ export default function BlogPost() {
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
                   <time dateTime={post.publishDate}>
-                    {new Date(post.publishDate).toLocaleDateString(dateLocale[lang] || "pt-BR", {
+                    {new Date(post.publishDate).toLocaleDateString("pt-BR", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
@@ -157,9 +154,9 @@ export default function BlogPost() {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <RefreshCw className="w-3.5 h-3.5" />
-                  {t("blog.updated")}{" "}
+                  Atualizado em{" "}
                   <time dateTime={post.updatedDate}>
-                    {new Date(post.updatedDate).toLocaleDateString(dateLocale[lang] || "pt-BR", {
+                    {new Date(post.updatedDate).toLocaleDateString("pt-BR", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
@@ -201,17 +198,17 @@ export default function BlogPost() {
 
               <div className="mt-10 sm:mt-14 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-[#E6195E] to-[#c01650] text-white text-center" data-testid="blog-cta">
                 <h3 className="text-xl sm:text-2xl font-display font-black mb-3 tracking-tight">
-                  {t("blog.cta.title")}
+                  Pronto para Baixar?
                 </h3>
                 <p className="text-sm sm:text-base text-white/80 font-medium mb-5 max-w-md mx-auto">
-                  {t("blog.cta.desc")}
+                  Use nossa ferramenta gratuita para baixar vídeos, fotos e reels do Instagram em segundos.
                 </p>
                 <Link href="/">
                   <Button
                     className="bg-white text-[#E6195E] hover:bg-white/90 font-bold text-sm sm:text-base px-6"
                     data-testid="button-blog-cta"
                   >
-                    {t("blog.cta.button")}
+                    Baixar Agora
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
@@ -220,7 +217,7 @@ export default function BlogPost() {
               {post.faqs.length > 0 && (
                 <div className="mt-10 sm:mt-14" data-testid="blog-faq">
                   <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-black text-[#1A1A1A] mb-6 tracking-tight">
-                    {t("blog.faq.title")}
+                    Perguntas Frequentes
                   </h2>
                   <Accordion type="single" collapsible className="space-y-2">
                     {post.faqs.map((faq, i) => (
@@ -247,7 +244,7 @@ export default function BlogPost() {
               {relatedPosts.length > 0 && (
                 <div className="mt-10 sm:mt-14 pt-10 sm:pt-14 border-t border-black/5" data-testid="blog-related">
                   <h2 className="text-xl sm:text-2xl font-display font-black text-[#1A1A1A] mb-6 tracking-tight">
-                    {t("blog.related")}
+                    Artigos Relacionados
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                     {relatedPosts.map((related) => (
@@ -265,7 +262,7 @@ export default function BlogPost() {
                           />
                           <div className="p-4 sm:p-5">
                             <span className="text-[10px] font-black uppercase tracking-wider text-[#E6195E]">
-                              {t(`blog.cat.${related.category.toLowerCase()}`)}
+                              {related.category}
                             </span>
                             <h3 className="text-sm sm:text-base font-black text-[#1A1A1A] mt-1.5 leading-snug group-hover:text-[#E6195E] transition-colors line-clamp-2">
                               {related.title}
@@ -284,7 +281,7 @@ export default function BlogPost() {
         <div className="fixed bottom-4 left-4 right-4 sm:hidden z-50" data-testid="blog-sticky-cta">
           <Link href="/">
             <Button className="w-full bg-[#E6195E] hover:bg-[#E6195E]/90 font-bold text-base shadow-lg shadow-[#E6195E]/25">
-              {t("blog.sticky.cta")}
+              Baixar Vídeo do Instagram
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>

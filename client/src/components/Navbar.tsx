@@ -1,29 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { ChevronDown, Globe, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { tools } from "@/lib/tools-config";
 import { cn } from "@/lib/utils";
-import { useLanguage, type Lang } from "@/lib/i18n";
-import { getToolTranslation } from "@/lib/tools-i18n";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
-
-const languages: { code: Lang; label: string; abbr: string }[] = [
-  { code: "pt", label: "Português", abbr: "PT" },
-  { code: "en", label: "English", abbr: "EN" },
-  { code: "es", label: "Español", abbr: "ES" },
-  { code: "fr", label: "Français", abbr: "FR" },
-  { code: "hi", label: "हिन्दी", abbr: "HI" },
-];
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
   const [location] = useLocation();
-  const { lang, setLang, t } = useLanguage();
-
-  const activeLang = languages.find((l) => l.code === lang) || languages[0];
 
   return (
     <nav className="border-b border-border/40 bg-white/80 backdrop-blur-md sticky top-0 z-50">
@@ -46,7 +32,7 @@ export function Navbar() {
                   toolsOpen ? "text-[#E6195E] bg-[#E6195E]/5" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
                 )}
               >
-                {t("nav.tools")}
+                {"Ferramentas"}
                 <ChevronDown className={cn("w-4 h-4 transition-transform", toolsOpen && "rotate-180")} />
               </button>
 
@@ -58,7 +44,6 @@ export function Navbar() {
               >
                 <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 border border-black/5 p-3 w-[420px] grid grid-cols-2 gap-1">
                   {tools.map((tool) => {
-                    const toolTr = getToolTranslation(tool.id, lang);
                     return (
                       <Link
                         key={tool.id}
@@ -72,7 +57,7 @@ export function Navbar() {
                         )}
                       >
                         <tool.icon className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">{toolTr?.shortTitle || tool.shortTitle}</span>
+                        <span className="truncate">{tool.shortTitle}</span>
                       </Link>
                     );
                   })}
@@ -88,7 +73,7 @@ export function Navbar() {
                 location === "/como-funciona" ? "text-[#E6195E]" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
               )}
             >
-              {t("nav.how")}
+              {"Como Funciona"}
             </Link>
 
             <Link
@@ -101,53 +86,6 @@ export function Navbar() {
             >
               Blog
             </Link>
-
-            <div
-              className="relative"
-              onMouseEnter={() => setLangOpen(true)}
-              onMouseLeave={() => setLangOpen(false)}
-            >
-              <button
-                data-testid="button-lang-dropdown"
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-colors",
-                  langOpen ? "text-[#E6195E] bg-[#E6195E]/5" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
-                )}
-              >
-                <Globe className="w-4 h-4" />
-                <span className="text-[10px] font-black tracking-wider bg-[#E6195E]/10 text-[#E6195E] rounded px-1.5 py-0.5 leading-none">{activeLang.abbr}</span>
-                <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", langOpen && "rotate-180")} />
-              </button>
-
-              <div
-                className={cn(
-                  "absolute top-full right-0 pt-2 transition-all duration-200",
-                  langOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
-                )}
-              >
-                <div className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-black/5 p-1.5 min-w-[160px]">
-                  {languages.map((l) => (
-                    <button
-                      key={l.code}
-                      data-testid={`lang-option-${l.code}`}
-                      onClick={() => {
-                        setLang(l.code);
-                        setLangOpen(false);
-                      }}
-                      className={cn(
-                        "flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm font-semibold transition-colors",
-                        lang === l.code
-                          ? "text-[#E6195E] bg-[#E6195E]/5"
-                          : "text-[#1A1A1A]/70 hover:text-[#E6195E] hover:bg-[#F8F9FA]"
-                      )}
-                    >
-                      <span className="text-[10px] font-black tracking-wider bg-[#E6195E]/10 text-[#E6195E] rounded px-1.5 py-0.5 leading-none">{l.abbr}</span>
-                      {l.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
 
           <button
@@ -166,10 +104,9 @@ export function Navbar() {
           )}
         >
           <div className="pt-3 sm:pt-4 border-t border-black/5">
-            <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">{t("nav.tools")}</p>
+            <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">{"Ferramentas"}</p>
             <div className="grid grid-cols-2 gap-1">
               {tools.map((tool) => {
-                const toolTr = getToolTranslation(tool.id, lang);
                 return (
                   <Link
                     key={tool.id}
@@ -184,7 +121,7 @@ export function Navbar() {
                     )}
                   >
                     <tool.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                    <span className="truncate">{toolTr?.shortTitle || tool.shortTitle}</span>
+                    <span className="truncate">{tool.shortTitle}</span>
                   </Link>
                 );
               })}
@@ -196,7 +133,7 @@ export function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="block px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-[#1A1A1A]/70 hover:text-[#E6195E]"
               >
-                {t("nav.how")}
+                {"Como Funciona"}
               </Link>
               <Link
                 href="/blog"
@@ -206,28 +143,6 @@ export function Navbar() {
               >
                 Blog
               </Link>
-            </div>
-
-            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-black/5">
-              <p className="px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/30">{t("nav.lang")}</p>
-              <div className="flex flex-wrap gap-1.5 px-2">
-                {languages.map((l) => (
-                  <button
-                    key={l.code}
-                    data-testid={`mobile-lang-${l.code}`}
-                    onClick={() => setLang(l.code)}
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors",
-                      lang === l.code
-                        ? "text-[#E6195E] bg-[#E6195E]/5 border border-[#E6195E]/20"
-                        : "text-[#1A1A1A]/70 hover:text-[#E6195E] border border-black/5"
-                    )}
-                  >
-                    <span className="text-[10px] font-black tracking-wider bg-[#E6195E]/10 text-[#E6195E] rounded px-1.5 py-0.5 leading-none">{l.abbr}</span>
-                    {l.label}
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         </div>

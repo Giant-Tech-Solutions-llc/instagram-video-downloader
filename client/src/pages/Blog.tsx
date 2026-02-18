@@ -3,12 +3,9 @@ import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Seo } from "@/components/Seo";
 import { blogPosts } from "@/lib/blog-config";
-import { useLanguage } from "@/lib/i18n";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 
 export default function Blog() {
-  const { t, lang } = useLanguage();
-  const dateLocale: Record<string, string> = { pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", hi: "hi-IN" };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
@@ -41,7 +38,7 @@ export default function Blog() {
               Blog
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
-              {t("blog.list.desc")}
+              Dicas, tutoriais e guias atualizados sobre como baixar conteúdo do Instagram de forma rápida e segura.
             </p>
           </div>
         </section>
@@ -68,7 +65,7 @@ export default function Blog() {
                       <div className="p-5 sm:p-6 md:p-8 flex flex-col justify-center">
                         <div className="flex items-center gap-3 mb-3">
                           <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#E6195E] bg-[#E6195E]/5 px-2.5 py-1 rounded-full">
-                            {t(`blog.cat.${post.category.toLowerCase()}`)}
+                            {post.category}
                           </span>
                           <span className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground font-medium">
                             <Clock className="w-3 h-3" />
@@ -85,7 +82,7 @@ export default function Blog() {
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <Calendar className="w-3.5 h-3.5" />
                             <time dateTime={post.publishDate}>
-                              {new Date(post.publishDate).toLocaleDateString(dateLocale[lang] || "pt-BR", {
+                              {new Date(post.publishDate).toLocaleDateString("pt-BR", {
                                 day: "numeric",
                                 month: "long",
                                 year: "numeric",
@@ -93,7 +90,7 @@ export default function Blog() {
                             </time>
                           </div>
                           <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#E6195E] group-hover:gap-2 transition-all">
-                            {t("blog.readmore")}
+                            Ler artigo
                             <ArrowRight className="w-3.5 h-3.5" />
                           </span>
                         </div>

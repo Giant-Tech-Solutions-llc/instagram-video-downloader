@@ -53,7 +53,7 @@ The project uses a single repository with three main directories:
 1. **Server-side scraping approach:** Instagram content is fetched server-side using axios + cheerio rather than client-side, to handle CORS restrictions. Instagram frequently blocks server-side scraping without proxies, which is a known limitation.
 2. **Shared route contracts:** The `shared/routes.ts` file acts as a typed API contract, with Zod schemas for both inputs and outputs, ensuring client and server stay in sync.
 3. **Mobile-first design:** The UI is optimized for smartphone users (the primary Brazilian user base), with responsive layouts and touch-friendly interactions.
-4. **Multi-language support:** Full i18n system supporting 5 languages (pt, en, es, fr, hi). Translation files in `client/src/lib/i18n.tsx` (general UI) and `client/src/lib/tools-i18n.ts` (tool-specific content). Language persisted in localStorage.
+4. **Portuguese-only UI:** The entire app is in Portuguese (pt-BR) targeting the Brazilian market. No multi-language support — all text is hardcoded in Portuguese.
 5. **Blog system:** Static blog with SEO-optimized posts stored in `client/src/lib/blog-config.ts`. Routes: `/blog` (list page) and `/blog/:slug` (single post template). Includes JSON-LD Article/FAQPage schemas, Open Graph tags, breadcrumbs, FAQ accordions, CTA blocks, and related posts. SEO component at `client/src/components/Seo.tsx`.
 
 ## External Dependencies
