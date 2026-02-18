@@ -65,11 +65,6 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                 {t("badge.free")}
               </div>
 
-              <div className="flex items-center justify-center gap-3 mb-4 sm:mb-6">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center">
-                  <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#E6195E]" />
-                </div>
-              </div>
 
               <h1
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-black text-[#1A1A1A] mb-4 sm:mb-6 md:mb-8 tracking-tighter leading-[0.95]"
