@@ -64,8 +64,11 @@ export function Seo({ title, description, canonical, ogImage, ogType = "website"
     }
 
     const existingLd = document.querySelectorAll('script[data-seo-jsonld]');
-    existingLd.forEach((el) => el.remove());
+    existingLd.forEach((el) => {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
 
+    const addedScripts: HTMLScriptElement[] = [];
     if (jsonLd) {
       const schemas = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
       schemas.forEach((schema) => {
@@ -74,12 +77,14 @@ export function Seo({ title, description, canonical, ogImage, ogType = "website"
         script.setAttribute("data-seo-jsonld", "true");
         script.textContent = JSON.stringify(schema);
         document.head.appendChild(script);
+        addedScripts.push(script);
       });
     }
 
     return () => {
-      const ldScripts = document.querySelectorAll('script[data-seo-jsonld]');
-      ldScripts.forEach((el) => el.remove());
+      addedScripts.forEach((el) => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
     };
   }, [title, description, canonical, ogImage, ogType, article, jsonLd]);
 
