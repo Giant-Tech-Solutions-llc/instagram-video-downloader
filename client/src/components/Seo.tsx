@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface SeoProps {
   title: string;
@@ -15,19 +15,31 @@ interface SeoProps {
   jsonLd?: object | object[];
 }
 
+function safeRemove(el: Element) {
+  try {
+    if (el.parentNode) {
+      el.parentNode.removeChild(el);
+    }
+  } catch (_e) {}
+}
+
 export function Seo({ title, description, canonical, ogImage, ogType = "website", article, jsonLd }: SeoProps) {
+  const scriptsRef = useRef<HTMLScriptElement[]>([]);
+
   useEffect(() => {
     document.title = title;
 
     const setMeta = (name: string, content: string, isProperty = false) => {
-      const attr = isProperty ? "property" : "name";
-      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
+      try {
+        const attr = isProperty ? "property" : "name";
+        let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+        if (!el) {
+          el = document.createElement("meta");
+          el.setAttribute(attr, name);
+          document.head.appendChild(el);
+        }
+        el.setAttribute("content", content);
+      } catch (_e) {}
     };
 
     setMeta("description", description);
@@ -35,13 +47,15 @@ export function Seo({ title, description, canonical, ogImage, ogType = "website"
     const baseUrl = window.location.origin;
     const canonicalUrl = canonical ? `${baseUrl}${canonical}` : `${baseUrl}${window.location.pathname}`;
 
-    let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonicalEl) {
-      canonicalEl = document.createElement("link");
-      canonicalEl.setAttribute("rel", "canonical");
-      document.head.appendChild(canonicalEl);
-    }
-    canonicalEl.setAttribute("href", canonicalUrl);
+    try {
+      let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+      if (!canonicalEl) {
+        canonicalEl = document.createElement("link");
+        canonicalEl.setAttribute("rel", "canonical");
+        document.head.appendChild(canonicalEl);
+      }
+      canonicalEl.setAttribute("href", canonicalUrl);
+    } catch (_e) {}
 
     setMeta("og:title", title, true);
     setMeta("og:description", description, true);
@@ -63,28 +77,29 @@ export function Seo({ title, description, canonical, ogImage, ogType = "website"
       setMeta("article:section", article.category, true);
     }
 
-    const existingLd = document.querySelectorAll('script[data-seo-jsonld]');
-    existingLd.forEach((el) => {
-      if (el.parentNode) el.parentNode.removeChild(el);
-    });
+    scriptsRef.current.forEach(safeRemove);
+    scriptsRef.current = [];
 
-    const addedScripts: HTMLScriptElement[] = [];
+    const existingLd = document.querySelectorAll('script[data-seo-jsonld]');
+    existingLd.forEach(safeRemove);
+
     if (jsonLd) {
       const schemas = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
       schemas.forEach((schema) => {
-        const script = document.createElement("script");
-        script.type = "application/ld+json";
-        script.setAttribute("data-seo-jsonld", "true");
-        script.textContent = JSON.stringify(schema);
-        document.head.appendChild(script);
-        addedScripts.push(script);
+        try {
+          const script = document.createElement("script");
+          script.type = "application/ld+json";
+          script.setAttribute("data-seo-jsonld", "true");
+          script.textContent = JSON.stringify(schema);
+          document.head.appendChild(script);
+          scriptsRef.current.push(script);
+        } catch (_e) {}
       });
     }
 
     return () => {
-      addedScripts.forEach((el) => {
-        if (el.parentNode) el.parentNode.removeChild(el);
-      });
+      scriptsRef.current.forEach(safeRemove);
+      scriptsRef.current = [];
     };
   }, [title, description, canonical, ogImage, ogType, article, jsonLd]);
 
