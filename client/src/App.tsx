@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AdminAuthProvider } from "@/lib/admin-auth";
 import Home from "@/pages/Home";
 import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
@@ -22,6 +23,15 @@ import PrivateDownloader from "@/pages/tools/PrivateDownloader";
 import HD4KDownloader from "@/pages/tools/HD4KDownloader";
 import NoWatermarkDownloader from "@/pages/tools/NoWatermarkDownloader";
 import IGTVDownloader from "@/pages/tools/IGTVDownloader";
+import AdminLogin from "@/pages/admin/AdminLogin";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminPosts from "@/pages/admin/AdminPosts";
+import AdminPostEditor from "@/pages/admin/AdminPostEditor";
+import AdminCategories from "@/pages/admin/AdminCategories";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminMedia from "@/pages/admin/AdminMedia";
+import AdminAuditLogs from "@/pages/admin/AdminAuditLogs";
+import AdminProfile from "@/pages/admin/AdminProfile";
 
 function Router() {
   return (
@@ -44,6 +54,19 @@ function Router() {
       <Route path="/como-funciona" component={ComoFunciona} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/posts" component={AdminPosts} />
+      <Route path="/admin/posts/trash">
+        <AdminPosts trashed />
+      </Route>
+      <Route path="/admin/posts/create" component={AdminPostEditor} />
+      <Route path="/admin/posts/edit/:id" component={AdminPostEditor} />
+      <Route path="/admin/categories" component={AdminCategories} />
+      <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/media" component={AdminMedia} />
+      <Route path="/admin/audit-logs" component={AdminAuditLogs} />
+      <Route path="/admin/profile" component={AdminProfile} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -53,8 +76,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router />
-        <Toaster />
+        <AdminAuthProvider>
+          <Router />
+          <Toaster />
+        </AdminAuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

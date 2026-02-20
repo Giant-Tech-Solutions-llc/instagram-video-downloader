@@ -1,4 +1,5 @@
 import { useParams, Link, Redirect } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Seo } from "@/components/Seo";
@@ -17,18 +18,73 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { ArrowRight, Calendar, Clock, RefreshCw, User } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Loader2, RefreshCw, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+interface BlogPostData {
+  id: number;
+  title: string;
+  slug: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  content: string;
+  excerpt: string | null;
+  featuredImage: string | null;
+  readTime: string | null;
+  publishedAt: string | null;
+  updatedAt: string | null;
+  faqs: Array<{ question: string; answer: string }> | null;
+  authorName: string;
+  categoryName: string;
+  categorySlug: string;
+}
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const post = slug ? getBlogPostBySlug(slug) : undefined;
+
+  const { data: dbPost, isLoading } = useQuery<BlogPostData>({
+    queryKey: [`/api/blog/posts/${slug}`],
+    enabled: !!slug,
+    retry: false,
+  });
+
+  const staticPost = slug ? getBlogPostBySlug(slug) : undefined;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#E6195E]" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const post = dbPost
+    ? {
+        title: dbPost.title,
+        slug: dbPost.slug,
+        metaTitle: dbPost.metaTitle || dbPost.title,
+        metaDescription: dbPost.metaDescription || dbPost.excerpt || "",
+        content: dbPost.content,
+        excerpt: dbPost.excerpt || "",
+        featuredImage: dbPost.featuredImage || "",
+        readTime: dbPost.readTime || "5 min",
+        publishDate: dbPost.publishedAt || "",
+        updatedDate: dbPost.updatedAt || dbPost.publishedAt || "",
+        author: dbPost.authorName,
+        category: dbPost.categoryName,
+        faqs: dbPost.faqs || [],
+      }
+    : staticPost;
 
   if (!post) {
     return <Redirect to="/blog" />;
   }
 
-  const relatedPosts = getRelatedPosts(post.relatedSlugs);
+  const relatedPosts = staticPost ? getRelatedPosts(staticPost.relatedSlugs || []) : [];
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -142,42 +198,48 @@ export default function BlogPost() {
                   <User className="w-3.5 h-3.5" />
                   {post.author}
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <time dateTime={post.publishDate}>
-                    {new Date(post.publishDate).toLocaleDateString("pt-BR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </time>
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  Atualizado em{" "}
-                  <time dateTime={post.updatedDate}>
-                    {new Date(post.updatedDate).toLocaleDateString("pt-BR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </time>
-                </span>
+                {post.publishDate && (
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <time dateTime={post.publishDate}>
+                      {new Date(post.publishDate).toLocaleDateString("pt-BR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </time>
+                  </span>
+                )}
+                {post.updatedDate && (
+                  <span className="flex items-center gap-1.5">
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Atualizado em{" "}
+                    <time dateTime={post.updatedDate}>
+                      {new Date(post.updatedDate).toLocaleDateString("pt-BR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </time>
+                  </span>
+                )}
               </div>
             </div>
           </section>
 
-          <section className="py-2 sm:py-4">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6">
-              <img
-                src={post.featuredImage}
-                alt={post.title}
-                className="w-full h-48 sm:h-64 md:h-80 object-cover rounded-2xl"
-                loading="eager"
-                data-testid="img-blog-featured"
-              />
-            </div>
-          </section>
+          {post.featuredImage && (
+            <section className="py-2 sm:py-4">
+              <div className="max-w-3xl mx-auto px-4 sm:px-6">
+                <img
+                  src={post.featuredImage}
+                  alt={post.title}
+                  className="w-full h-48 sm:h-64 md:h-80 object-cover rounded-2xl"
+                  loading="eager"
+                  data-testid="img-blog-featured"
+                />
+              </div>
+            </section>
+          )}
 
           <section className="py-8 sm:py-12 md:py-16">
             <div className="max-w-3xl mx-auto px-4 sm:px-6">

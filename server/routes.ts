@@ -4,7 +4,12 @@ import { storage } from "./storage";
 import { z } from "zod";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { seed } from "./seed";
+import path from "path";
+import express from "express";
+import { seed, seedAdmin } from "./seed";
+import { setupSession } from "./auth";
+import adminRouter from "./admin-routes";
+import { cmsStorage } from "./cms-storage";
 
 const BROWSER_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
@@ -393,6 +398,120 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   seed();
+  seedAdmin();
+
+  app.use(setupSession());
+
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+  app.use("/api/admin", adminRouter);
+
+  app.get("/api/blog/posts", async (req, res) => {
+    try {
+      const { page, limit, category } = req.query;
+      const result = await cmsStorage.getPublishedPosts({
+        page: page ? Number(page) : 1,
+        limit: limit ? Number(limit) : 10,
+        categorySlug: category as string,
+      });
+
+      const cats = await cmsStorage.getCategories();
+      const users = await cmsStorage.getUsers();
+
+      const postsWithDetails = result.posts.map(post => {
+        const author = users.find(u => u.id === post.authorId);
+        const cat = cats.find(c => c.id === post.categoryId);
+        return {
+          ...post,
+          authorName: author?.name || "Equipe Baixar Vídeo",
+          categoryName: cat?.name || "",
+          categorySlug: cat?.slug || "",
+        };
+      });
+
+      res.json({ posts: postsWithDetails, total: result.total });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao carregar posts." });
+    }
+  });
+
+  app.get("/api/blog/posts/:slug", async (req, res) => {
+    try {
+      const post = await cmsStorage.getPostBySlug(req.params.slug);
+      if (!post || post.status !== 'published') {
+        return res.status(404).json({ message: "Post não encontrado." });
+      }
+
+      const users = await cmsStorage.getUsers();
+      const cats = await cmsStorage.getCategories();
+      const author = users.find(u => u.id === post.authorId);
+      const cat = cats.find(c => c.id === post.categoryId);
+
+      res.json({
+        ...post,
+        authorName: author?.name || "Equipe Baixar Vídeo",
+        categoryName: cat?.name || "",
+        categorySlug: cat?.slug || "",
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao carregar post." });
+    }
+  });
+
+  app.get("/api/blog/categories", async (_req, res) => {
+    try {
+      const cats = await cmsStorage.getCategories();
+      res.json(cats);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao carregar categorias." });
+    }
+  });
+
+  app.get("/sitemap.xml", async (_req, res) => {
+    try {
+      const { posts } = await cmsStorage.getPublishedPosts({ limit: 1000 });
+      const baseUrl = "https://baixarvideo.com";
+
+      const staticPages = [
+        { url: "/", priority: "1.0", changefreq: "daily" },
+        { url: "/blog", priority: "0.8", changefreq: "daily" },
+        { url: "/baixar-reels-instagram", priority: "0.9", changefreq: "weekly" },
+        { url: "/baixar-stories-instagram", priority: "0.9", changefreq: "weekly" },
+        { url: "/baixar-fotos-instagram", priority: "0.9", changefreq: "weekly" },
+        { url: "/baixar-foto-perfil-instagram", priority: "0.8", changefreq: "weekly" },
+        { url: "/extrair-audio-instagram", priority: "0.8", changefreq: "weekly" },
+        { url: "/baixar-destaques-instagram", priority: "0.8", changefreq: "weekly" },
+        { url: "/baixar-carrossel-instagram", priority: "0.8", changefreq: "weekly" },
+        { url: "/baixar-conteudo-privado-instagram", priority: "0.7", changefreq: "weekly" },
+        { url: "/baixar-hd-4k-instagram", priority: "0.8", changefreq: "weekly" },
+        { url: "/baixar-sem-marca-dagua-instagram", priority: "0.8", changefreq: "weekly" },
+        { url: "/baixar-igtv-instagram", priority: "0.7", changefreq: "weekly" },
+        { url: "/como-funciona", priority: "0.6", changefreq: "monthly" },
+        { url: "/contato", priority: "0.5", changefreq: "monthly" },
+        { url: "/termos", priority: "0.3", changefreq: "yearly" },
+        { url: "/privacidade", priority: "0.3", changefreq: "yearly" },
+      ];
+
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+      for (const page of staticPages) {
+        xml += `  <url>\n    <loc>${baseUrl}${page.url}</loc>\n    <changefreq>${page.changefreq}</changefreq>\n    <priority>${page.priority}</priority>\n  </url>\n`;
+      }
+
+      for (const post of posts) {
+        const lastmod = post.updatedAt ? new Date(post.updatedAt).toISOString().split('T')[0] : '';
+        xml += `  <url>\n    <loc>${baseUrl}/blog/${post.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+      }
+
+      xml += '</urlset>';
+
+      res.set('Content-Type', 'application/xml');
+      res.send(xml);
+    } catch (error) {
+      res.status(500).send("Error generating sitemap");
+    }
+  });
 
   app.post('/api/download/process', async (req, res) => {
     try {
