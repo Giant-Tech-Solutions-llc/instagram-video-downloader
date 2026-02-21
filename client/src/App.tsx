@@ -23,6 +23,7 @@ import PrivateDownloader from "@/pages/tools/PrivateDownloader";
 import HD4KDownloader from "@/pages/tools/HD4KDownloader";
 import NoWatermarkDownloader from "@/pages/tools/NoWatermarkDownloader";
 import IGTVDownloader from "@/pages/tools/IGTVDownloader";
+import LiveDownloader from "@/pages/tools/LiveDownloader";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminPosts from "@/pages/admin/AdminPosts";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/baixar-hd-4k-instagram" component={HD4KDownloader} />
       <Route path="/baixar-sem-marca-dagua-instagram" component={NoWatermarkDownloader} />
       <Route path="/baixar-igtv-instagram" component={IGTVDownloader} />
+      <Route path="/baixar-live-instagram" component={LiveDownloader} />
       <Route path="/termos" component={TermsOfUse} />
       <Route path="/privacidade" component={PrivacyPolicy} />
       <Route path="/contato" component={Contact} />

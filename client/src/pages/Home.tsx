@@ -7,20 +7,25 @@ import { Link } from "wouter";
 import {
   ArrowRight,
   Camera,
+  Check,
   CheckCircle,
   Clapperboard,
   Clock,
   Copy,
   Download,
   AlertCircle,
+  Eye,
   History,
   Infinity,
   Loader2,
+  Monitor,
   Music,
   PlayCircle,
+  Shield,
   Smartphone,
   Tv,
   Video,
+  X,
   Zap,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -57,17 +62,17 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E6195E] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E6195E]"></span>
                 </span>
-                {"Ferramenta 100% Gratuita"}
+                {"100% Grátis"}
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-black text-[#1A1A1A] mb-4 sm:mb-6 md:mb-8 tracking-tighter leading-[0.95]" data-testid="text-page-title">
-                {"Baixar Vídeo"} <br />
-                <span className="text-[#E6195E]">{"do Instagram"}</span>
+                {"Baixar Vídeo do Instagram"} <br />
+                <span className="text-[#E6195E]">{"Grátis em HD"}</span>
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8 font-medium leading-relaxed px-2">
-                {"A solução definitiva para salvar conteúdos do Instagram."} <br className="hidden md:block" />
-                {"Rápido, seguro e em alta qualidade com apenas um clique."}
+                {"Faça baixar vídeo do Instagram em alta qualidade instantaneamente."} <br className="hidden md:block" />
+                {"Cole o link do vídeo abaixo e baixar videos do Instagram direto para o seu dispositivo — rápido, seguro e sem marca d'água."}
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 md:mb-16 px-2">
@@ -151,7 +156,7 @@ export default function Home() {
                         <span className="text-sm sm:text-base md:text-lg">{"Processando..."}</span>
                       </>
                     ) : (
-                      "BAIXAR"
+                      "BAIXAR AGORA"
                     )}
                   </button>
                 </form>
@@ -176,13 +181,12 @@ export default function Home() {
               </AnimatePresence>
 
               <div className="mt-4 sm:mt-6 md:mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-black/20">
-                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-black/40">{"Formatos:"}</span>
                 <div className="flex gap-2 sm:gap-4 items-center">
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">{"MP4 HD"}</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/40">{"Sem aplicativo."}</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">{"JPG Original"}</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/40">{"Sem login."}</span>
                   <span className="text-black/10">|</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-black/30">{"Alta Qualidade"}</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-black/40">{"100% grátis."}</span>
                 </div>
               </div>
             </motion.div>
@@ -258,30 +262,67 @@ export default function Home() {
         </AnimatePresence>
 
         <section className="py-16 sm:py-20 md:py-24 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-[#1A1A1A] leading-tight mb-4 sm:mb-6">
+                {"Baixar Vídeo Instagram Online"} <span className="text-[#E6195E]">{"de Forma Rápida e Segura"}</span>
+              </h2>
+            </div>
+            <div className="space-y-4 sm:space-y-6 text-base sm:text-lg text-muted-foreground font-medium leading-relaxed">
+              <p>
+                {"O Instagram está cheio de conteúdos envolventes: Reels, vídeos curtos, publicações longas e muito mais. Embora o aplicativo permita salvar alguns conteúdos, ele não oferece a opção de baixar vídeo do Instagram diretamente para o seu dispositivo."}
+              </p>
+              <p>
+                {"Nosso baixador de vídeo do Instagram permite que você faça baixar vídeo Instagram online em poucos segundos."}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-6 sm:my-8">
+                {[
+                  "Assistir offline",
+                  "Repostar conteúdo",
+                  "Editar vídeos",
+                  "Fazer backup",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 p-3 sm:p-4 rounded-xl bg-[#F8F9FA] border border-black/5">
+                    <CheckCircle className="w-4 h-4 text-[#E6195E] flex-shrink-0" />
+                    <span className="text-sm sm:text-base font-bold text-[#1A1A1A]">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <p>
+                {"Nosso site para baixar video do Instagram torna o processo simples e seguro. Com suporte para publicações públicas, download em alta qualidade e processamento rápido, você pode baixar vídeo do Instagram grátis sem instalar nenhum aplicativo."}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20 md:py-24 bg-[#F8F9FA]">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-10 sm:mb-16">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Nossas Ferramentas"}</span>
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Ferramentas Gratuitas, Online e Sem Aplicativo"}</span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
-                {"Todas as Ferramentas"} <span className="text-[#E6195E]">{"Instagram"}</span>
+                {"Todas as Ferramentas para Baixar"} <br className="hidden sm:block" /> <span className="text-[#E6195E]">{"Conteúdo do Instagram"}</span>
               </h2>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mt-4 sm:mt-6 max-w-2xl mx-auto font-medium px-2">
-                {"Escolha a ferramenta ideal para o tipo de conteúdo que deseja baixar."}
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mt-4 sm:mt-6 max-w-3xl mx-auto font-medium px-2">
+                {"Escolha a Ferramenta Ideal para Qualquer Tipo de Conteúdo. Oferecemos um conjunto completo de ferramentas para baixar conteúdo do Instagram, desenvolvidas para ajudar você a baixar, salvar, converter, copiar e extrair vídeos e outros conteúdos de forma rápida e segura."}
+              </p>
+              <p className="text-sm sm:text-base text-muted-foreground mt-3 max-w-3xl mx-auto font-medium px-2">
+                {"Todas as ferramentas são gratuitas, funcionam 100% online e não exigem a instalação de nenhum aplicativo."}
               </p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {tools.map((tool) => {
+              {tools.filter(t => t.slug !== "/").map((tool) => {
                 return (
                   <Link
                     key={tool.id}
                     href={tool.slug}
                     data-testid={`home-tool-${tool.id}`}
-                    className="group p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-[#F8F9FA] border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
+                    className="group p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-white border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
                   >
                     <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-300">
                       <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#E6195E] group-hover:text-white transition-colors" />
                     </div>
-                    <h3 className="text-xs sm:text-sm font-black text-[#1A1A1A] mb-1">{tool.shortTitle}</h3>
+                    <h3 className="text-xs sm:text-sm font-black text-[#1A1A1A] mb-1">{tool.title}</h3>
                     <p className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-relaxed line-clamp-2 hidden sm:block">{tool.subtitle}</p>
                   </Link>
                 );
@@ -290,27 +331,56 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-20 md:py-24 bg-[#F8F9FA]">
+        <section className="py-16 sm:py-20 md:py-24 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-10 sm:mb-16">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Processo Simples"}</span>
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"3 Passos Simples"}</span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
-                {"Como usar o"} <span className="text-[#E6195E]">{"Downloader"}</span>
+                {"Como Baixar Video"} <span className="text-[#E6195E]">{"do Instagram"}</span>
               </h2>
+              <p className="text-base sm:text-lg text-muted-foreground mt-4 max-w-2xl mx-auto font-medium">
+                {"Se você quer saber como baixar video do Instagram, siga estes passos:"}
+              </p>
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-12 sm:mb-16">
               {[
-                { step: "01", title: "Encontre o Conteúdo", desc: "Abra o Instagram e encontre o vídeo, reel, foto ou story que deseja salvar e copie o link." },
-                { step: "02", title: "Cole o Link", desc: "Cole o link copiado no campo de busca acima e aguarde o processamento rápido." },
-                { step: "03", title: "Baixe Agora", desc: "Clique no botão de download e salve o arquivo em alta qualidade no seu dispositivo." },
+                { step: "01", title: "Copie o Link", desc: "Abra o Instagram, toque nos três pontos (…) e selecione \"Copiar link\"." },
+                { step: "02", title: "Cole o Link", desc: "Volte ao nosso baixador de vídeo do Instagram e cole o link." },
+                { step: "03", title: "Clique em Baixar", desc: "Seu vídeo estará pronto em segundos." },
               ].map((item, i) => (
-                <div key={i} className="text-center p-6 sm:p-8 rounded-2xl sm:rounded-[2rem] bg-white border border-black/5">
+                <div key={i} className="text-center p-6 sm:p-8 rounded-2xl sm:rounded-[2rem] bg-[#F8F9FA] border border-black/5">
                   <div className="text-4xl sm:text-5xl font-display font-black text-[#E6195E]/10 mb-3 sm:mb-4">{item.step}</div>
                   <h3 className="text-lg sm:text-xl font-black mb-2 sm:mb-3 text-[#1A1A1A]">{item.title}</h3>
                   <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-medium">{item.desc}</p>
                 </div>
               ))}
+            </div>
+
+            <div className="max-w-3xl mx-auto bg-[#F8F9FA] rounded-2xl sm:rounded-[2rem] border border-black/5 p-6 sm:p-8">
+              <h3 className="text-lg sm:text-xl font-black text-[#1A1A1A] mb-4">
+                {"Como Baixar Vídeo do Instagram no Celular"}
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground font-medium mb-4">
+                {"Se você estiver usando um dispositivo móvel e não encontrar a opção de link:"}
+              </p>
+              <div className="space-y-2.5">
+                {[
+                  "Toque em compartilhar",
+                  "Copie o link",
+                  "Abra o navegador",
+                  "Cole o link em nosso programa online para baixar conteúdo do Instagram",
+                  "Clique em baixar",
+                ].map((step, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#E6195E]/10 text-[#E6195E] text-xs font-black flex items-center justify-center mt-0.5">{i + 1}</span>
+                    <span className="text-sm sm:text-base text-[#1A1A1A] font-medium">{step}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground font-bold mt-4 pt-4 border-t border-black/5">
+                {"Sem extensões. Sem aplicativos. Sem complicação."}
+              </p>
             </div>
           </div>
         </section>
@@ -319,17 +389,22 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-12 sm:mb-16 md:mb-24">
               <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Vantagens"}</span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black mb-6 sm:mb-8 leading-tight">
-                {"Por que escolher o"} <span className="text-[#E6195E]">{"Baixar Vídeo"}</span>?
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black mb-4 sm:mb-6 leading-tight">
+                {"Por Que Escolher Nosso"} <span className="text-[#E6195E]">{"Baixador de Vídeo do Instagram"}</span>
               </h2>
+              <p className="text-base sm:text-lg text-white/50 max-w-2xl mx-auto font-medium">
+                {"Existem muitos sites, mas veja por que somos a melhor escolha para baixar vídeo do Instagram:"}
+              </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-12">
               {[
-                { icon: <Zap className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Alta Qualidade", desc: "Baixe vídeos em MP4 HD e fotos em resolução original." },
-                { icon: <Clock className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Download Rápido", desc: "Processamento instantâneo sem esperas ou anúncios abusivos." },
-                { icon: <Infinity className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Ilimitado", desc: "Faça quantos downloads desejar sem limites diários." },
-                { icon: <Smartphone className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Suporte Total", desc: "Funciona em todos os dispositivos iOS, Android e PC." },
+                { icon: <Zap className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Processamento Rápido", desc: "Baixe vídeos em segundos." },
+                { icon: <Shield className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Seguro e Privado", desc: "Não armazenamos seus dados." },
+                { icon: <Eye className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Interface Simples", desc: "Sem anúncios confusos." },
+                { icon: <Smartphone className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Compatível com Celular", desc: "Funciona em Android e iPhone." },
+                { icon: <Monitor className="w-6 h-6 sm:w-8 sm:h-8" />, title: "Alta Qualidade", desc: "Faça baixar video Instagram HD sem marca d'água." },
+                { icon: <Infinity className="w-6 h-6 sm:w-8 sm:h-8" />, title: "100% Online", desc: "Sem instalação." },
               ].map((feature, i) => (
                 <div key={i} className="text-center group">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl md:rounded-[2rem] bg-white/5 flex items-center justify-center mx-auto mb-4 sm:mb-6 md:mb-8 border border-white/5 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-500">
@@ -340,6 +415,87 @@ export default function Home() {
                 </div>
               ))}
             </div>
+
+            <p className="text-center text-white/50 text-sm sm:text-base font-medium mt-10 sm:mt-16 max-w-2xl mx-auto">
+              {"Se você procura um site para baixar video do Instagram confiável, esta é a solução ideal."}
+            </p>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20 md:py-24 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-10 sm:mb-16">
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Comparação com Outras Ferramentas"}</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-[#1A1A1A] leading-tight">
+                {"Como Nosso Baixador"} <span className="text-[#E6195E]">{"se Compara"}</span>
+              </h2>
+              <p className="text-base sm:text-lg text-muted-foreground mt-4 max-w-2xl mx-auto font-medium">
+                {"Veja como nosso baixador de vídeo do Instagram se destaca em velocidade, qualidade, recursos e segurança."}
+              </p>
+            </div>
+
+            <div className="overflow-x-auto -mx-4 px-4">
+              <table className="w-full min-w-[700px] border-collapse" data-testid="comparison-table">
+                <thead>
+                  <tr>
+                    <th className="text-left p-3 sm:p-4 text-sm sm:text-base font-black text-[#1A1A1A] bg-[#F8F9FA] rounded-tl-xl border-b border-black/5">{"Recursos"}</th>
+                    <th className="p-3 sm:p-4 text-sm sm:text-base font-black text-white bg-[#E6195E] border-b border-[#E6195E]">{"Nossa Ferramenta"}</th>
+                    <th className="p-3 sm:p-4 text-xs sm:text-sm font-bold text-[#1A1A1A]/60 bg-[#F8F9FA] border-b border-black/5">{"SSSInstagram"}</th>
+                    <th className="p-3 sm:p-4 text-xs sm:text-sm font-bold text-[#1A1A1A]/60 bg-[#F8F9FA] border-b border-black/5">{"SnapInsta"}</th>
+                    <th className="p-3 sm:p-4 text-xs sm:text-sm font-bold text-[#1A1A1A]/60 bg-[#F8F9FA] rounded-tr-xl border-b border-black/5">{"SaveClip.app"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: "Baixar Vídeos do Instagram", us: "Alta velocidade, HD, sem login", sss: "Downloads rápidos", snap: "Sim", save: "Sim" },
+                    { feature: "Baixar Reels do Instagram", us: "Sim – HD", sss: "Sim", snap: "Sim", save: "Sim" },
+                    { feature: "Baixar Stories e Highlights", us: "Sim", sss: "Sim", snap: null, save: "Sim" },
+                    { feature: "Baixar Fotos e Carrossel", us: "Sim", sss: "Sim", snap: "Sim", save: "Sim" },
+                    { feature: "Extrair Áudio / Converter para MP3", us: "Sim", sss: null, snap: null, save: null },
+                    { feature: "Suporte para Conteúdo Privado", us: "Sim (acesso autorizado)", sss: "Limitado", snap: null, save: "Sim (acesso autorizado)" },
+                    { feature: "Sem Necessidade de Login", us: "Sim", sss: "Sim", snap: "Sim", save: "Sim" },
+                    { feature: "Sem Necessidade de Instalar Aplicativo", us: "Sim", sss: null, snap: "Sim", save: null },
+                    { feature: "Download Sem Marca d'Água", us: "Sim", sss: null, snap: "Sim", save: null },
+                    { feature: "Compatível com Celular e Computador", us: "Sim", sss: "Sim", snap: "Sim", save: "Sim" },
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#F8F9FA]/50"}>
+                      <td className="p-3 sm:p-4 text-xs sm:text-sm font-bold text-[#1A1A1A] border-b border-black/5">{row.feature}</td>
+                      <td className="p-3 sm:p-4 text-center border-b border-black/5 bg-[#E6195E]/5">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Check className="w-4 h-4 text-[#E6195E]" />
+                          <span className="text-xs sm:text-sm font-bold text-[#E6195E]">{row.us}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 sm:p-4 text-center border-b border-black/5">
+                        {row.sss ? (
+                          <span className="text-xs sm:text-sm font-medium text-[#1A1A1A]/50">{row.sss}</span>
+                        ) : (
+                          <X className="w-4 h-4 text-red-300 mx-auto" />
+                        )}
+                      </td>
+                      <td className="p-3 sm:p-4 text-center border-b border-black/5">
+                        {row.snap ? (
+                          <span className="text-xs sm:text-sm font-medium text-[#1A1A1A]/50">{row.snap}</span>
+                        ) : (
+                          <X className="w-4 h-4 text-red-300 mx-auto" />
+                        )}
+                      </td>
+                      <td className="p-3 sm:p-4 text-center border-b border-black/5">
+                        {row.save ? (
+                          <span className="text-xs sm:text-sm font-medium text-[#1A1A1A]/50">{row.save}</span>
+                        ) : (
+                          <X className="w-4 h-4 text-red-300 mx-auto" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-center text-muted-foreground text-sm sm:text-base font-medium mt-8 max-w-3xl mx-auto">
+              {"Enquanto muitos sites oferecem apenas downloads básicos, nossa plataforma permite baixar vídeo do Instagram, extrair áudio, baixar conteúdo privado autorizado e salvar vídeos em HD, tudo em um único lugar."}
+            </p>
           </div>
         </section>
 
@@ -383,7 +539,7 @@ export default function Home() {
         <section className="py-16 sm:py-24 md:py-32 bg-white" id="faq">
           <div className="max-w-4xl mx-auto px-4">
             <div className="mb-10 sm:mb-16 md:mb-20">
-              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Suporte"}</span>
+              <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Perguntas Frequentes"}</span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
                 {"Perguntas"} <span className="text-[#E6195E]">{"Frequentes"}</span>
               </h2>
@@ -391,12 +547,16 @@ export default function Home() {
 
             <div className="space-y-3 sm:space-y-4 md:space-y-6">
               {[
-                { q: "Como baixar vídeos do Instagram?", a: "Copie o link do vídeo, cole no campo acima e clique em 'BAIXAR'. O vídeo será processado e o link de download em MP4 aparecerá instantaneamente." },
-                { q: "Como baixar Fotos do Instagram em alta qualidade?", a: "Basta colar o link da publicação da foto. Nosso sistema extrai a imagem em sua resolução original (HD), permitindo que você salve em JPG sem perda de nitidez." },
-                { q: "É possível baixar Reels com áudio?", a: "Sim! Nosso downloader baixa Reels completos com áudio e vídeo em alta definição, ideal para assistir offline ou compartilhar." },
-                { q: "Como baixar Stories e Destaques (Highlights)?", a: "Copie o link do Story ou do Destaque desejado. Lembre-se que Stories expiram em 24h, então baixe-os enquanto ainda estão visíveis no perfil público." },
-                { q: "O serviço é gratuito e ilimitado?", a: "Com certeza. Você pode realizar downloads ilimitados de vídeos, fotos e reels sem pagar nada e sem precisar criar uma conta." },
-                { q: "Quais ferramentas estão disponíveis?", a: "Oferecemos 12 ferramentas especializadas: Vídeo, Reels, Stories, Fotos, Foto de Perfil, Áudio/MP3, Destaques, Carrossel, Conteúdo Privado, HD/4K, Sem Marca d'Água e IGTV." },
+                { q: "1. É grátis baixar vídeo do Instagram?", a: "Sim, nosso site permite baixar vídeo do Instagram gratis sem limites." },
+                { q: "2. Posso baixar vídeo do Instagram sem aplicativo?", a: "Sim. Você pode baixar vídeo Instagram online direto no navegador." },
+                { q: "3. Preciso fazer login?", a: "Não." },
+                { q: "4. Posso baixar vídeo Instagram HD?", a: "Sim, oferecemos baixar video Instagram HD sempre que disponível." },
+                { q: "5. Remove marca d'água?", a: "Sim." },
+                { q: "6. Posso baixar vídeos privados?", a: "Apenas com acesso autorizado." },
+                { q: "7. É seguro usar o site?", a: "Sim, não armazenamos dados." },
+                { q: "8. Funciona no celular?", a: "Sim, Android, iPhone, tablet e PC." },
+                { q: "9. Como baixar vídeo do Instagram online grátis?", a: "Copie o link, cole no site e clique em baixar." },
+                { q: "10. Funciona em qualquer dispositivo?", a: "Sim, sem precisar instalar aplicativo." },
               ].map((item, i) => (
                 <div key={i} className="bg-[#F8F9FA] rounded-xl sm:rounded-2xl md:rounded-[2rem] border border-black/5 overflow-hidden">
                   <details className="group">
