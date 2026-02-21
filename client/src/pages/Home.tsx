@@ -538,7 +538,7 @@ export default function Home() {
 
         <section className="py-16 sm:py-24 md:py-32 bg-white" id="faq">
           <div className="max-w-4xl mx-auto px-4">
-            <div className="mb-10 sm:mb-16 md:mb-20">
+            <div className="text-center mb-10 sm:mb-16 md:mb-20">
               <span className="text-[#E6195E] font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 sm:mb-4 block">{"Perguntas Frequentes"}</span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-[#1A1A1A] leading-tight">
                 {"Perguntas"} <span className="text-[#E6195E]">{"Frequentes"}</span>
