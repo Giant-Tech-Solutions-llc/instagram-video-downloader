@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Save, Eye, ArrowLeft, Plus, Trash2, History } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Save, Eye, ArrowLeft, Plus, Trash2, History, Clock, FileText, Link2, Calendar, Search } from "lucide-react";
+import MDEditor from "@uiw/react-md-editor";
 import AdminLayout from "./AdminLayout";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +24,17 @@ function slugify(text: string): string {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .trim();
+}
+
+function countWords(text: string): number {
+  if (!text) return 0;
+  const plain = text.replace(/[#*_`~\[\]()>!|-]/g, " ").replace(/\s+/g, " ").trim();
+  return plain ? plain.split(" ").length : 0;
+}
+
+function calcReadTime(wordCount: number): string {
+  const minutes = Math.max(1, Math.ceil(wordCount / 200));
+  return `${minutes} min read`;
 }
 
 export default function AdminPostEditor() {
@@ -43,9 +56,18 @@ export default function AdminPostEditor() {
   const [tags, setTags] = useState("");
   const [canonicalUrl, setCanonicalUrl] = useState("");
   const [readTime, setReadTime] = useState("");
+  const [internalLinks, setInternalLinks] = useState("");
+  const [publishDate, setPublishDate] = useState("");
   const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([]);
   const [showRevisions, setShowRevisions] = useState(false);
   const [slugManuallySet, setSlugManuallySet] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [autosaveEnabled, setAutosaveEnabled] = useState(true);
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasChangesRef = useRef(false);
+
+  const wordCount = countWords(content);
+  const computedReadTime = calcReadTime(wordCount);
 
   const { data: post, isLoading: postLoading } = useQuery({
     queryKey: ["/api/admin/posts", params.id],
@@ -77,8 +99,14 @@ export default function AdminPostEditor() {
       setTags(post.tags?.join(", ") || "");
       setCanonicalUrl(post.canonicalUrl || "");
       setReadTime(post.readTime || "");
+      setInternalLinks(post.internalLinks || "");
       setFaqs(post.faqs || []);
       setSlugManuallySet(true);
+      if (post.publishedAt) {
+        const d = new Date(post.publishedAt);
+        setPublishDate(d.toISOString().slice(0, 16));
+      }
+      hasChangesRef.current = false;
     }
   }, [post, isEditing]);
 
@@ -87,6 +115,10 @@ export default function AdminPostEditor() {
       setSlug(slugify(title));
     }
   }, [title, slugManuallySet]);
+
+  useEffect(() => {
+    setReadTime(computedReadTime);
+  }, [computedReadTime]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -100,7 +132,8 @@ export default function AdminPostEditor() {
       const data = await res.json();
       queryClient.invalidateQueries({ queryKey: ["/api/admin/posts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard/stats"] });
-      toast({ title: isEditing ? "Post updated!" : "Post created!" });
+      setLastSaved(new Date());
+      hasChangesRef.current = false;
       if (!isEditing) {
         navigate(`/admin/posts/edit/${data.id}`);
       }
@@ -111,12 +144,7 @@ export default function AdminPostEditor() {
     },
   });
 
-  const handleSave = (saveStatus?: string) => {
-    if (!title || !slug) {
-      toast({ title: "Title and slug are required.", variant: "destructive" });
-      return;
-    }
-
+  const buildPostData = useCallback((saveStatus?: string) => {
     const postData: any = {
       title,
       slug,
@@ -130,15 +158,55 @@ export default function AdminPostEditor() {
       tags: tags ? tags.split(",").map(t => t.trim()).filter(Boolean) : [],
       canonicalUrl,
       readTime,
+      internalLinks,
       faqs: faqs.filter(f => f.question && f.answer),
     };
 
-    if (saveStatus === "published" && (!post || post.status !== "published")) {
+    if (publishDate) {
+      postData.publishedAt = new Date(publishDate).toISOString();
+    } else if (saveStatus === "published" && (!post || post.status !== "published")) {
       postData.publishedAt = new Date().toISOString();
     }
 
+    return postData;
+  }, [title, slug, metaTitle, metaDescription, content, excerpt, featuredImage, categoryId, status, tags, canonicalUrl, readTime, internalLinks, faqs, publishDate, post]);
+
+  const handleSave = (saveStatus?: string) => {
+    if (!title || !slug) {
+      toast({ title: "Title and slug are required.", variant: "destructive" });
+      return;
+    }
+    const postData = buildPostData(saveStatus);
     saveMutation.mutate(postData);
+    if (saveStatus !== "draft") {
+      toast({ title: saveStatus === "published" ? "Post published!" : "Post saved!" });
+    }
   };
+
+  useEffect(() => {
+    hasChangesRef.current = true;
+  }, [title, slug, metaTitle, metaDescription, content, excerpt, featuredImage, categoryId, status, tags, canonicalUrl, readTime, internalLinks, publishDate, faqs]);
+
+  useEffect(() => {
+    if (!autosaveEnabled || !isEditing) return;
+
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+
+    autosaveTimerRef.current = setTimeout(() => {
+      if (hasChangesRef.current && title && slug && !saveMutation.isPending) {
+        const postData = buildPostData();
+        saveMutation.mutate(postData);
+      }
+    }, 30000);
+
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
+    };
+  }, [title, slug, metaTitle, metaDescription, content, excerpt, featuredImage, categoryId, status, tags, canonicalUrl, readTime, internalLinks, publishDate, faqs, isEditing, autosaveEnabled, buildPostData]);
 
   const addFaq = () => setFaqs([...faqs, { question: "", answer: "" }]);
   const removeFaq = (index: number) => setFaqs(faqs.filter((_, i) => i !== index));
@@ -149,6 +217,11 @@ export default function AdminPostEditor() {
   };
 
   const canPublish = user?.role === "super_admin" || user?.role === "editor";
+
+  const metaTitleLen = (metaTitle || title).length;
+  const metaDescLen = metaDescription.length;
+  const metaTitleColor = metaTitleLen > 60 ? "text-red-400" : metaTitleLen > 50 ? "text-yellow-400" : "text-green-400";
+  const metaDescColor = metaDescLen > 160 ? "text-red-400" : metaDescLen > 140 ? "text-yellow-400" : "text-green-400";
 
   if (isEditing && postLoading) {
     return (
@@ -161,7 +234,7 @@ export default function AdminPostEditor() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -175,6 +248,22 @@ export default function AdminPostEditor() {
               <h1 className="text-2xl font-bold text-white">
                 {isEditing ? "Edit Post" : "New Post"}
               </h1>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-gray-500 text-xs flex items-center gap-1">
+                  <FileText className="w-3 h-3" /> {wordCount} words
+                </span>
+                <span className="text-gray-500 text-xs flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> {computedReadTime}
+                </span>
+                {lastSaved && (
+                  <span className="text-gray-500 text-xs">
+                    Saved {lastSaved.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                )}
+                {isEditing && autosaveEnabled && (
+                  <Badge className="bg-green-500/10 text-green-400 text-[10px] px-1.5 py-0">Autosave ON</Badge>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -231,18 +320,19 @@ export default function AdminPostEditor() {
             </Card>
 
             <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-white text-base">Content</CardTitle>
+                <span className="text-gray-500 text-xs">{wordCount} words &middot; {computedReadTime}</span>
               </CardHeader>
-              <CardContent className="p-4">
-                <Textarea
+              <CardContent className="p-4" data-color-mode="dark">
+                <MDEditor
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write post content in HTML..."
-                  className="bg-gray-800 border-gray-700 text-white min-h-[400px] font-mono text-sm"
+                  onChange={(val) => setContent(val || "")}
+                  height={500}
+                  preview="live"
                   data-testid="input-content"
                 />
-                <p className="text-gray-500 text-xs mt-2">Supports HTML. Use tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt; etc.</p>
+                <p className="text-gray-500 text-xs mt-2">Write using Markdown. Use # for headings, **bold**, *italic*, - for lists, etc.</p>
               </CardContent>
             </Card>
 
@@ -369,6 +459,19 @@ export default function AdminPostEditor() {
                   </Select>
                 </div>
                 <div className="space-y-2">
+                  <Label className="text-gray-300 text-sm flex items-center gap-1">
+                    <Calendar className="w-3 h-3" /> Publish Date
+                  </Label>
+                  <Input
+                    type="datetime-local"
+                    value={publishDate}
+                    onChange={(e) => setPublishDate(e.target.value)}
+                    className="bg-gray-800 border-gray-700 text-white"
+                    data-testid="input-publish-date"
+                  />
+                  <p className="text-gray-500 text-[10px]">Leave empty to use current time when publishing</p>
+                </div>
+                <div className="space-y-2">
                   <Label className="text-gray-300 text-sm">Category</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
                     <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -394,13 +497,16 @@ export default function AdminPostEditor() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300 text-sm">Read Time</Label>
+                  <Label className="text-gray-300 text-sm flex items-center gap-1">
+                    <Clock className="w-3 h-3" /> Read Time
+                  </Label>
                   <Input
                     value={readTime}
                     onChange={(e) => setReadTime(e.target.value)}
-                    placeholder="5 min"
+                    placeholder="5 min read"
                     className="bg-gray-800 border-gray-700 text-white"
                   />
+                  <p className="text-gray-500 text-[10px]">Auto-calculated: {computedReadTime}</p>
                 </div>
               </CardContent>
             </Card>
@@ -430,7 +536,27 @@ export default function AdminPostEditor() {
 
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-white text-base">SEO</CardTitle>
+                <CardTitle className="text-white text-base flex items-center gap-2">
+                  <Link2 className="w-4 h-4" /> Internal Links
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <Textarea
+                  value={internalLinks}
+                  onChange={(e) => setInternalLinks(e.target.value)}
+                  placeholder="Add internal linking notes or URLs to link to from this post, one per line"
+                  className="bg-gray-800 border-gray-700 text-white min-h-[80px] text-sm"
+                  data-testid="input-internal-links"
+                />
+                <p className="text-gray-500 text-[10px] mt-1">Notes for internal linking strategy</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white text-base flex items-center gap-2">
+                  <Search className="w-4 h-4" /> SEO
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
@@ -442,7 +568,10 @@ export default function AdminPostEditor() {
                     className="bg-gray-800 border-gray-700 text-white"
                     data-testid="input-meta-title"
                   />
-                  <p className="text-gray-500 text-xs">{metaTitle.length}/60 characters</p>
+                  <div className="flex items-center justify-between">
+                    <p className={`text-xs ${metaTitleColor}`}>{metaTitleLen}/60 characters</p>
+                    {metaTitleLen > 60 && <span className="text-red-400 text-[10px]">Too long!</span>}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-gray-300 text-sm">Meta Description</Label>
@@ -453,7 +582,10 @@ export default function AdminPostEditor() {
                     className="bg-gray-800 border-gray-700 text-white min-h-[80px]"
                     data-testid="input-meta-description"
                   />
-                  <p className="text-gray-500 text-xs">{metaDescription.length}/160 characters</p>
+                  <div className="flex items-center justify-between">
+                    <p className={`text-xs ${metaDescColor}`}>{metaDescLen}/160 characters</p>
+                    {metaDescLen > 160 && <span className="text-red-400 text-[10px]">Too long!</span>}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-gray-300 text-sm">Canonical URL</Label>
@@ -465,13 +597,22 @@ export default function AdminPostEditor() {
                   />
                 </div>
 
-                {metaTitle && (
-                  <div className="p-3 bg-gray-800 rounded-lg">
-                    <p className="text-blue-400 text-sm font-medium truncate">{metaTitle || title}</p>
-                    <p className="text-green-400 text-xs truncate">/blog/{slug}</p>
-                    <p className="text-gray-400 text-xs mt-1 line-clamp-2">{metaDescription || excerpt}</p>
+                <div className="border border-gray-700 rounded-lg overflow-hidden">
+                  <div className="bg-gray-800 px-3 py-2 border-b border-gray-700">
+                    <p className="text-gray-400 text-[10px] uppercase tracking-wider font-medium">Google Preview</p>
                   </div>
-                )}
+                  <div className="p-3 bg-white">
+                    <p className="text-[#1a0dab] text-base font-medium leading-tight truncate">
+                      {metaTitle || title || "Page Title"}
+                    </p>
+                    <p className="text-[#006621] text-xs mt-0.5 truncate">
+                      baixarvideo.com/blog/{slug || "post-slug"}
+                    </p>
+                    <p className="text-[#545454] text-xs mt-1 line-clamp-2 leading-relaxed">
+                      {metaDescription || excerpt || "Add a meta description to see how your page will appear in Google search results."}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

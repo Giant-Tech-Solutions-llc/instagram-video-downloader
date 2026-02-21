@@ -1,5 +1,8 @@
 import { useParams, Link, Redirect } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Seo } from "@/components/Seo";
@@ -83,6 +86,28 @@ export default function BlogPost() {
   if (!post) {
     return <Redirect to="/blog" />;
   }
+
+  const isMarkdown = (text: string) => {
+    if (!text) return false;
+    const htmlPattern = /<(h[1-6]|p|div|span|ul|ol|li|a|img|strong|em|table|br|hr)\b/i;
+    if (htmlPattern.test(text)) return false;
+    const mdPattern = /(^#{1,6}\s|^\*\s|^-\s|^\d+\.\s|\*\*|__|\[.*\]\(.*\)|```)/m;
+    return mdPattern.test(text);
+  };
+
+  const renderedContent = useMemo(() => {
+    if (!post.content) return "";
+    let html: string;
+    if (isMarkdown(post.content)) {
+      html = marked(post.content, { breaks: true }) as string;
+    } else {
+      html = post.content;
+    }
+    return DOMPurify.sanitize(html, {
+      ADD_TAGS: ["iframe"],
+      ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "target"],
+    });
+  }, [post.content]);
 
   const relatedPosts = staticPost ? getRelatedPosts(staticPost.relatedSlugs || []) : [];
 
@@ -255,7 +280,7 @@ export default function BlogPost() {
                   prose-ul:my-4 prose-ul:space-y-1
                 "
                 data-testid="blog-content"
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: renderedContent }}
               />
 
               <div className="mt-10 sm:mt-14 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-[#E6195E] to-[#c01650] text-white text-center" data-testid="blog-cta">

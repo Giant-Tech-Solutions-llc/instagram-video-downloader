@@ -89,10 +89,13 @@ The project uses a single repository with three main directories:
 1. **Server-side scraping approach:** Instagram content is fetched server-side using axios + cheerio rather than client-side, to handle CORS restrictions. Instagram frequently blocks server-side scraping without proxies, which is a known limitation.
 2. **Shared route contracts:** The `shared/routes.ts` file acts as a typed API contract, with Zod schemas for both inputs and outputs, ensuring client and server stay in sync.
 3. **Mobile-first design:** The UI is optimized for smartphone users (the primary Brazilian user base), with responsive layouts and touch-friendly interactions.
-4. **Portuguese-only UI:** The entire app is in Portuguese (pt-BR) targeting the Brazilian market. No multi-language support — all text is hardcoded in Portuguese.
+4. **Portuguese public site / English admin panel:** The public-facing site is entirely in Portuguese (pt-BR). The admin CMS panel is in English.
 5. **Database-driven blog:** Blog posts are stored in PostgreSQL and served via API. Static blog config in `client/src/lib/blog-config.ts` serves as fallback. Public pages fetch from `/api/blog/posts` and `/api/blog/posts/:slug`.
 6. **Session-based admin auth:** Uses express-session with PostgreSQL session store. HttpOnly cookies with secure flags. Role-based access control across all admin endpoints.
 7. **CMS admin panel:** Dark-themed admin UI with sidebar navigation. Separate from public site design. Protected by session auth and role-based middleware.
+8. **Markdown editor:** Post content uses @uiw/react-md-editor with live preview. Content stored as Markdown, rendered to HTML on public blog via `marked` + `DOMPurify` for XSS protection.
+9. **Autosave:** Post editor autosaves every 30 seconds for existing posts when changes are detected. All editable fields trigger autosave.
+10. **SEO tools:** Google snippet preview, character counters for meta title/description, word count and reading time calculator.
 
 ## External Dependencies
 
@@ -113,6 +116,9 @@ The project uses a single repository with three main directories:
 - **express-session** + **connect-pg-simple** — Session management with PostgreSQL store
 - **multer** — File upload handling for media library
 - **sanitize-html** — HTML content sanitization for blog posts
+- **@uiw/react-md-editor** — Markdown editor with live preview for blog post editing
+- **marked** — Markdown-to-HTML conversion for public blog rendering
+- **dompurify** — HTML sanitization for XSS protection on rendered content
 
 ### Replit-Specific
 - **@replit/vite-plugin-runtime-error-modal** — Runtime error overlay in development

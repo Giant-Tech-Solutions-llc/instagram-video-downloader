@@ -83,6 +83,7 @@ export const blogPosts = pgTable("blog_posts", {
   faqs: jsonb("faqs").$type<{ question: string; answer: string }[]>(),
   canonicalUrl: text("canonical_url"),
   readTime: text("read_time"),
+  internalLinks: text("internal_links"),
   publishedAt: timestamp("published_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
