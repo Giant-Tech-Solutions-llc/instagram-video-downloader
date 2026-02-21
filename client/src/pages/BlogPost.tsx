@@ -83,10 +83,6 @@ export default function BlogPost() {
       }
     : staticPost;
 
-  if (!post) {
-    return <Redirect to="/blog" />;
-  }
-
   const isMarkdown = (text: string) => {
     if (!text) return false;
     const htmlPattern = /<(h[1-6]|p|div|span|ul|ol|li|a|img|strong|em|table|br|hr)\b/i;
@@ -96,7 +92,7 @@ export default function BlogPost() {
   };
 
   const renderedContent = useMemo(() => {
-    if (!post.content) return "";
+    if (!post?.content) return "";
     let html: string;
     if (isMarkdown(post.content)) {
       html = marked(post.content, { breaks: true }) as string;
@@ -107,9 +103,13 @@ export default function BlogPost() {
       ADD_TAGS: ["iframe"],
       ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "target"],
     });
-  }, [post.content]);
+  }, [post?.content]);
 
   const relatedPosts = staticPost ? getRelatedPosts(staticPost.relatedSlugs || []) : [];
+
+  if (!post) {
+    return <Redirect to="/blog" />;
+  }
 
   const articleSchema = {
     "@context": "https://schema.org",
