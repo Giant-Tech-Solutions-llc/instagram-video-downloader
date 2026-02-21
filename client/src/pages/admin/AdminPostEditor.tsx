@@ -100,20 +100,20 @@ export default function AdminPostEditor() {
       const data = await res.json();
       queryClient.invalidateQueries({ queryKey: ["/api/admin/posts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard/stats"] });
-      toast({ title: isEditing ? "Post atualizado!" : "Post criado!" });
+      toast({ title: isEditing ? "Post updated!" : "Post created!" });
       if (!isEditing) {
         navigate(`/admin/posts/edit/${data.id}`);
       }
     },
     onError: async (err: any) => {
       const data = await err?.json?.().catch(() => null);
-      toast({ title: data?.message || "Erro ao salvar post.", variant: "destructive" });
+      toast({ title: data?.message || "Error saving post.", variant: "destructive" });
     },
   });
 
   const handleSave = (saveStatus?: string) => {
     if (!title || !slug) {
-      toast({ title: "Título e slug são obrigatórios.", variant: "destructive" });
+      toast({ title: "Title and slug are required.", variant: "destructive" });
       return;
     }
 
@@ -153,7 +153,7 @@ export default function AdminPostEditor() {
   if (isEditing && postLoading) {
     return (
       <AdminLayout>
-        <div className="text-gray-400 text-center p-8">Carregando...</div>
+        <div className="text-gray-400 text-center p-8">Loading...</div>
       </AdminLayout>
     );
   }
@@ -173,7 +173,7 @@ export default function AdminPostEditor() {
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-white">
-                {isEditing ? "Editar Post" : "Novo Post"}
+                {isEditing ? "Edit Post" : "New Post"}
               </h1>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function AdminPostEditor() {
               data-testid="button-save-draft"
             >
               <Save className="w-4 h-4 mr-2" />
-              Salvar Rascunho
+              Save Draft
             </Button>
             {canPublish && (
               <Button
@@ -196,7 +196,7 @@ export default function AdminPostEditor() {
                 data-testid="button-publish"
               >
                 <Eye className="w-4 h-4 mr-2" />
-                Publicar
+                Publish
               </Button>
             )}
           </div>
@@ -207,11 +207,11 @@ export default function AdminPostEditor() {
             <Card className="bg-gray-900 border-gray-800">
               <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-gray-300">Título</Label>
+                  <Label className="text-gray-300">Title</Label>
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Título do post"
+                    placeholder="Post title"
                     className="bg-gray-800 border-gray-700 text-white text-lg"
                     data-testid="input-title"
                   />
@@ -221,7 +221,7 @@ export default function AdminPostEditor() {
                   <Input
                     value={slug}
                     onChange={(e) => { setSlug(e.target.value); setSlugManuallySet(true); }}
-                    placeholder="url-do-post"
+                    placeholder="post-url-slug"
                     className="bg-gray-800 border-gray-700 text-white"
                     data-testid="input-slug"
                   />
@@ -232,29 +232,29 @@ export default function AdminPostEditor() {
 
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-white text-base">Conteúdo</CardTitle>
+                <CardTitle className="text-white text-base">Content</CardTitle>
               </CardHeader>
               <CardContent className="p-4">
                 <Textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  placeholder="Escreva o conteúdo do post em HTML..."
+                  placeholder="Write post content in HTML..."
                   className="bg-gray-800 border-gray-700 text-white min-h-[400px] font-mono text-sm"
                   data-testid="input-content"
                 />
-                <p className="text-gray-500 text-xs mt-2">Suporta HTML. Use tags como &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt; etc.</p>
+                <p className="text-gray-500 text-xs mt-2">Supports HTML. Use tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt; etc.</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-white text-base">Resumo / Excerto</CardTitle>
+                <CardTitle className="text-white text-base">Excerpt</CardTitle>
               </CardHeader>
               <CardContent className="p-4">
                 <Textarea
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
-                  placeholder="Breve descrição do post (exibido na listagem do blog)"
+                  placeholder="Brief post description (shown in blog listing)"
                   className="bg-gray-800 border-gray-700 text-white min-h-[100px]"
                   data-testid="input-excerpt"
                 />
@@ -265,17 +265,17 @@ export default function AdminPostEditor() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-white text-base">FAQ</CardTitle>
                 <Button size="sm" variant="outline" className="border-gray-700 text-gray-300" onClick={addFaq} data-testid="button-add-faq">
-                  <Plus className="w-3 h-3 mr-1" /> Adicionar
+                  <Plus className="w-3 h-3 mr-1" /> Add
                 </Button>
               </CardHeader>
               <CardContent className="p-4 space-y-4">
                 {faqs.length === 0 && (
-                  <p className="text-gray-500 text-sm">Nenhuma FAQ adicionada. Clique em "Adicionar" para criar.</p>
+                  <p className="text-gray-500 text-sm">No FAQs added. Click "Add" to create one.</p>
                 )}
                 {faqs.map((faq, index) => (
                   <div key={index} className="space-y-2 p-3 bg-gray-800 rounded-lg">
                     <div className="flex items-center justify-between">
-                      <Label className="text-gray-300 text-sm">Pergunta {index + 1}</Label>
+                      <Label className="text-gray-300 text-sm">Question {index + 1}</Label>
                       <Button size="sm" variant="ghost" className="text-red-400 h-6" onClick={() => removeFaq(index)}>
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -283,13 +283,13 @@ export default function AdminPostEditor() {
                     <Input
                       value={faq.question}
                       onChange={(e) => updateFaq(index, "question", e.target.value)}
-                      placeholder="Pergunta"
+                      placeholder="Question"
                       className="bg-gray-700 border-gray-600 text-white"
                     />
                     <Textarea
                       value={faq.answer}
                       onChange={(e) => updateFaq(index, "answer", e.target.value)}
-                      placeholder="Resposta"
+                      placeholder="Answer"
                       className="bg-gray-700 border-gray-600 text-white min-h-[60px]"
                     />
                   </div>
@@ -300,7 +300,7 @@ export default function AdminPostEditor() {
             {isEditing && (
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-white text-base">Revisões</CardTitle>
+                  <CardTitle className="text-white text-base">Revisions</CardTitle>
                   <Button
                     size="sm"
                     variant="outline"
@@ -308,20 +308,20 @@ export default function AdminPostEditor() {
                     onClick={() => setShowRevisions(!showRevisions)}
                   >
                     <History className="w-3 h-3 mr-1" />
-                    {showRevisions ? "Ocultar" : "Ver Revisões"}
+                    {showRevisions ? "Hide" : "View Revisions"}
                   </Button>
                 </CardHeader>
                 {showRevisions && (
                   <CardContent className="p-4">
                     {revisions.length === 0 ? (
-                      <p className="text-gray-500 text-sm">Nenhuma revisão encontrada.</p>
+                      <p className="text-gray-500 text-sm">No revisions found.</p>
                     ) : (
                       <div className="space-y-2">
                         {revisions.map((rev: any) => (
                           <div key={rev.id} className="p-3 bg-gray-800 rounded-lg">
                             <div className="flex items-center justify-between">
                               <span className="text-gray-400 text-xs">
-                                {new Date(rev.createdAt).toLocaleString("pt-BR")}
+                                {new Date(rev.createdAt).toLocaleString("en-US")}
                               </span>
                               <Button
                                 size="sm"
@@ -333,10 +333,10 @@ export default function AdminPostEditor() {
                                   if (snapshot.content) setContent(snapshot.content);
                                   if (snapshot.metaTitle) setMetaTitle(snapshot.metaTitle);
                                   if (snapshot.metaDescription) setMetaDescription(snapshot.metaDescription);
-                                  toast({ title: "Revisão restaurada no editor. Salve para aplicar." });
+                                  toast({ title: "Revision restored in editor. Save to apply." });
                                 }}
                               >
-                                Restaurar
+                                Restore
                               </Button>
                             </div>
                           </div>
@@ -352,7 +352,7 @@ export default function AdminPostEditor() {
           <div className="space-y-6">
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-white text-base">Publicação</CardTitle>
+                <CardTitle className="text-white text-base">Publishing</CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
@@ -362,17 +362,17 @@ export default function AdminPostEditor() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="draft">Rascunho</SelectItem>
-                      {canPublish && <SelectItem value="published">Publicado</SelectItem>}
-                      {canPublish && <SelectItem value="scheduled">Agendado</SelectItem>}
+                      <SelectItem value="draft">Draft</SelectItem>
+                      {canPublish && <SelectItem value="published">Published</SelectItem>}
+                      {canPublish && <SelectItem value="scheduled">Scheduled</SelectItem>}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300 text-sm">Categoria</Label>
+                  <Label className="text-gray-300 text-sm">Category</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
                     <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                      <SelectValue placeholder="Selecione..." />
+                      <SelectValue placeholder="Select..." />
                     </SelectTrigger>
                     <SelectContent>
                       {(cats as any[]).map((cat: any) => (
@@ -384,7 +384,7 @@ export default function AdminPostEditor() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300 text-sm">Tags (separadas por vírgula)</Label>
+                  <Label className="text-gray-300 text-sm">Tags (comma separated)</Label>
                   <Input
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
@@ -394,7 +394,7 @@ export default function AdminPostEditor() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300 text-sm">Tempo de Leitura</Label>
+                  <Label className="text-gray-300 text-sm">Read Time</Label>
                   <Input
                     value={readTime}
                     onChange={(e) => setReadTime(e.target.value)}
@@ -407,13 +407,13 @@ export default function AdminPostEditor() {
 
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-white text-base">Imagem Destacada</CardTitle>
+                <CardTitle className="text-white text-base">Featured Image</CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3">
                 <Input
                   value={featuredImage}
                   onChange={(e) => setFeaturedImage(e.target.value)}
-                  placeholder="URL da imagem ou caminho do upload"
+                  placeholder="Image URL or upload path"
                   className="bg-gray-800 border-gray-700 text-white"
                   data-testid="input-featured-image"
                 />
@@ -434,29 +434,29 @@ export default function AdminPostEditor() {
               </CardHeader>
               <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-gray-300 text-sm">Meta Título</Label>
+                  <Label className="text-gray-300 text-sm">Meta Title</Label>
                   <Input
                     value={metaTitle}
                     onChange={(e) => setMetaTitle(e.target.value)}
-                    placeholder="Título para buscadores (max 60 chars)"
+                    placeholder="Title for search engines (max 60 chars)"
                     className="bg-gray-800 border-gray-700 text-white"
                     data-testid="input-meta-title"
                   />
-                  <p className="text-gray-500 text-xs">{metaTitle.length}/60 caracteres</p>
+                  <p className="text-gray-500 text-xs">{metaTitle.length}/60 characters</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300 text-sm">Meta Descrição</Label>
+                  <Label className="text-gray-300 text-sm">Meta Description</Label>
                   <Textarea
                     value={metaDescription}
                     onChange={(e) => setMetaDescription(e.target.value)}
-                    placeholder="Descrição para buscadores (max 160 chars)"
+                    placeholder="Description for search engines (max 160 chars)"
                     className="bg-gray-800 border-gray-700 text-white min-h-[80px]"
                     data-testid="input-meta-description"
                   />
-                  <p className="text-gray-500 text-xs">{metaDescription.length}/160 caracteres</p>
+                  <p className="text-gray-500 text-xs">{metaDescription.length}/160 characters</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300 text-sm">URL Canônica</Label>
+                  <Label className="text-gray-300 text-sm">Canonical URL</Label>
                   <Input
                     value={canonicalUrl}
                     onChange={(e) => setCanonicalUrl(e.target.value)}

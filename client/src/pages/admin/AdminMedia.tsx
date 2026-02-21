@@ -21,7 +21,7 @@ export default function AdminMedia() {
     mutationFn: (id: number) => fetch(`/api/admin/media/${id}`, { method: "DELETE", credentials: "include" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/media"] });
-      toast({ title: "Mídia excluída!" });
+      toast({ title: "Media deleted!" });
     },
   });
 
@@ -42,13 +42,13 @@ export default function AdminMedia() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Erro ao fazer upload.");
+        throw new Error(data.message || "Upload failed.");
       }
 
       queryClient.invalidateQueries({ queryKey: ["/api/admin/media"] });
-      toast({ title: "Upload realizado com sucesso!" });
+      toast({ title: "Upload successful!" });
     } catch (error: any) {
-      toast({ title: error.message || "Erro ao fazer upload.", variant: "destructive" });
+      toast({ title: error.message || "Upload failed.", variant: "destructive" });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -57,7 +57,7 @@ export default function AdminMedia() {
 
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
-    toast({ title: "URL copiada!" });
+    toast({ title: "URL copied!" });
   };
 
   return (
@@ -65,23 +65,23 @@ export default function AdminMedia() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Mídia</h1>
-            <p className="text-gray-400 text-sm">{(mediaList as any[]).length} arquivo(s)</p>
+            <h1 className="text-2xl font-bold text-white">Media</h1>
+            <p className="text-gray-400 text-sm">{(mediaList as any[]).length} file(s)</p>
           </div>
           <div>
             <input type="file" ref={fileInputRef} onChange={handleUpload} accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" data-testid="input-file-upload" />
             <Button className="bg-pink-600 hover:bg-pink-700 text-white" onClick={() => fileInputRef.current?.click()} disabled={uploading} data-testid="button-upload">
-              <Upload className="w-4 h-4 mr-2" /> {uploading ? "Enviando..." : "Upload"}
+              <Upload className="w-4 h-4 mr-2" /> {uploading ? "Uploading..." : "Upload"}
             </Button>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="text-gray-400 text-center p-8">Carregando...</div>
+          <div className="text-gray-400 text-center p-8">Loading...</div>
         ) : !(mediaList as any[]).length ? (
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
             <Image className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400">Nenhuma mídia enviada.</p>
+            <p className="text-gray-400">No media uploaded.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -95,9 +95,9 @@ export default function AdminMedia() {
                   <p className="text-gray-500 text-xs mb-2">{(m.size / 1024).toFixed(1)} KB</p>
                   <div className="flex gap-1">
                     <Button size="sm" variant="outline" className="flex-1 border-gray-700 text-gray-300 text-xs h-7" onClick={() => copyUrl(m.url)}>
-                      <Copy className="w-3 h-3 mr-1" /> Copiar URL
+                      <Copy className="w-3 h-3 mr-1" /> Copy URL
                     </Button>
-                    <Button size="sm" variant="ghost" className="text-red-400 h-7" onClick={() => { if (confirm("Excluir?")) deleteMutation.mutate(m.id); }}>
+                    <Button size="sm" variant="ghost" className="text-red-400 h-7" onClick={() => { if (confirm("Delete this file?")) deleteMutation.mutate(m.id); }}>
                       <Trash2 className="w-3 h-3" />
                     </Button>
                   </div>

@@ -11,10 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
 const STATUS_LABELS: Record<string, string> = {
-  draft: "Rascunho",
-  published: "Publicado",
-  scheduled: "Agendado",
-  trashed: "Lixeira",
+  draft: "Draft",
+  published: "Published",
+  scheduled: "Scheduled",
+  trashed: "Trashed",
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -46,7 +46,7 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/posts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard/stats"] });
-      toast({ title: "Post movido para a lixeira." });
+      toast({ title: "Post moved to trash." });
     },
   });
 
@@ -55,7 +55,7 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/posts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard/stats"] });
-      toast({ title: "Post restaurado." });
+      toast({ title: "Post restored." });
     },
   });
 
@@ -64,7 +64,7 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/posts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard/stats"] });
-      toast({ title: "Post excluído permanentemente." });
+      toast({ title: "Post permanently deleted." });
     },
   });
 
@@ -76,16 +76,16 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-white">
-              {trashed ? "Lixeira" : "Posts"}
+              {trashed ? "Trash" : "Posts"}
             </h1>
             <p className="text-gray-400 text-sm">
-              {data ? `${data.total} post(s) encontrado(s)` : "Carregando..."}
+              {data ? `${data.total} post(s) found` : "Loading..."}
             </p>
           </div>
           {!trashed && (
             <Link href="/admin/posts/create">
               <Button className="bg-pink-600 hover:bg-pink-700 text-white" data-testid="button-new-post">
-                <Plus className="w-4 h-4 mr-2" /> Novo Post
+                <Plus className="w-4 h-4 mr-2" /> New Post
               </Button>
             </Link>
           )}
@@ -95,7 +95,7 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <Input
-              placeholder="Buscar por título..."
+              placeholder="Search by title..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="pl-9 bg-gray-800 border-gray-700 text-white"
@@ -105,13 +105,13 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
           {!trashed && (
             <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v === "all" ? "" : v); setPage(1); }}>
               <SelectTrigger className="w-40 bg-gray-800 border-gray-700 text-white">
-                <SelectValue placeholder="Todos" />
+                <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="draft">Rascunho</SelectItem>
-                <SelectItem value="published">Publicado</SelectItem>
-                <SelectItem value="scheduled">Agendado</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
               </SelectContent>
             </Select>
           )}
@@ -119,9 +119,9 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
 
         <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center text-gray-400">Carregando...</div>
+            <div className="p-8 text-center text-gray-400">Loading...</div>
           ) : !data?.posts.length ? (
-            <div className="p-8 text-center text-gray-400">Nenhum post encontrado.</div>
+            <div className="p-8 text-center text-gray-400">No posts found.</div>
           ) : (
             <div className="divide-y divide-gray-800">
               {data.posts.map((post: any) => (
@@ -135,7 +135,7 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
                       <span className="text-gray-500 text-xs">/{post.slug}</span>
                       {post.updatedAt && (
                         <span className="text-gray-500 text-xs">
-                          {new Date(post.updatedAt).toLocaleDateString("pt-BR")}
+                          {new Date(post.updatedAt).toLocaleDateString("en-US")}
                         </span>
                       )}
                     </div>
@@ -150,13 +150,13 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
                           onClick={() => restoreMutation.mutate(post.id)}
                           data-testid={`button-restore-${post.id}`}
                         >
-                          <RotateCcw className="w-3 h-3 mr-1" /> Restaurar
+                          <RotateCcw className="w-3 h-3 mr-1" /> Restore
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => {
-                            if (confirm("Excluir permanentemente?")) deleteMutation.mutate(post.id);
+                            if (confirm("Permanently delete this post?")) deleteMutation.mutate(post.id);
                           }}
                           data-testid={`button-delete-${post.id}`}
                         >
@@ -174,7 +174,7 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
                         )}
                         <Link href={`/admin/posts/edit/${post.id}`}>
                           <Button size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800" data-testid={`button-edit-${post.id}`}>
-                            <Edit className="w-3 h-3 mr-1" /> Editar
+                            <Edit className="w-3 h-3 mr-1" /> Edit
                           </Button>
                         </Link>
                         <Button
@@ -204,10 +204,10 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
             >
-              Anterior
+              Previous
             </Button>
             <span className="text-gray-400 text-sm flex items-center px-3">
-              Página {page} de {totalPages}
+              Page {page} of {totalPages}
             </span>
             <Button
               size="sm"
@@ -216,7 +216,7 @@ export default function AdminPosts({ trashed = false }: { trashed?: boolean }) {
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
             >
-              Próxima
+              Next
             </Button>
           </div>
         )}

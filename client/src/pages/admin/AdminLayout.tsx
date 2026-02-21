@@ -20,12 +20,12 @@ import { useState, type ReactNode } from "react";
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/posts", label: "Posts", icon: FileText },
-  { href: "/admin/posts/trash", label: "Lixeira", icon: Trash2 },
-  { href: "/admin/categories", label: "Categorias", icon: FolderOpen },
-  { href: "/admin/media", label: "Mídia", icon: Image },
-  { href: "/admin/users", label: "Usuários", icon: Users },
-  { href: "/admin/audit-logs", label: "Logs", icon: ClipboardList },
-  { href: "/admin/profile", label: "Perfil", icon: Settings },
+  { href: "/admin/posts/trash", label: "Trash", icon: Trash2 },
+  { href: "/admin/categories", label: "Categories", icon: FolderOpen },
+  { href: "/admin/media", label: "Media", icon: Image },
+  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
+  { href: "/admin/profile", label: "Profile", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -36,7 +36,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-400">Carregando...</div>
+        <div className="text-gray-400">Loading...</div>
       </div>
     );
   }
@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             data-testid="button-logout"
           >
             <LogOut className="w-4 h-4 mr-2" />
-            Sair
+            Sign Out
           </Button>
         </div>
       </aside>
@@ -136,10 +136,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <Menu className="w-5 h-5" />
           </button>
           <div className="text-gray-400 text-sm hidden sm:block">
-            Baixar Vídeo Instagram - Painel de Administração
+            Baixar Video Instagram - Administration Panel
           </div>
           <Link href="/" className="text-gray-500 text-sm hover:text-gray-300">
-            ← Voltar ao site
+            &larr; Back to site
           </Link>
         </header>
 

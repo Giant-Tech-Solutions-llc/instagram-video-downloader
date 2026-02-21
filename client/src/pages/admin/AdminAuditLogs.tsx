@@ -6,13 +6,13 @@ import { useState } from "react";
 
 const ACTION_LABELS: Record<string, string> = {
   login: "Login",
-  create_post: "Criar Post",
-  update_post: "Editar Post",
-  trash_post: "Mover p/ Lixeira",
-  restore_post: "Restaurar Post",
-  delete_post: "Excluir Post",
-  create_category: "Criar Categoria",
-  create_user: "Criar Usuário",
+  create_post: "Create Post",
+  update_post: "Update Post",
+  trash_post: "Move to Trash",
+  restore_post: "Restore Post",
+  delete_post: "Delete Post",
+  create_category: "Create Category",
+  create_user: "Create User",
 };
 
 export default function AdminAuditLogs() {
@@ -29,15 +29,15 @@ export default function AdminAuditLogs() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Logs de Auditoria</h1>
-          <p className="text-gray-400 text-sm">{data?.total ?? 0} registro(s)</p>
+          <h1 className="text-2xl font-bold text-white">Audit Logs</h1>
+          <p className="text-gray-400 text-sm">{data?.total ?? 0} record(s)</p>
         </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center text-gray-400">Carregando...</div>
+            <div className="p-8 text-center text-gray-400">Loading...</div>
           ) : !data?.logs.length ? (
-            <div className="p-8 text-center text-gray-400">Nenhum log encontrado.</div>
+            <div className="p-8 text-center text-gray-400">No logs found.</div>
           ) : (
             <div className="divide-y divide-gray-800">
               {data.logs.map((log: any) => (
@@ -50,7 +50,7 @@ export default function AdminAuditLogs() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-gray-500 text-xs">{new Date(log.createdAt).toLocaleString("pt-BR")}</span>
+                  <span className="text-gray-500 text-xs">{new Date(log.createdAt).toLocaleString("en-US")}</span>
                 </div>
               ))}
             </div>
@@ -59,9 +59,9 @@ export default function AdminAuditLogs() {
 
         {totalPages > 1 && (
           <div className="flex justify-center gap-2">
-            <Button size="sm" variant="outline" className="border-gray-700 text-gray-300" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Anterior</Button>
-            <span className="text-gray-400 text-sm flex items-center px-3">Página {page} de {totalPages}</span>
-            <Button size="sm" variant="outline" className="border-gray-700 text-gray-300" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Próxima</Button>
+            <Button size="sm" variant="outline" className="border-gray-700 text-gray-300" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Previous</Button>
+            <span className="text-gray-400 text-sm flex items-center px-3">Page {page} of {totalPages}</span>
+            <Button size="sm" variant="outline" className="border-gray-700 text-gray-300" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
           </div>
         )}
       </div>

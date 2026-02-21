@@ -29,12 +29,12 @@ export default function AdminCategories() {
     mutationFn: (data: any) => apiRequest("POST", "/api/admin/categories", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories"] });
-      toast({ title: "Categoria criada!" });
+      toast({ title: "Category created!" });
       resetForm();
     },
     onError: async (err: any) => {
       const data = await err?.json?.().catch(() => null);
-      toast({ title: data?.message || "Erro ao criar categoria.", variant: "destructive" });
+      toast({ title: data?.message || "Error creating category.", variant: "destructive" });
     },
   });
 
@@ -42,7 +42,7 @@ export default function AdminCategories() {
     mutationFn: ({ id, ...data }: any) => apiRequest("PUT", `/api/admin/categories/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories"] });
-      toast({ title: "Categoria atualizada!" });
+      toast({ title: "Category updated!" });
       resetForm();
     },
   });
@@ -51,7 +51,7 @@ export default function AdminCategories() {
     mutationFn: (id: number) => apiRequest("DELETE", `/api/admin/categories/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories"] });
-      toast({ title: "Categoria excluída!" });
+      toast({ title: "Category deleted!" });
     },
   });
 
@@ -73,7 +73,7 @@ export default function AdminCategories() {
 
   const handleSubmit = () => {
     if (!name || !slug) {
-      toast({ title: "Nome e slug são obrigatórios.", variant: "destructive" });
+      toast({ title: "Name and slug are required.", variant: "destructive" });
       return;
     }
     if (editing) {
@@ -88,37 +88,37 @@ export default function AdminCategories() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Categorias</h1>
-            <p className="text-gray-400 text-sm">{(cats as any[]).length} categoria(s)</p>
+            <h1 className="text-2xl font-bold text-white">Categories</h1>
+            <p className="text-gray-400 text-sm">{(cats as any[]).length} category(ies)</p>
           </div>
           <Button className="bg-pink-600 hover:bg-pink-700 text-white" onClick={() => { resetForm(); setShowForm(true); }} data-testid="button-new-category">
-            <Plus className="w-4 h-4 mr-2" /> Nova Categoria
+            <Plus className="w-4 h-4 mr-2" /> New Category
           </Button>
         </div>
 
         {showForm && (
           <Card className="bg-gray-900 border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white text-base">{editing ? "Editar Categoria" : "Nova Categoria"}</CardTitle>
+              <CardTitle className="text-white text-base">{editing ? "Edit Category" : "New Category"}</CardTitle>
               <Button size="sm" variant="ghost" className="text-gray-400" onClick={resetForm}><X className="w-4 h-4" /></Button>
             </CardHeader>
             <CardContent className="p-4 space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-gray-300">Nome</Label>
-                  <Input value={name} onChange={(e) => { setName(e.target.value); if (!editing) setSlug(slugify(e.target.value)); }} placeholder="Nome da categoria" className="bg-gray-800 border-gray-700 text-white" data-testid="input-category-name" />
+                  <Label className="text-gray-300">Name</Label>
+                  <Input value={name} onChange={(e) => { setName(e.target.value); if (!editing) setSlug(slugify(e.target.value)); }} placeholder="Category name" className="bg-gray-800 border-gray-700 text-white" data-testid="input-category-name" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-gray-300">Slug</Label>
-                  <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="slug-da-categoria" className="bg-gray-800 border-gray-700 text-white" data-testid="input-category-slug" />
+                  <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="category-slug" className="bg-gray-800 border-gray-700 text-white" data-testid="input-category-slug" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-gray-300">Descrição</Label>
-                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descrição da categoria" className="bg-gray-800 border-gray-700 text-white" />
+                <Label className="text-gray-300">Description</Label>
+                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Category description" className="bg-gray-800 border-gray-700 text-white" />
               </div>
               <Button className="bg-pink-600 hover:bg-pink-700 text-white" onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} data-testid="button-save-category">
-                <Save className="w-4 h-4 mr-2" /> {editing ? "Atualizar" : "Criar"}
+                <Save className="w-4 h-4 mr-2" /> {editing ? "Update" : "Create"}
               </Button>
             </CardContent>
           </Card>
@@ -126,9 +126,9 @@ export default function AdminCategories() {
 
         <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center text-gray-400">Carregando...</div>
+            <div className="p-8 text-center text-gray-400">Loading...</div>
           ) : !(cats as any[]).length ? (
-            <div className="p-8 text-center text-gray-400">Nenhuma categoria criada.</div>
+            <div className="p-8 text-center text-gray-400">No categories created.</div>
           ) : (
             <div className="divide-y divide-gray-800">
               {(cats as any[]).map((cat: any) => (
@@ -141,7 +141,7 @@ export default function AdminCategories() {
                     <Button size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800" onClick={() => startEdit(cat)} data-testid={`button-edit-category-${cat.id}`}>
                       <Edit className="w-3 h-3" />
                     </Button>
-                    <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300" onClick={() => { if (confirm("Excluir categoria?")) deleteMutation.mutate(cat.id); }}>
+                    <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300" onClick={() => { if (confirm("Delete this category?")) deleteMutation.mutate(cat.id); }}>
                       <Trash2 className="w-3 h-3" />
                     </Button>
                   </div>

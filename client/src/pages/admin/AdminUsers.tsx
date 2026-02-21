@@ -15,9 +15,9 @@ import { useState } from "react";
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
   editor: "Editor",
-  author: "Autor",
-  contributor: "Contribuidor",
-  viewer: "Visualizador",
+  author: "Author",
+  contributor: "Contributor",
+  viewer: "Viewer",
 };
 
 const ROLE_COLORS: Record<string, string> = {
@@ -47,12 +47,12 @@ export default function AdminUsers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard/stats"] });
-      toast({ title: "Usuário criado!" });
+      toast({ title: "User created!" });
       resetForm();
     },
     onError: async (err: any) => {
       const data = await err?.json?.().catch(() => null);
-      toast({ title: data?.message || "Erro ao criar usuário.", variant: "destructive" });
+      toast({ title: data?.message || "Error creating user.", variant: "destructive" });
     },
   });
 
@@ -60,7 +60,7 @@ export default function AdminUsers() {
     mutationFn: ({ id, ...data }: any) => apiRequest("PUT", `/api/admin/users/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({ title: "Usuário atualizado!" });
+      toast({ title: "User updated!" });
       resetForm();
     },
   });
@@ -70,7 +70,7 @@ export default function AdminUsers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard/stats"] });
-      toast({ title: "Usuário excluído!" });
+      toast({ title: "User deleted!" });
     },
   });
 
@@ -94,11 +94,11 @@ export default function AdminUsers() {
 
   const handleSubmit = () => {
     if (!name || !email) {
-      toast({ title: "Nome e e-mail são obrigatórios.", variant: "destructive" });
+      toast({ title: "Name and email are required.", variant: "destructive" });
       return;
     }
     if (!editing && !password) {
-      toast({ title: "Senha é obrigatória para novos usuários.", variant: "destructive" });
+      toast({ title: "Password is required for new users.", variant: "destructive" });
       return;
     }
     const data: any = { name, email, role };
@@ -115,38 +115,38 @@ export default function AdminUsers() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Usuários</h1>
-            <p className="text-gray-400 text-sm">{(users as any[]).length} usuário(s)</p>
+            <h1 className="text-2xl font-bold text-white">Users</h1>
+            <p className="text-gray-400 text-sm">{(users as any[]).length} user(s)</p>
           </div>
           <Button className="bg-pink-600 hover:bg-pink-700 text-white" onClick={() => { resetForm(); setShowForm(true); }} data-testid="button-new-user">
-            <Plus className="w-4 h-4 mr-2" /> Novo Usuário
+            <Plus className="w-4 h-4 mr-2" /> New User
           </Button>
         </div>
 
         {showForm && (
           <Card className="bg-gray-900 border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white text-base">{editing ? "Editar Usuário" : "Novo Usuário"}</CardTitle>
+              <CardTitle className="text-white text-base">{editing ? "Edit User" : "New User"}</CardTitle>
               <Button size="sm" variant="ghost" className="text-gray-400" onClick={resetForm}><X className="w-4 h-4" /></Button>
             </CardHeader>
             <CardContent className="p-4 space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-gray-300">Nome</Label>
-                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome completo" className="bg-gray-800 border-gray-700 text-white" data-testid="input-user-name" />
+                  <Label className="text-gray-300">Name</Label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className="bg-gray-800 border-gray-700 text-white" data-testid="input-user-name" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300">E-mail</Label>
-                  <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="email@exemplo.com" className="bg-gray-800 border-gray-700 text-white" data-testid="input-user-email" />
+                  <Label className="text-gray-300">Email</Label>
+                  <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="email@example.com" className="bg-gray-800 border-gray-700 text-white" data-testid="input-user-email" />
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-gray-300">Senha {editing && "(deixe vazio para manter)"}</Label>
+                  <Label className="text-gray-300">Password {editing && "(leave empty to keep current)"}</Label>
                   <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="••••••••" className="bg-gray-800 border-gray-700 text-white" data-testid="input-user-password" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-300">Função</Label>
+                  <Label className="text-gray-300">Role</Label>
                   <Select value={role} onValueChange={setRole}>
                     <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                       <SelectValue />
@@ -154,15 +154,15 @@ export default function AdminUsers() {
                     <SelectContent>
                       <SelectItem value="super_admin">Super Admin</SelectItem>
                       <SelectItem value="editor">Editor</SelectItem>
-                      <SelectItem value="author">Autor</SelectItem>
-                      <SelectItem value="contributor">Contribuidor</SelectItem>
-                      <SelectItem value="viewer">Visualizador</SelectItem>
+                      <SelectItem value="author">Author</SelectItem>
+                      <SelectItem value="contributor">Contributor</SelectItem>
+                      <SelectItem value="viewer">Viewer</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <Button className="bg-pink-600 hover:bg-pink-700 text-white" onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} data-testid="button-save-user">
-                <Save className="w-4 h-4 mr-2" /> {editing ? "Atualizar" : "Criar"}
+                <Save className="w-4 h-4 mr-2" /> {editing ? "Update" : "Create"}
               </Button>
             </CardContent>
           </Card>
@@ -170,7 +170,7 @@ export default function AdminUsers() {
 
         <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center text-gray-400">Carregando...</div>
+            <div className="p-8 text-center text-gray-400">Loading...</div>
           ) : (
             <div className="divide-y divide-gray-800">
               {(users as any[]).map((u: any) => (
@@ -192,7 +192,7 @@ export default function AdminUsers() {
                       <Edit className="w-3 h-3" />
                     </Button>
                     {u.id !== currentUser?.id && (
-                      <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300" onClick={() => { if (confirm("Excluir usuário?")) deleteMutation.mutate(u.id); }}>
+                      <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300" onClick={() => { if (confirm("Delete this user?")) deleteMutation.mutate(u.id); }}>
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     )}

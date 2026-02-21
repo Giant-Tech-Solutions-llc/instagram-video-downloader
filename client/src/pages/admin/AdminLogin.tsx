@@ -29,7 +29,7 @@ export default function AdminLogin() {
       navigate("/admin");
     } catch (err: any) {
       const data = await err?.json?.().catch(() => null);
-      setError(data?.message || "Erro ao fazer login.");
+      setError(data?.message || "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -42,8 +42,8 @@ export default function AdminLogin() {
           <div className="mx-auto w-12 h-12 bg-pink-600/20 rounded-full flex items-center justify-center mb-4">
             <Lock className="w-6 h-6 text-pink-500" />
           </div>
-          <CardTitle className="text-2xl text-white">Painel Admin</CardTitle>
-          <p className="text-gray-400 text-sm">Baixar Vídeo Instagram - CMS</p>
+          <CardTitle className="text-2xl text-white">Admin Panel</CardTitle>
+          <p className="text-gray-400 text-sm">Baixar Video Instagram - CMS</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -53,7 +53,7 @@ export default function AdminLogin() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300">E-mail</Label>
+              <Label htmlFor="email" className="text-gray-300">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -66,7 +66,7 @@ export default function AdminLogin() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-300">Senha</Label>
+              <Label htmlFor="password" className="text-gray-300">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -84,7 +84,7 @@ export default function AdminLogin() {
               disabled={loading}
               data-testid="button-login"
             >
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </CardContent>
