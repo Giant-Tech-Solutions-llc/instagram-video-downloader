@@ -53,18 +53,6 @@ export default function BlogPost() {
 
   const staticPost = slug ? getBlogPostBySlug(slug) : undefined;
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-grow flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#E6195E]" />
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
   const post = dbPost
     ? {
         title: dbPost.title,
@@ -83,18 +71,12 @@ export default function BlogPost() {
       }
     : staticPost;
 
-  const isMarkdown = (text: string) => {
-    if (!text) return false;
-    const htmlPattern = /<(h[1-6]|p|div|span|ul|ol|li|a|img|strong|em|table|br|hr)\b/i;
-    if (htmlPattern.test(text)) return false;
-    const mdPattern = /(^#{1,6}\s|^\*\s|^-\s|^\d+\.\s|\*\*|__|\[.*\]\(.*\)|```)/m;
-    return mdPattern.test(text);
-  };
-
   const renderedContent = useMemo(() => {
     if (!post?.content) return "";
+    const htmlPattern = /<(h[1-6]|p|div|span|ul|ol|li|a|img|strong|em|table|br|hr)\b/i;
+    const mdPattern = /(^#{1,6}\s|^\*\s|^-\s|^\d+\.\s|\*\*|__|\[.*\]\(.*\)|```)/m;
     let html: string;
-    if (isMarkdown(post.content)) {
+    if (!htmlPattern.test(post.content) && mdPattern.test(post.content)) {
       html = marked(post.content, { breaks: true }) as string;
     } else {
       html = post.content;
@@ -106,6 +88,18 @@ export default function BlogPost() {
   }, [post?.content]);
 
   const relatedPosts = staticPost ? getRelatedPosts(staticPost.relatedSlugs || []) : [];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#E6195E]" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!post) {
     return <Redirect to="/blog" />;
