@@ -268,7 +268,7 @@ export default function Home() {
                 {"Baixar Vídeo Instagram Online"} <span className="text-[#E6195E]">{"de Forma Rápida e Segura"}</span>
               </h2>
             </div>
-            <div className="space-y-4 sm:space-y-6 text-base sm:text-lg text-muted-foreground font-medium leading-relaxed">
+            <div className="space-y-4 sm:space-y-6 text-base sm:text-lg text-muted-foreground font-medium leading-relaxed text-center">
               <p>
                 {"O Instagram está cheio de conteúdos envolventes: Reels, vídeos curtos, publicações longas e muito mais. Embora o aplicativo permita salvar alguns conteúdos, ele não oferece a opção de baixar vídeo do Instagram diretamente para o seu dispositivo."}
               </p>
