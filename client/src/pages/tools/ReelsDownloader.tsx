@@ -435,14 +435,14 @@ export default function ReelsDownloader() {
               ))}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-12 sm:mb-16 max-w-3xl mx-auto">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-12 sm:mb-16">
               {[
                 "Salvar Reels no celular",
                 "Baixar Reels no PC",
                 "Armazenar Reels na galeria",
                 "Utilizar Reels para edição",
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2 p-3 sm:p-4 rounded-xl bg-white border border-black/5">
+                <div key={i} className="flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-4 rounded-xl bg-white border border-black/5 whitespace-nowrap">
                   <CheckCircle className="w-4 h-4 text-[#E6195E] flex-shrink-0" />
                   <span className="text-xs sm:text-sm font-bold text-[#1A1A1A]">{item}</span>
                 </div>
