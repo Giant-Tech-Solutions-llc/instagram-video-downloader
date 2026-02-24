@@ -42,6 +42,38 @@ export const blogPosts: BlogPost[] = [
       { question: "Posso baixar vídeos privados do Instagram?", answer: "Apenas se você tiver acesso autorizado à conta privada ou for o dono do conteúdo." }
     ],
     relatedSlugs: []
+  },
+  {
+    slug: "como-baixar-video-instagram-celular",
+    title: "Como Baixar Vídeo do Instagram no Celular (Guia para Android & iPhone)",
+    metaTitle: "Como Baixar Vídeo do Instagram no Celular – Android & iPhone | Baixar Vídeo",
+    metaDescription: "Aprenda como baixar vídeo do Instagram no celular Android e iPhone. Guia passo a passo sem aplicativo, sem marca d'água e em qualidade original.",
+    excerpt: "Guia completo para baixar vídeos do Instagram no Android e iPhone sem instalar aplicativos. Método seguro e sem marca d'água.",
+    featuredImage: "/images/blog-baixar-video-celular.png",
+    author: "Equipe Baixar Vídeo",
+    publishDate: "2026-02-24",
+    updatedDate: "2026-02-24",
+    category: "Tutoriais",
+    readTime: "6 min",
+    content: "",
+    faqs: [],
+    relatedSlugs: []
+  },
+  {
+    slug: "como-baixar-video-instagram-reels",
+    title: "Como Baixar Vídeo do Instagram Reels (Com Música & Sem Marca d'Água)",
+    metaTitle: "Como Baixar Vídeo do Instagram Reels – Com Música & Sem Marca d'Água | Baixar Vídeo",
+    metaDescription: "Aprenda como baixar vídeo do Instagram Reels com música e sem marca d'água. Guia completo para Android, iPhone e PC.",
+    excerpt: "Guia completo para baixar vídeos do Instagram Reels com música, sem marca d'água, no celular e PC.",
+    featuredImage: "/images/blog-baixar-reels-video.png",
+    author: "Equipe Baixar Vídeo",
+    publishDate: "2026-02-24",
+    updatedDate: "2026-02-24",
+    category: "Tutoriais",
+    readTime: "6 min",
+    content: "",
+    faqs: [],
+    relatedSlugs: []
   }
 ];
 
