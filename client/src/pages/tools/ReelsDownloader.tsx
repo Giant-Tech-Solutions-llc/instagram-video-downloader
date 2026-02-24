@@ -357,7 +357,7 @@ export default function ReelsDownloader() {
                   "Converter Reels para MP3",
                   "Copiar e baixar Reels instantaneamente",
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 p-3 sm:p-4 rounded-xl bg-white border border-black/5">
+                  <div key={i} className="flex items-center gap-2 p-3 sm:p-4 rounded-xl bg-white border border-black/5 text-left">
                     <CheckCircle className="w-4 h-4 text-[#E6195E] flex-shrink-0" />
                     <span className="text-sm sm:text-base font-bold text-[#1A1A1A]">{item}</span>
                   </div>
