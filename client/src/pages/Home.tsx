@@ -305,6 +305,9 @@ export default function Home() {
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mt-4 sm:mt-6 max-w-3xl mx-auto font-medium px-2">
                 {"Escolha a Ferramenta Ideal para Qualquer Tipo de Conteúdo. Oferecemos um conjunto completo de ferramentas para baixar conteúdo do Instagram, desenvolvidas para ajudar você a baixar, salvar, converter, copiar e extrair vídeos e outros conteúdos de forma rápida e segura."}
               </p>
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mt-3 max-w-3xl mx-auto font-medium px-2">
+                {"Se você deseja baixar Stories do Instagram, salvar Reels em HD, converter vídeos do Instagram para MP3, baixar vídeos do Instagram sem marca d'água ou usar um site confiável para baixar vídeo do Instagram pelo link, basta escolher a ferramenta ideal abaixo."}
+              </p>
               <p className="text-sm sm:text-base text-muted-foreground mt-3 max-w-3xl mx-auto font-medium px-2">
                 {"Todas as ferramentas são gratuitas, funcionam 100% online e não exigem a instalação de nenhum aplicativo."}
               </p>
