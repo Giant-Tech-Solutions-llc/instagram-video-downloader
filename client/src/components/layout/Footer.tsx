@@ -38,7 +38,6 @@ export default function Footer() {
               <li><Link href="/termos" data-testid="footer-link-termos" className="text-white/50 hover:text-[#E6195E] transition-colors">{"Termos de Uso"}</Link></li>
               <li><Link href="/privacidade" data-testid="footer-link-privacidade" className="text-white/50 hover:text-[#E6195E] transition-colors">{"Política de Privacidade"}</Link></li>
               <li><Link href="/contato" data-testid="footer-link-contato" className="text-white/50 hover:text-[#E6195E] transition-colors">{"Contato"}</Link></li>
-              <li><Link href="/admin/login" data-testid="footer-link-admin" className="text-white/20 hover:text-white/50 transition-colors">{"Admin"}</Link></li>
             </ul>
           </div>
         </div>

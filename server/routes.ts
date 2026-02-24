@@ -4,11 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import path from "path";
-import express from "express";
-import { seed, seedAdmin } from "./seed";
-import { setupSession } from "./auth";
-import adminRouter from "./admin-routes";
+import { seed } from "./seed";
 import { cmsStorage } from "./cms-storage";
 
 const BROWSER_HEADERS = {
@@ -398,13 +394,6 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   seed();
-  seedAdmin();
-
-  app.use(setupSession());
-
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-
-  app.use("/api/admin", adminRouter);
 
   app.get("/api/blog/posts", async (req, res) => {
     try {
@@ -416,14 +405,12 @@ export async function registerRoutes(
       });
 
       const cats = await cmsStorage.getCategories();
-      const users = await cmsStorage.getUsers();
 
       const postsWithDetails = result.posts.map(post => {
-        const author = users.find(u => u.id === post.authorId);
         const cat = cats.find(c => c.id === post.categoryId);
         return {
           ...post,
-          authorName: author?.name || "Equipe Baixar Vídeo",
+          authorName: "Equipe Baixar Vídeo",
           categoryName: cat?.name || "",
           categorySlug: cat?.slug || "",
         };
@@ -442,14 +429,12 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Post não encontrado." });
       }
 
-      const users = await cmsStorage.getUsers();
       const cats = await cmsStorage.getCategories();
-      const author = users.find(u => u.id === post.authorId);
       const cat = cats.find(c => c.id === post.categoryId);
 
       res.json({
         ...post,
-        authorName: author?.name || "Equipe Baixar Vídeo",
+        authorName: "Equipe Baixar Vídeo",
         categoryName: cat?.name || "",
         categorySlug: cat?.slug || "",
       });
