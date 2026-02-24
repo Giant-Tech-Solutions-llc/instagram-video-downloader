@@ -43,31 +43,7 @@ export async function seedAdmin() {
 
     const { posts } = await cmsStorage.getPosts({ limit: 1 });
     if (posts.length === 0) {
-      const allCats = await cmsStorage.getCategories();
-      const tutoriaisCat = allCats.find(c => c.slug === "tutoriais");
-      const dicasCat = allCats.find(c => c.slug === "dicas");
-
-      const { blogPosts: staticPosts } = await import("../client/src/lib/blog-config");
-      for (const sp of staticPosts) {
-        const cat = sp.category === "Tutoriais" ? tutoriaisCat : dicasCat;
-        await cmsStorage.createPost({
-          title: sp.title,
-          slug: sp.slug,
-          metaTitle: sp.metaTitle,
-          metaDescription: sp.metaDescription,
-          content: sp.content,
-          excerpt: sp.excerpt,
-          featuredImage: sp.featuredImage,
-          categoryId: cat?.id ?? null,
-          authorId: adminId,
-          status: "published",
-          tags: [sp.category.toLowerCase()],
-          faqs: sp.faqs,
-          readTime: sp.readTime,
-          publishedAt: new Date(sp.publishDate),
-        } as any);
-      }
-      console.log(`Seeded ${staticPosts.length} blog posts from static config`);
+      console.log("No blog posts found. Create posts via the admin panel.");
     }
   } catch (error) {
     console.error("Error seeding admin data:", error);
