@@ -23,7 +23,6 @@ import {
   PlayCircle,
   Shield,
   Smartphone,
-  Tv,
   Video,
   X,
   Zap,
@@ -81,7 +80,6 @@ export default function Home() {
                   { label: "Fotos", slug: "/baixar-fotos-instagram", icon: Camera },
                   { label: "Stories", slug: "/baixar-stories-instagram", icon: History },
                   { label: "Reels", slug: "/baixar-reels-instagram", icon: Clapperboard },
-                  { label: "IGTV", slug: "/baixar-igtv-instagram", icon: Tv },
                   { label: "MP3", slug: "/extrair-audio-instagram", icon: Music },
                 ].map((item) => (
                   <Link
@@ -452,10 +450,10 @@ export default function Home() {
                   {[
                     { feature: "Baixar Vídeos do Instagram", us: "Alta velocidade, HD, sem login", sss: "Downloads rápidos", snap: "Sim", save: "Sim" },
                     { feature: "Baixar Reels do Instagram", us: "Sim – HD", sss: "Sim", snap: "Sim", save: "Sim" },
-                    { feature: "Baixar Stories e Highlights", us: "Sim", sss: "Sim", snap: null, save: "Sim" },
-                    { feature: "Baixar Fotos e Carrossel", us: "Sim", sss: "Sim", snap: "Sim", save: "Sim" },
+                    { feature: "Baixar Stories do Instagram", us: "Sim", sss: "Sim", snap: null, save: "Sim" },
+                    { feature: "Baixar Fotos do Instagram", us: "Sim", sss: "Sim", snap: "Sim", save: "Sim" },
                     { feature: "Extrair Áudio / Converter para MP3", us: "Sim", sss: null, snap: null, save: null },
-                    { feature: "Suporte para Conteúdo Privado", us: "Sim (acesso autorizado)", sss: "Limitado", snap: null, save: "Sim (acesso autorizado)" },
+                    { feature: "Baixar Foto de Perfil", us: "Sim", sss: null, snap: null, save: null },
                     { feature: "Sem Necessidade de Login", us: "Sim", sss: "Sim", snap: "Sim", save: "Sim" },
                     { feature: "Sem Necessidade de Instalar Aplicativo", us: "Sim", sss: null, snap: "Sim", save: null },
                     { feature: "Download Sem Marca d'Água", us: "Sim", sss: null, snap: "Sim", save: null },
@@ -497,7 +495,7 @@ export default function Home() {
             </div>
 
             <p className="text-center text-muted-foreground text-sm sm:text-base font-medium mt-8 max-w-3xl mx-auto">
-              {"Enquanto muitos sites oferecem apenas downloads básicos, nossa plataforma permite baixar vídeo do Instagram, extrair áudio, baixar conteúdo privado autorizado e salvar vídeos em HD, tudo em um único lugar."}
+              {"Enquanto muitos sites oferecem apenas downloads básicos, nossa plataforma permite baixar vídeo do Instagram, Reels, Stories, fotos, foto de perfil e extrair áudio, tudo em um único lugar."}
             </p>
           </div>
         </section>

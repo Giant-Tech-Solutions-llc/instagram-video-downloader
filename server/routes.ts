@@ -382,9 +382,6 @@ function getErrorMessage(toolType?: string): string {
     'stories': 'Não foi possível acessar o Story. Verifique se o perfil é público e se o Story ainda está disponível (Stories expiram em 24h).',
     'private': 'Conteúdo privado não pôde ser acessado. Nossa ferramenta só consegue processar links de conteúdo público ou links diretos de mídia.',
     'profile-picture': 'Não foi possível encontrar a foto de perfil. Verifique se o nome de usuário está correto e se o perfil existe.',
-    'highlights': 'Não foi possível acessar o Destaque. Verifique se o perfil é público e se o link está correto.',
-    'carousel': 'Não foi possível extrair as mídias do carrossel. Verifique se o link do post está correto e se o perfil é público.',
-    'igtv': 'Não foi possível acessar o vídeo IGTV. Verifique se o link é de um vídeo IGTV público e tente novamente.',
   };
   return messages[toolType || ''] || 'Não foi possível encontrar a mídia. Verifique se o link está correto e se o perfil é público. O Instagram pode estar bloqueando temporariamente, tente novamente em alguns minutos.';
 }
@@ -465,12 +462,6 @@ export async function registerRoutes(
         { url: "/baixar-fotos-instagram", priority: "0.9", changefreq: "weekly" },
         { url: "/baixar-foto-perfil-instagram", priority: "0.8", changefreq: "weekly" },
         { url: "/extrair-audio-instagram", priority: "0.8", changefreq: "weekly" },
-        { url: "/baixar-destaques-instagram", priority: "0.8", changefreq: "weekly" },
-        { url: "/baixar-carrossel-instagram", priority: "0.8", changefreq: "weekly" },
-        { url: "/baixar-conteudo-privado-instagram", priority: "0.7", changefreq: "weekly" },
-        { url: "/baixar-hd-4k-instagram", priority: "0.8", changefreq: "weekly" },
-        { url: "/baixar-sem-marca-dagua-instagram", priority: "0.8", changefreq: "weekly" },
-        { url: "/baixar-igtv-instagram", priority: "0.7", changefreq: "weekly" },
         { url: "/como-funciona", priority: "0.6", changefreq: "monthly" },
         { url: "/contato", priority: "0.5", changefreq: "monthly" },
         { url: "/termos", priority: "0.3", changefreq: "yearly" },

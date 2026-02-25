@@ -21,7 +21,6 @@ import {
   PlayCircle,
   Shield,
   Smartphone,
-  Tv,
   Video,
   X,
   Zap,
@@ -86,7 +85,6 @@ export default function PhotoDownloader() {
                   { label: "Fotos", slug: "/baixar-fotos-instagram", id: "foto", icon: Camera },
                   { label: "Stories", slug: "/baixar-stories-instagram", id: "stories", icon: History },
                   { label: "Reels", slug: "/baixar-reels-instagram", id: "reels", icon: Clapperboard },
-                  { label: "IGTV", slug: "/baixar-igtv-instagram", id: "igtv", icon: Tv },
                   { label: "MP3", slug: "/extrair-audio-instagram", id: "audio", icon: Music },
                 ].map((item) => (
                   <Link
@@ -397,16 +395,9 @@ export default function PhotoDownloader() {
               {[
                 { title: "Baixador de Reels do Instagram", desc: "Baixe Reels do Instagram em HD ou 4K sem marca d'água.", slug: "/baixar-reels-instagram" },
                 { title: "Baixador de Stories do Instagram", desc: "Baixe Stories antes que expirem. Salve Stories públicos ou baixe Stories privados com acesso autorizado.", slug: "/baixar-stories-instagram" },
-                { title: "Baixador de Highlights do Instagram", desc: "Salve Destaques arquivados e Stories antigos em alta resolução.", slug: "/baixar-destaques-instagram" },
-                { title: "Baixador de Live do Instagram", desc: "Baixe transmissões ao vivo (Lives) e salve para assistir offline em formato MP4.", slug: "/baixar-live-instagram" },
                 { title: "Baixador de Foto de Perfil do Instagram", desc: "Visualize e baixe fotos de perfil em tamanho original e alta qualidade sem precisar fazer login.", slug: "/baixar-foto-perfil-instagram" },
-                { title: "Baixador de Carrossel", desc: "Baixe múltiplas fotos e vídeos de um único post carrossel com apenas um clique.", slug: "/baixar-carrossel-instagram" },
                 { title: "Baixador de Áudio / MP3 do Instagram", desc: "Baixe o áudio de vídeos ou converta para MP3 facilmente.", slug: "/extrair-audio-instagram" },
-                { title: "Baixador de Conteúdo Privado", desc: "Baixe fotos e vídeos privados com acesso autorizado à conta.", slug: "/baixar-conteudo-privado-instagram" },
-                { title: "Baixador de Imagem HD & 4K", desc: "Baixe fotos do Instagram em alta resolução sem perda de qualidade.", slug: "/baixar-hd-4k-instagram" },
-                { title: "Baixar IGTV do Instagram", desc: "Baixe vídeos longos do IGTV em HD diretamente pelo link.", slug: "/baixar-igtv-instagram" },
                 { title: "Baixador de Vídeos do Instagram", desc: "Baixe vídeos tradicionais do Instagram em HD usando apenas o link da publicação.", slug: "/" },
-                { title: "Baixar Sem Marca d'Água", desc: "Salve fotos e vídeos sem marca d'água para repostagem ou edição.", slug: "/baixar-sem-marca-dagua-instagram" },
               ].map((item, i) => (
                 <Link key={i} href={item.slug} className="group p-5 sm:p-6 rounded-xl sm:rounded-2xl bg-[#F8F9FA] border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all">
                   <h3 className="text-sm sm:text-base font-black text-[#1A1A1A] mb-2 group-hover:text-[#E6195E] transition-colors">{item.title}</h3>

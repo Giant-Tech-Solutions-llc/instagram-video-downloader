@@ -16,7 +16,6 @@ import {
   Loader2,
   Music,
   PlayCircle,
-  Tv,
   Video,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -80,7 +79,6 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                   { label: "Fotos", slug: "/baixar-fotos-instagram", id: "foto", icon: Camera },
                   { label: "Stories", slug: "/baixar-stories-instagram", id: "stories", icon: History },
                   { label: "Reels", slug: "/baixar-reels-instagram", id: "reels", icon: Clapperboard },
-                  { label: "IGTV", slug: "/baixar-igtv-instagram", id: "igtv", icon: Tv },
                   { label: "MP3", slug: "/extrair-audio-instagram", id: "audio", icon: Music },
                 ].map((item) => (
                   <Link
@@ -209,7 +207,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
                         <CheckCircle className="w-3 h-3" /> {processMutation.data.items!.length} itens encontrados
                       </div>
                       <h3 className="text-2xl sm:text-3xl font-black font-display text-foreground leading-tight" data-testid="text-download-ready">
-                        Carrossel Pronto!
+                        Conteúdo Pronto!
                       </h3>
                       <p className="text-muted-foreground text-sm sm:text-base md:text-lg mt-2">Baixe cada item individualmente abaixo.</p>
                     </div>

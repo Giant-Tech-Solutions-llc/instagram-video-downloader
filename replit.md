@@ -25,7 +25,7 @@ The project uses a single repository with three main directories:
 - **Animations:** Framer Motion for loading states and reveal animations
 - **Fonts:** Inter (body) and Outfit (headings) from Google Fonts
 - **Build Tool:** Vite with React plugin, path aliases (`@/` → `client/src/`, `@shared/` → `shared/`)
-- **Pages:** Home (main Instagram Video Downloader at `/`), plus 11 dedicated tool landing pages (Reels, Stories, Photos, Profile Picture, Audio/MP3, Highlights, Carousel, Private Content, HD/4K, No Watermark, IGTV), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), How it Works (`/como-funciona`), 404 page
+- **Pages:** Home (main Instagram Video Downloader at `/`), plus 5 dedicated tool landing pages (Reels, Stories, Photos, Profile Picture, Audio/MP3), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), How it Works (`/como-funciona`), 404 page
 - **Tool Pages Architecture:** Reusable `ToolPageLayout` component renders all tool landing pages. Tool configuration (slugs, titles, FAQs, SEO content) is centralized in `client/src/lib/tools-config.ts`. Individual page components in `client/src/pages/tools/` are thin wrappers around `ToolPageLayout`.
 
 ### Backend Architecture
