@@ -311,20 +311,38 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {tools.filter(t => t.slug !== "/").map((tool) => {
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
+              {tools.filter(t => t.slug !== "/").slice(0, 3).map((tool) => {
                 return (
                   <Link
                     key={tool.id}
                     href={tool.slug}
                     data-testid={`home-tool-${tool.id}`}
-                    className="group p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-white border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
+                    className="group p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-white border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
                   >
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-300">
-                      <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#E6195E] group-hover:text-white transition-colors" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-4 sm:mb-5 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-300">
+                      <tool.icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#E6195E] group-hover:text-white transition-colors" />
                     </div>
-                    <h3 className="text-xs sm:text-sm font-black text-[#1A1A1A] mb-1">{tool.title}</h3>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-relaxed line-clamp-2 hidden sm:block">{tool.subtitle}</p>
+                    <h3 className="text-sm sm:text-base md:text-lg font-black text-[#1A1A1A] mb-2">{tool.title}</h3>
+                    <p className="text-xs sm:text-sm md:text-base text-muted-foreground font-medium leading-relaxed">{tool.subtitle}</p>
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-4xl mx-auto mt-4 sm:mt-5 md:mt-6">
+              {tools.filter(t => t.slug !== "/").slice(3).map((tool) => {
+                return (
+                  <Link
+                    key={tool.id}
+                    href={tool.slug}
+                    data-testid={`home-tool-${tool.id}`}
+                    className="group p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-white border border-black/5 hover:border-[#E6195E]/20 hover:shadow-lg hover:shadow-[#E6195E]/5 transition-all text-center"
+                  >
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-[#E6195E]/10 flex items-center justify-center mx-auto mb-4 sm:mb-5 group-hover:bg-[#E6195E] group-hover:scale-110 transition-all duration-300">
+                      <tool.icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#E6195E] group-hover:text-white transition-colors" />
+                    </div>
+                    <h3 className="text-sm sm:text-base md:text-lg font-black text-[#1A1A1A] mb-2">{tool.title}</h3>
+                    <p className="text-xs sm:text-sm md:text-base text-muted-foreground font-medium leading-relaxed">{tool.subtitle}</p>
                   </Link>
                 );
               })}
