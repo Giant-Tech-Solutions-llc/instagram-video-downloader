@@ -280,9 +280,9 @@ export default function Home() {
                   "Editar vídeos",
                   "Fazer backup",
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 p-3 sm:p-4 rounded-xl bg-[#F8F9FA] border border-black/5">
-                    <CheckCircle className="w-4 h-4 text-[#E6195E] flex-shrink-0" />
-                    <span className="text-sm sm:text-base font-bold text-[#1A1A1A]">{item}</span>
+                  <div key={i} className="flex items-center gap-2.5 px-5 py-4 sm:px-6 sm:py-5 rounded-xl bg-[#F8F9FA] border border-black/5 whitespace-nowrap">
+                    <CheckCircle className="w-5 h-5 text-[#E6195E] flex-shrink-0" />
+                    <span className="text-base sm:text-lg font-bold text-[#1A1A1A]">{item}</span>
                   </div>
                 ))}
               </div>
