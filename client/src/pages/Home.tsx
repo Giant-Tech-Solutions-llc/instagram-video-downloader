@@ -273,16 +273,16 @@ export default function Home() {
               <p>
                 {"Nosso baixador de vídeo do Instagram permite que você faça baixar vídeo Instagram online em poucos segundos."}
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-6 sm:my-8">
+              <div className="flex flex-wrap justify-center gap-3 sm:gap-4 my-6 sm:my-8">
                 {[
                   "Assistir offline",
                   "Repostar conteúdo",
                   "Editar vídeos",
                   "Fazer backup",
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2.5 px-5 py-4 sm:px-6 sm:py-5 rounded-xl bg-[#F8F9FA] border border-black/5 whitespace-nowrap">
+                  <div key={i} className="flex items-center gap-2.5 px-5 py-4 sm:px-6 sm:py-5 rounded-xl bg-[#F8F9FA] border border-black/5">
                     <CheckCircle className="w-5 h-5 text-[#E6195E] flex-shrink-0" />
-                    <span className="text-base sm:text-lg font-bold text-[#1A1A1A]">{item}</span>
+                    <span className="text-base sm:text-lg font-bold text-[#1A1A1A] whitespace-nowrap">{item}</span>
                   </div>
                 ))}
               </div>
