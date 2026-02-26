@@ -112,7 +112,7 @@ export default function Home() {
                       type="url"
                       data-testid="input-instagram-url"
                       placeholder={"Insira o link do Instagram aqui..."}
-                      className="w-full h-14 sm:h-16 md:h-20 pl-4 sm:pl-6 md:pl-10 pr-20 sm:pr-28 md:pr-32 rounded-xl sm:rounded-2xl md:rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-4 md:focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-sm sm:text-base md:text-xl font-medium placeholder:text-black/20"
+                      className="w-full h-14 sm:h-16 md:h-20 pl-4 sm:pl-6 md:pl-10 pr-16 sm:pr-32 md:pr-36 rounded-xl sm:rounded-2xl md:rounded-[1.8rem] bg-[#F8F9FA] border-2 border-transparent focus:bg-white focus:border-[#E6195E]/20 focus:ring-4 md:focus:ring-[12px] focus:ring-[#E6195E]/5 transition-all outline-none text-sm sm:text-base md:text-xl font-medium placeholder:text-black/20 text-ellipsis"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                     />
@@ -205,7 +205,7 @@ export default function Home() {
                   <div className="md:w-1/2 bg-black/5 relative aspect-video md:aspect-auto min-h-[200px]">
                     {processMutation.data.thumbnail ? (
                       <img
-                        src={processMutation.data.thumbnail}
+                        src={`/api/proxy-image?url=${encodeURIComponent(processMutation.data.thumbnail)}`}
                         alt="Preview"
                         className="w-full h-full object-cover absolute inset-0"
                         data-testid="img-download-preview"
