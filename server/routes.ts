@@ -83,24 +83,26 @@ async function tryEmbedExtraction(url: string): Promise<MediaItem[]> {
       }
     }
 
-    if (items.length === 0) {
-      const scriptContent = html;
-      const videoMatch = scriptContent.match(/"video_url"\s*:\s*"([^"]+)"/);
-      if (videoMatch) {
-        const videoUrl = videoMatch[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/');
+    if (items.length === 0 || !items.some(i => i.type === 'video')) {
+      const videoUrlMatch = html.match(/video_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
+      if (videoUrlMatch && videoUrlMatch[1]) {
+        const videoUrl = videoUrlMatch[1]
+          .replace(/\\\\\//g, '/')
+          .replace(/\\\//g, '/')
+          .replace(/\\u0026/g, '&')
+          .replace(/\\u00253D/g, '%3D');
+        items.length = 0;
         items.push({ url: videoUrl, type: 'video' });
       }
 
       if (items.length === 0) {
-        const displayUrls = scriptContent.match(/"display_url"\s*:\s*"([^"]+)"/g);
-        if (displayUrls) {
-          for (const match of displayUrls) {
-            const urlMatch = match.match(/"display_url"\s*:\s*"([^"]+)"/);
-            if (urlMatch) {
-              const imgUrl = urlMatch[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/');
-              items.push({ url: imgUrl, type: 'image' });
-            }
-          }
+        const displayMatch = html.match(/display_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
+        if (displayMatch && displayMatch[1]) {
+          const imgUrl = displayMatch[1]
+            .replace(/\\\\\//g, '/')
+            .replace(/\\\//g, '/')
+            .replace(/\\u0026/g, '&');
+          items.push({ url: imgUrl, type: 'image' });
         }
       }
     }
@@ -331,27 +333,24 @@ async function tryAlternateEmbedExtraction(url: string): Promise<MediaItem[]> {
     const html = response.data;
     const items: MediaItem[] = [];
 
-    const videoMatches = html.match(/video_url['"]\s*:\s*['"](https?:[^'"]+)['"]/g);
-    if (videoMatches) {
-      for (const match of videoMatches) {
-        const urlMatch = match.match(/['"](https?:[^'"]+)['"]/);
-        if (urlMatch) {
-          const cleanUrl = urlMatch[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/');
-          items.push({ url: cleanUrl, type: 'video' });
-        }
-      }
+    const videoUrlMatch = html.match(/video_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
+    if (videoUrlMatch && videoUrlMatch[1]) {
+      const cleanUrl = videoUrlMatch[1]
+        .replace(/\\\\\//g, '/')
+        .replace(/\\\//g, '/')
+        .replace(/\\u0026/g, '&')
+        .replace(/\\u00253D/g, '%3D');
+      items.push({ url: cleanUrl, type: 'video' });
     }
 
     if (items.length === 0) {
-      const imgMatches = html.match(/display_url['"]\s*:\s*['"](https?:[^'"]+)['"]/g);
-      if (imgMatches) {
-        for (const match of imgMatches) {
-          const urlMatch = match.match(/['"](https?:[^'"]+)['"]/);
-          if (urlMatch) {
-            const cleanUrl = urlMatch[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/');
-            items.push({ url: cleanUrl, type: 'image' });
-          }
-        }
+      const displayMatch = html.match(/display_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
+      if (displayMatch && displayMatch[1]) {
+        const cleanUrl = displayMatch[1]
+          .replace(/\\\\\//g, '/')
+          .replace(/\\\//g, '/')
+          .replace(/\\u0026/g, '&');
+        items.push({ url: cleanUrl, type: 'image' });
       }
     }
 
@@ -516,6 +515,8 @@ export async function registerRoutes(
       console.log(`Processing download for URL: ${url} (tool: ${toolType})`);
 
       let allItems: MediaItem[] = [];
+      const isReelUrl = /\/reel(s)?\//.test(url);
+      const expectsVideo = isReelUrl || toolType === 'video' || toolType === 'reels' || toolType === 'audio';
 
       if (toolType === 'profile-picture') {
         allItems = await tryProfilePictureExtraction(url);
@@ -523,34 +524,39 @@ export async function registerRoutes(
           allItems = await tryDirectPageExtraction(url);
         }
       } else {
-        console.log('Strategy 1: Embed extraction...');
-        allItems = await tryEmbedExtraction(url);
+        const strategies: { name: string; fn: () => Promise<MediaItem[]> }[] = [
+          { name: 'JSON API extraction', fn: () => tryJsonApiExtraction(url) },
+          { name: 'GraphQL extraction', fn: () => tryGraphQLExtraction(url) },
+          { name: 'Embed extraction', fn: () => tryEmbedExtraction(url) },
+          { name: 'Alternate embed extraction', fn: () => tryAlternateEmbedExtraction(url) },
+          { name: 'Direct page extraction', fn: () => tryDirectPageExtraction(url) },
+        ];
 
-        if (allItems.length === 0) {
-          console.log('Strategy 2: Alternate embed extraction...');
-          allItems = await tryAlternateEmbedExtraction(url);
-        }
-
-        if (allItems.length === 0) {
-          console.log('Strategy 3: JSON API extraction...');
-          allItems = await tryJsonApiExtraction(url);
-        }
-
-        if (allItems.length === 0) {
-          console.log('Strategy 4: GraphQL extraction...');
-          allItems = await tryGraphQLExtraction(url);
-        }
-
-        if (allItems.length === 0) {
-          console.log('Strategy 5: Direct page extraction...');
-          allItems = await tryDirectPageExtraction(url);
-        }
-
-        if (allItems.length === 0) {
+        if (isReelUrl) {
           const reelUrl = url.replace('/reel/', '/p/').replace('/reels/', '/p/');
-          if (reelUrl !== url) {
-            console.log('Strategy 6: Reel URL variant...');
-            allItems = await tryEmbedExtraction(reelUrl);
+          strategies.push({ name: 'Reel URL variant', fn: () => tryEmbedExtraction(reelUrl) });
+        }
+
+        for (let i = 0; i < strategies.length; i++) {
+          const strategy = strategies[i];
+          console.log(`Strategy ${i + 1}: ${strategy.name}...`);
+          allItems = await strategy.fn();
+
+          if (allItems.length > 0) {
+            const hasVideo = allItems.some(item => item.type === 'video');
+            if (expectsVideo && !hasVideo) {
+              console.log(`Strategy ${i + 1} returned only images for a video URL, trying next...`);
+              continue;
+            }
+            break;
+          }
+        }
+
+        if (allItems.length === 0 && expectsVideo) {
+          console.log('All video strategies failed, retrying for any media...');
+          for (const strategy of strategies) {
+            allItems = await strategy.fn();
+            if (allItems.length > 0) break;
           }
         }
       }
