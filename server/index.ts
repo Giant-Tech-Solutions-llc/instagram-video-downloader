@@ -9,14 +9,6 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled Rejection:", reason);
 });
-process.on("SIGTERM", () => {
-  console.log("Received SIGTERM");
-  process.exit(0);
-});
-process.on("SIGINT", () => {
-  console.log("Received SIGINT");
-  process.exit(0);
-});
 
 const app = express();
 const httpServer = createServer(app);
