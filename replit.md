@@ -53,12 +53,19 @@ The project uses a single repository with three main directories:
 - **`shared/schema.ts`** — Drizzle table definitions, Zod insert schemas, and TypeScript types
 - **`shared/routes.ts`** — API contract definitions with Zod schemas for request/response validation, used by both client and server for type safety
 
+### Running the Project
+- **Workflow:** `Start application` runs `bash start.sh` which builds the frontend with Vite and starts the Express server in production mode (`NODE_ENV=production`)
+- **Why production mode:** The Replit environment sends SIGHUP signals that kill Vite's esbuild child process, causing `process.exit(1)` in the Vite error handler. Production mode serves pre-built static files and avoids this issue entirely.
+- **`start.sh`:** Kills any existing process on port 5000, builds the frontend via `npx vite build`, then runs the server with `tsx`
+- **Signal handling:** `server/index.ts` intercepts SIGTERM, SIGHUP, and `process.exit(1)` to keep the server alive under hostile signal conditions
+
 ### Key Design Decisions
 1. **Server-side scraping approach:** Instagram content is fetched server-side using axios + cheerio rather than client-side, to handle CORS restrictions. Instagram frequently blocks server-side scraping without proxies, which is a known limitation.
 2. **Shared route contracts:** The `shared/routes.ts` file acts as a typed API contract, with Zod schemas for both inputs and outputs, ensuring client and server stay in sync.
 3. **Mobile-first design:** The UI is optimized for smartphone users (the primary Brazilian user base), with responsive layouts and touch-friendly interactions.
 4. **Portuguese-only public site:** The public-facing site is entirely in Portuguese (pt-BR).
 5. **Database-driven blog:** Blog posts are stored in PostgreSQL and served via read-only API. Public pages fetch from `/api/blog/posts` and `/api/blog/posts/:slug`. Content stored as Markdown, rendered to HTML via `marked` + `DOMPurify`.
+6. **Thumbnail proxy:** Instagram CDN images are proxied through `/api/proxy-image` to avoid CORS/referrer blocking in browsers.
 
 ## External Dependencies
 
