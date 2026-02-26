@@ -9,6 +9,14 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled Rejection:", reason);
 });
+process.on("SIGTERM", () => {
+  console.log("Received SIGTERM");
+  process.exit(0);
+});
+process.on("SIGINT", () => {
+  console.log("Received SIGINT");
+  process.exit(0);
+});
 
 const app = express();
 const httpServer = createServer(app);
@@ -56,7 +64,8 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+        const jsonStr = JSON.stringify(capturedJsonResponse);
+        logLine += ` :: ${jsonStr.length > 200 ? jsonStr.slice(0, 200) + '...' : jsonStr}`;
       }
       log(logLine);
     }
