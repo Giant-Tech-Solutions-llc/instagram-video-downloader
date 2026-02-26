@@ -1,10 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
+import { createServer } from "http";
 
 const app = express();
-const server = createServer(app);
+const httpServer = createServer(app);
 
 declare module "http" {
   interface IncomingMessage {
@@ -36,7 +36,7 @@ export function log(message: string, source = "express") {
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -58,11 +58,9 @@ app.use((req, res, next) => {
   next();
 });
 
-async function setup() {
-  // ✅ Correctly pass server + app
-  await registerRoutes(server, app);
+(async () => {
+  await registerRoutes(app);
 
-  // Error handler
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -76,17 +74,22 @@ async function setup() {
     return res.status(status).json({ message });
   });
 
-  // ✅ ALWAYS serve frontend (fixes "Cannot GET /")
-  serveStatic(app);
-}
+  if (process.env.NODE_ENV === "production") {
+    serveStatic(app);
+  } else {
+    const { setupVite } = await import("./vite");
+    await setupVite(httpServer, app);
+  }
 
-setup();
-
-// ✅ Use dynamic port (required for Replit)
-const PORT = process.env.PORT || 3000;
-
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-export default app;
+  const port = parseInt(process.env.PORT || "5000", 10);
+  httpServer.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      log(`serving on port ${port}`);
+    },
+  );
+})();

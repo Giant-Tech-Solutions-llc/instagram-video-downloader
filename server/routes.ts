@@ -1,5 +1,4 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import axios from "axios";
@@ -386,9 +385,8 @@ function getErrorMessage(toolType?: string): string {
 }
 
 export async function registerRoutes(
-  httpServer: Server,
   app: Express
-): Promise<Server> {
+): Promise<void> {
   seed();
 
   app.get("/api/blog/posts", async (req, res) => {
@@ -675,5 +673,4 @@ export async function registerRoutes(
     });
   });
 
-  return httpServer;
 }
