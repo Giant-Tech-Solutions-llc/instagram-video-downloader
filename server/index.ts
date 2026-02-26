@@ -9,6 +9,17 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled Rejection:", reason);
 });
+process.on("SIGTERM", () => {});
+process.on("SIGHUP", () => {});
+
+const originalExit = process.exit;
+process.exit = ((code?: number) => {
+  if (code === 1) {
+    console.error("process.exit(1) intercepted - keeping server alive");
+    return undefined as never;
+  }
+  return originalExit(code);
+}) as typeof process.exit;
 
 const app = express();
 const httpServer = createServer(app);
@@ -90,14 +101,7 @@ app.use((req, res, next) => {
   }
 
   const port = parseInt(process.env.PORT || "5000", 10);
-  httpServer.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`serving on port ${port}`);
-    },
-  );
+  httpServer.listen(port, "0.0.0.0", () => {
+    log(`serving on port ${port}`);
+  });
 })();
