@@ -45,6 +45,49 @@ interface MediaItem {
   type: 'video' | 'image';
 }
 
+function cleanInstagramUrl(rawUrl: string): string {
+  return rawUrl
+    .replace(/\\\\\//g, '/')
+    .replace(/\\\//g, '/')
+    .replace(/\\u0026/g, '&')
+    .replace(/\\u00253D/g, '%3D')
+    .replace(/&amp;/g, '&');
+}
+
+function shortcodeToMediaId(shortcode: string): string | null {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  let id = BigInt(0);
+  for (const char of shortcode) {
+    const idx = alphabet.indexOf(char);
+    if (idx === -1) return null;
+    id = id * BigInt(64) + BigInt(idx);
+  }
+  return id.toString();
+}
+
+function findVideoUrlsInText(text: string): string[] {
+  const urls: string[] = [];
+  const patterns = [
+    /video_url\\?":\\?"(https?:[^"\\]*(?:\\.[^"\\]*)*)/g,
+    /"video_url"\s*:\s*"([^"]+)"/g,
+    /"contentUrl"\s*:\s*"([^"]+\.mp4[^"]*)"/g,
+    /(?:src|url)\\?"?:\s*\\?"?(https?:\/\/[^\s"\\]*\.mp4[^\s"\\]*)/g,
+    /"video_versions"\s*:\s*\[\s*\{\s*[^}]*"url"\s*:\s*"([^"]+)"/g,
+  ];
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      if (match[1]) {
+        const cleaned = cleanInstagramUrl(match[1]);
+        if (cleaned.includes('cdninstagram.com') || cleaned.includes('fbcdn.net')) {
+          urls.push(cleaned);
+        }
+      }
+    }
+  }
+  return urls;
+}
+
 async function tryEmbedExtraction(url: string): Promise<MediaItem[]> {
   const shortcode = extractShortcode(url);
   if (!shortcode) return [];
@@ -70,6 +113,40 @@ async function tryEmbedExtraction(url: string): Promise<MediaItem[]> {
       items.push({ url: videoSrc, thumbnail: posterSrc || undefined, type: 'video' });
     }
 
+    if (!items.some(i => i.type === 'video')) {
+      const ogVideo = $('meta[property="og:video"]').attr('content') ||
+                      $('meta[property="og:video:secure_url"]').attr('content');
+      if (ogVideo) {
+        const cleanedOgVideo = cleanInstagramUrl(ogVideo);
+        if (cleanedOgVideo.includes('cdninstagram.com') || cleanedOgVideo.includes('fbcdn.net')) {
+          items.length = 0;
+          items.push({ url: cleanedOgVideo, type: 'video' });
+        }
+      }
+    }
+
+    if (!items.some(i => i.type === 'video')) {
+      const videoUrls = findVideoUrlsInText(html);
+      if (videoUrls.length > 0) {
+        items.length = 0;
+        items.push({ url: videoUrls[0], type: 'video' });
+      }
+    }
+
+    if (!items.some(i => i.type === 'video')) {
+      const mp4Matches = html.match(/https?:\/\/[^\s"'\\]*\.mp4[^\s"'\\]*/g);
+      if (mp4Matches) {
+        for (const rawUrl of mp4Matches) {
+          const cleaned = cleanInstagramUrl(rawUrl);
+          if (cleaned.includes('cdninstagram.com') || cleaned.includes('fbcdn.net')) {
+            items.length = 0;
+            items.push({ url: cleaned, type: 'video' });
+            break;
+          }
+        }
+      }
+    }
+
     if (items.length === 0) {
       const imgSrc = $('img.EmbeddedMediaImage').attr('src') ||
                      $('img[srcset]').first().attr('src') ||
@@ -82,28 +159,18 @@ async function tryEmbedExtraction(url: string): Promise<MediaItem[]> {
       }
     }
 
-    if (items.length === 0 || !items.some(i => i.type === 'video')) {
-      const videoUrlMatch = html.match(/video_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
-      if (videoUrlMatch && videoUrlMatch[1]) {
-        const videoUrl = videoUrlMatch[1]
-          .replace(/\\\\\//g, '/')
-          .replace(/\\\//g, '/')
-          .replace(/\\u0026/g, '&')
-          .replace(/\\u00253D/g, '%3D');
-        items.length = 0;
-        items.push({ url: videoUrl, type: 'video' });
+    if (items.length === 0) {
+      const displayMatch = html.match(/display_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
+      if (displayMatch && displayMatch[1]) {
+        items.push({ url: cleanInstagramUrl(displayMatch[1]), type: 'image' });
       }
+    }
 
-      if (items.length === 0) {
-        const displayMatch = html.match(/display_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
-        if (displayMatch && displayMatch[1]) {
-          const imgUrl = displayMatch[1]
-            .replace(/\\\\\//g, '/')
-            .replace(/\\\//g, '/')
-            .replace(/\\u0026/g, '&');
-          items.push({ url: imgUrl, type: 'image' });
-        }
-      }
+    if (!items.some(i => i.type === 'video')) {
+      console.log('Embed: no video_url found. HTML contains video_url:', html.includes('video_url'),
+        '| .mp4:', html.includes('.mp4'),
+        '| video tag:', html.includes('<video'),
+        '| HTML length:', html.length);
     }
 
     return items;
@@ -321,6 +388,67 @@ async function tryProfilePictureExtraction(url: string): Promise<MediaItem[]> {
   }
 }
 
+async function tryMediaInfoExtraction(url: string): Promise<MediaItem[]> {
+  const shortcode = extractShortcode(url);
+  if (!shortcode) return [];
+
+  const mediaId = shortcodeToMediaId(shortcode);
+  if (!mediaId) return [];
+
+  try {
+    const apiUrl = `https://i.instagram.com/api/v1/media/${mediaId}/info/`;
+    const response = await axios.get(apiUrl, {
+      headers: {
+        'User-Agent': 'Instagram 275.0.0.27.98 Android (33/13; 420dpi; 1080x2400; samsung; SM-G991B; o1s; exynos2100; en_US; 458229258)',
+        'X-IG-App-ID': '936619743392459',
+        'X-IG-Capabilities': '3brTvx0=',
+        'Accept': '*/*',
+        'Accept-Language': 'pt-BR,pt;q=0.9',
+      },
+      timeout: 15000,
+    });
+
+    const items = response.data?.items;
+    if (!items || items.length === 0) return [];
+
+    const results: MediaItem[] = [];
+    for (const item of items) {
+      if (item.carousel_media) {
+        for (const media of item.carousel_media) {
+          if (media.video_versions?.length > 0) {
+            results.push({
+              url: media.video_versions[0].url,
+              thumbnail: media.image_versions2?.candidates?.[0]?.url,
+              type: 'video',
+            });
+          } else if (media.image_versions2?.candidates?.length > 0) {
+            results.push({
+              url: media.image_versions2.candidates[0].url,
+              type: 'image',
+            });
+          }
+        }
+      } else if (item.video_versions?.length > 0) {
+        results.push({
+          url: item.video_versions[0].url,
+          thumbnail: item.image_versions2?.candidates?.[0]?.url,
+          type: 'video',
+        });
+      } else if (item.image_versions2?.candidates?.length > 0) {
+        results.push({
+          url: item.image_versions2.candidates[0].url,
+          type: 'image',
+        });
+      }
+    }
+
+    return results;
+  } catch (e: any) {
+    console.log('Media info extraction failed:', e.message);
+    return [];
+  }
+}
+
 async function tryAlternateEmbedExtraction(url: string): Promise<MediaItem[]> {
   const shortcode = extractShortcode(url);
   if (!shortcode) return [];
@@ -337,24 +465,22 @@ async function tryAlternateEmbedExtraction(url: string): Promise<MediaItem[]> {
     const html = response.data;
     const items: MediaItem[] = [];
 
-    const videoUrlMatch = html.match(/video_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
-    if (videoUrlMatch && videoUrlMatch[1]) {
-      const cleanUrl = videoUrlMatch[1]
-        .replace(/\\\\\//g, '/')
-        .replace(/\\\//g, '/')
-        .replace(/\\u0026/g, '&')
-        .replace(/\\u00253D/g, '%3D');
-      items.push({ url: cleanUrl, type: 'video' });
+    const videoUrls = findVideoUrlsInText(html);
+    if (videoUrls.length > 0) {
+      items.push({ url: videoUrls[0], type: 'video' });
     }
 
-    if (items.length === 0) {
-      const displayMatch = html.match(/display_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
-      if (displayMatch && displayMatch[1]) {
-        const cleanUrl = displayMatch[1]
-          .replace(/\\\\\//g, '/')
-          .replace(/\\\//g, '/')
-          .replace(/\\u0026/g, '&');
-        items.push({ url: cleanUrl, type: 'image' });
+    if (!items.some(i => i.type === 'video')) {
+      const mp4Matches = html.match(/https?:\/\/[^\s"'\\]*\.mp4[^\s"'\\]*/g);
+      if (mp4Matches) {
+        for (const rawUrl of mp4Matches) {
+          const cleaned = cleanInstagramUrl(rawUrl);
+          if (cleaned.includes('cdninstagram.com') || cleaned.includes('fbcdn.net')) {
+            items.length = 0;
+            items.push({ url: cleaned, type: 'video' });
+            break;
+          }
+        }
       }
     }
 
@@ -363,14 +489,24 @@ async function tryAlternateEmbedExtraction(url: string): Promise<MediaItem[]> {
       const videoSrc = $('video').attr('src') || $('video source').attr('src');
       if (videoSrc) {
         items.push({ url: videoSrc, type: 'video' });
-      } else {
-        $('img').each((_, el) => {
-          const src = $(el).attr('src') || '';
-          if ((src.includes('cdninstagram') || src.includes('fbcdn')) && !src.includes('s150x150') && !src.includes('emoji')) {
-            items.push({ url: src, type: 'image' });
-          }
-        });
       }
+    }
+
+    if (items.length === 0) {
+      const displayMatch = html.match(/display_url\\?":\\?"(https?:.*?)(?:\\?"|$)/);
+      if (displayMatch && displayMatch[1]) {
+        items.push({ url: cleanInstagramUrl(displayMatch[1]), type: 'image' });
+      }
+    }
+
+    if (items.length === 0) {
+      const $ = cheerio.load(html);
+      $('img').each((_, el) => {
+        const src = $(el).attr('src') || '';
+        if ((src.includes('cdninstagram') || src.includes('fbcdn')) && !src.includes('s150x150') && !src.includes('emoji')) {
+          items.push({ url: src, type: 'image' });
+        }
+      });
     }
 
     return items;
@@ -529,6 +665,7 @@ export async function registerRoutes(
       } else {
         const strategies: { name: string; fn: () => Promise<MediaItem[]> }[] = [
           { name: 'JSON API extraction', fn: () => tryJsonApiExtraction(url) },
+          { name: 'Media info API', fn: () => tryMediaInfoExtraction(url) },
           { name: 'GraphQL extraction', fn: () => tryGraphQLExtraction(url) },
           { name: 'Embed extraction', fn: () => tryEmbedExtraction(url) },
           { name: 'Alternate embed extraction', fn: () => tryAlternateEmbedExtraction(url) },
@@ -562,6 +699,10 @@ export async function registerRoutes(
             if (allItems.length > 0) break;
           }
         }
+
+        if (expectsVideo && allItems.length > 0 && !allItems.some(i => i.type === 'video')) {
+          console.log(`WARNING: Could not extract video for reel/video URL: ${url} - returning cover image instead`);
+        }
       }
 
       if (allItems.length === 0) {
@@ -580,11 +721,14 @@ export async function registerRoutes(
 
       await storage.logDownload({ url, status: 'success', format });
 
+      const videoFallback = expectsVideo && !uniqueItems.some(i => i.type === 'video');
+
       const response: any = {
         url: primary.url,
         thumbnail: primary.thumbnail || (uniqueItems.find(i => i.type === 'image')?.url),
         filename: `instagram-${primary.type}-${Date.now()}.${format}`,
         type: primary.type,
+        ...(videoFallback && { warning: 'video_not_found' }),
       };
 
       if (uniqueItems.length > 1) {
