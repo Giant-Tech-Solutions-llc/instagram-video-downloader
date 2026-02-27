@@ -24,6 +24,10 @@ Preferred communication style: Simple, everyday language.
 ### Environment Variables (set on Vercel)
 - `DATABASE_URL` — PostgreSQL connection string (required)
 - `SESSION_SECRET` — Session secret (required)
+- `IG_SESSION_ID` — Instagram session cookie (required for video downloads)
+- `IG_CSRF_TOKEN` — Instagram CSRF token (recommended, improves stability)
+- `IG_DS_USER_ID` — Instagram user ID (recommended, improves stability)
+- **Note:** Instagram session cookies expire periodically. To renew: login to instagram.com → DevTools → Application → Cookies → copy `sessionid`, `csrftoken`, `ds_user_id` values.
 
 ## System Architecture
 
@@ -50,10 +54,11 @@ The project uses a single repository with four main directories:
 ### Backend Architecture
 - **Framework:** Express.js running on Node.js with TypeScript
 - **API Pattern:** RESTful endpoints defined in `server/routes.ts`
-- **Core Endpoint:** `POST /api/download/process` — accepts an Instagram URL, scrapes the page using axios + cheerio to extract video/image URLs from Open Graph meta tags and embedded JSON. Additional endpoints: `GET /api/proxy-download` for proxied file downloads and `GET /api/stats` for download statistics.
+- **Core Endpoint:** `POST /api/download/process` — accepts an Instagram URL, extracts video/image URLs using authenticated Instagram API calls. Additional endpoints: `GET /api/proxy-download` for proxied file downloads and `GET /api/stats` for download statistics.
+- **Instagram HTTP Engine:** `server/instagram-http.ts` provides authenticated requests with browser fingerprint rotation (5 desktop + 3 mobile UAs), session cookie injection, randomized Accept-Language headers, and proper `X-IG-App-ID` / `sec-ch-ua` / `sec-fetch-*` headers. Uses `IG_SESSION_ID`, `IG_CSRF_TOKEN`, and `IG_DS_USER_ID` environment secrets.
+- **Extraction Strategies (ordered):** JSON API (`?__a=1`), Mobile Media Info API (`/api/v1/media/{id}/info/`), GraphQL (2 query hashes), Direct Page HTML (with `__additionalDataLoaded` / `_sharedData` parsing), Embed page, Alternate Embed (Googlebot UA), Reel URL variant. All strategies use session-authenticated requests via `makeInstagramRequest()`.
 - **Public Blog API:** `GET /api/blog/posts`, `GET /api/blog/posts/:slug`, `GET /api/blog/categories`
 - **Sitemap:** `GET /sitemap.xml` — dynamically generated from published posts + static pages
-- **Web Scraping:** Uses axios for HTTP requests with browser-like headers and cheerio for HTML parsing
 - **Local Development:** Vite dev server middleware is used in development mode for HMR; in production, static files are served from `client/dist/`
 - **Vercel Production:** `api/index.ts` wraps the Express app as a serverless function. Static files are served by Vercel's CDN from `client/dist/`.
 
@@ -83,7 +88,7 @@ The project uses a single repository with four main directories:
 - Set `DATABASE_URL` and `SESSION_SECRET` as environment variables in Vercel project settings
 
 ### Key Design Decisions
-1. **Server-side scraping approach:** Instagram content is fetched server-side using axios + cheerio rather than client-side, to handle CORS restrictions. Instagram frequently blocks server-side scraping without proxies, which is a known limitation.
+1. **Authenticated session approach:** Instagram content is fetched server-side using authenticated session cookies (`IG_SESSION_ID`) with browser fingerprint rotation. This bypasses Instagram's anti-scraping blocks that affect unauthenticated requests. Session cookies need periodic renewal as Instagram sessions expire (typically every few months). The `server/instagram-http.ts` module handles all authentication and fingerprinting.
 2. **Shared route contracts:** The `shared/routes.ts` file acts as a typed API contract, with Zod schemas for both inputs and outputs, ensuring client and server stay in sync.
 3. **Mobile-first design:** The UI is optimized for smartphone users (the primary Brazilian user base), with responsive layouts and touch-friendly interactions.
 4. **Portuguese-only public site:** The public-facing site is entirely in Portuguese (pt-BR).

@@ -5,6 +5,7 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 import { seed } from "./seed";
 import { cmsStorage } from "./cms-storage";
+import { makeInstagramRequest, hasSessionAuth, jitterDelay } from "./instagram-http";
 
 const BROWSER_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
@@ -94,14 +95,7 @@ async function tryEmbedExtraction(url: string): Promise<MediaItem[]> {
 
   try {
     const embedUrl = `https://www.instagram.com/p/${shortcode}/embed/captioned/`;
-    const response = await axios.get(embedUrl, {
-      headers: {
-        ...BROWSER_HEADERS,
-        'Referer': 'https://www.instagram.com/',
-      },
-      timeout: 15000,
-      maxRedirects: 5,
-    });
+    const response = await makeInstagramRequest(embedUrl, { useAuth: false });
 
     const html = response.data;
     const $ = cheerio.load(html);
@@ -182,14 +176,36 @@ async function tryEmbedExtraction(url: string): Promise<MediaItem[]> {
 
 async function tryDirectPageExtraction(url: string): Promise<MediaItem[]> {
   try {
-    const response = await axios.get(url, {
-      headers: BROWSER_HEADERS,
-      timeout: 15000,
-      maxRedirects: 5,
-    });
+    const response = await makeInstagramRequest(url);
 
-    const $ = cheerio.load(response.data);
+    const html = typeof response.data === 'string' ? response.data : '';
+    if (!html) return [];
+
+    const $ = cheerio.load(html);
     const items: MediaItem[] = [];
+
+    const additionalMatch = html.match(/window\.__additionalDataLoaded\s*\(\s*'[^']*'\s*,\s*(\{.+?\})\s*\)/s);
+    if (additionalMatch) {
+      try {
+        const data = JSON.parse(additionalMatch[1]);
+        const mediaItem = data?.items?.[0] || data?.graphql?.shortcode_media;
+        if (mediaItem) {
+          if (data?.items?.[0]) {
+            return parseMediaItems(data.items);
+          }
+          return parseGraphQLMedia(mediaItem);
+        }
+      } catch {}
+    }
+
+    const sharedDataMatch = html.match(/window\._sharedData\s*=\s*(\{.+?\});\s*<\/script>/s);
+    if (sharedDataMatch) {
+      try {
+        const shared = JSON.parse(sharedDataMatch[1]);
+        const media = shared?.entry_data?.PostPage?.[0]?.graphql?.shortcode_media;
+        if (media) return parseGraphQLMedia(media);
+      } catch {}
+    }
 
     let videoUrl = $('meta[property="og:video"]').attr('content') ||
                    $('meta[property="og:video:secure_url"]').attr('content');
@@ -202,38 +218,34 @@ async function tryDirectPageExtraction(url: string): Promise<MediaItem[]> {
     }
 
     if (items.length === 0) {
+      const videoUrls = findVideoUrlsInText(html);
+      if (videoUrls.length > 0) {
+        items.push({ url: videoUrls[0], type: 'video' });
+      }
+    }
+
+    if (items.length === 0) {
       const scripts = $('script').map((_, el) => $(el).html()).get();
       for (const scriptContent of scripts) {
         if (!scriptContent) continue;
 
-        const videoMatch = scriptContent.match(/video_url\\?":\\?"(https?:.*?)(?:\\?"|$)/) ||
-                            scriptContent.match(/"video_url"\s*:\s*"([^"]+)"/);
-        if (videoMatch && videoMatch[1]) {
-          videoUrl = videoMatch[1]
-            .replace(/\\\\\//g, '/')
-            .replace(/\\\//g, '/')
-            .replace(/\\u0026/g, '&')
-            .replace(/\\u00253D/g, '%3D');
-          items.push({ url: videoUrl, thumbnail: imageUrl || undefined, type: 'video' });
+        const videoUrls = findVideoUrlsInText(scriptContent);
+        if (videoUrls.length > 0) {
+          items.push({ url: videoUrls[0], type: 'video' });
           break;
         }
+      }
+    }
 
-        const sidecarMatch = scriptContent.match(/"edge_sidecar_to_children"\s*:\s*(\{[^}]+\})/);
-        if (sidecarMatch) {
-          const displayUrls = scriptContent.match(/"display_url"\s*:\s*"([^"]+)"/g);
-          if (displayUrls) {
-            for (const m of displayUrls) {
-              const u = m.match(/"display_url"\s*:\s*"([^"]+)"/);
-              if (u) items.push({ url: u[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/'), type: 'image' });
-            }
-          }
-        }
+    if (items.length === 0) {
+      const scripts = $('script').map((_, el) => $(el).html()).get();
+      for (const scriptContent of scripts) {
+        if (!scriptContent) continue;
 
-        if (items.length === 0) {
-          const displayMatch = scriptContent.match(/"display_url"\s*:\s*"([^"]+)"/);
-          if (displayMatch && displayMatch[1]) {
-            items.push({ url: displayMatch[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/'), type: 'image' });
-          }
+        const displayMatch = scriptContent.match(/"display_url"\s*:\s*"([^"]+)"/);
+        if (displayMatch && displayMatch[1]) {
+          items.push({ url: cleanInstagramUrl(displayMatch[1]), type: 'image' });
+          break;
         }
       }
     }
@@ -249,42 +261,80 @@ async function tryGraphQLExtraction(url: string): Promise<MediaItem[]> {
   const shortcode = extractShortcode(url);
   if (!shortcode) return [];
 
-  try {
-    const graphqlUrl = `https://www.instagram.com/graphql/query/?query_hash=b3055c01b4b222b8a47dc12b090e4e64&variables=${encodeURIComponent(JSON.stringify({ shortcode, child_comment_count: 0, fetch_comment_count: 0, parent_comment_count: 0, has_threaded_comments: false }))}`;
-    const response = await axios.get(graphqlUrl, {
-      headers: {
-        ...BROWSER_HEADERS,
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-IG-App-ID': '936619743392459',
-      },
-      timeout: 15000,
-    });
+  const hashes = [
+    'b3055c01b4b222b8a47dc12b090e4e64',
+    '2b0673e0dc4580674a88d2953fe1a16a',
+  ];
 
-    const data = response.data?.data?.shortcode_media;
-    if (!data) return [];
+  for (const hash of hashes) {
+    try {
+      const variables = JSON.stringify({ shortcode, child_comment_count: 3, fetch_comment_count: 40, parent_comment_count: 0, has_threaded_comments: false });
+      const graphqlUrl = `https://www.instagram.com/graphql/query/?query_hash=${hash}&variables=${encodeURIComponent(variables)}`;
+      const response = await makeInstagramRequest(graphqlUrl, { isApiCall: true });
 
-    const items: MediaItem[] = [];
+      const data = response.data?.data?.shortcode_media || response.data?.data?.xdt_shortcode_media;
+      if (data) return parseGraphQLMedia(data);
+    } catch (e: any) {
+      console.log(`GraphQL hash ${hash.slice(0, 8)} failed:`, e.message);
+    }
+  }
 
-    if (data.__typename === 'GraphSidecar' && data.edge_sidecar_to_children?.edges) {
-      for (const edge of data.edge_sidecar_to_children.edges) {
-        const node = edge.node;
-        if (node.is_video && node.video_url) {
-          items.push({ url: node.video_url, thumbnail: node.display_url, type: 'video' });
-        } else if (node.display_url) {
-          items.push({ url: node.display_url, type: 'image' });
+  return [];
+}
+
+function parseMediaItems(items: any[]): MediaItem[] {
+  const results: MediaItem[] = [];
+  for (const item of items) {
+    if (item.carousel_media) {
+      for (const media of item.carousel_media) {
+        if (media.video_versions && media.video_versions.length > 0) {
+          const sorted = [...media.video_versions].sort((a: any, b: any) => (b.height || 0) - (a.height || 0));
+          results.push({
+            url: sorted[0].url,
+            thumbnail: media.image_versions2?.candidates?.[0]?.url,
+            type: 'video',
+          });
+        } else if (media.image_versions2?.candidates?.length > 0) {
+          results.push({
+            url: media.image_versions2.candidates[0].url,
+            type: 'image',
+          });
         }
       }
-    } else if (data.is_video && data.video_url) {
-      items.push({ url: data.video_url, thumbnail: data.display_url, type: 'video' });
-    } else if (data.display_url) {
-      items.push({ url: data.display_url, type: 'image' });
+    } else if (item.video_versions && item.video_versions.length > 0) {
+      const sorted = [...item.video_versions].sort((a: any, b: any) => (b.height || 0) - (a.height || 0));
+      results.push({
+        url: sorted[0].url,
+        thumbnail: item.image_versions2?.candidates?.[0]?.url,
+        type: 'video',
+      });
+    } else if (item.image_versions2?.candidates?.length > 0) {
+      results.push({
+        url: item.image_versions2.candidates[0].url,
+        type: 'image',
+      });
     }
-
-    return items;
-  } catch (e: any) {
-    console.log('GraphQL extraction failed:', e.message);
-    return [];
   }
+  return results;
+}
+
+function parseGraphQLMedia(data: any): MediaItem[] {
+  const items: MediaItem[] = [];
+  if (data.__typename === 'GraphSidecar' && data.edge_sidecar_to_children?.edges) {
+    for (const edge of data.edge_sidecar_to_children.edges) {
+      const node = edge.node;
+      if (node.is_video && node.video_url) {
+        items.push({ url: node.video_url, thumbnail: node.display_url, type: 'video' });
+      } else if (node.display_url) {
+        items.push({ url: node.display_url, type: 'image' });
+      }
+    }
+  } else if (data.is_video && data.video_url) {
+    items.push({ url: data.video_url, thumbnail: data.display_url, type: 'video' });
+  } else if (data.display_url) {
+    items.push({ url: data.display_url, type: 'image' });
+  }
+  return items;
 }
 
 async function tryJsonApiExtraction(url: string): Promise<MediaItem[]> {
@@ -293,51 +343,20 @@ async function tryJsonApiExtraction(url: string): Promise<MediaItem[]> {
 
   try {
     const apiUrl = `https://www.instagram.com/p/${shortcode}/?__a=1&__d=dis`;
-    const response = await axios.get(apiUrl, {
-      headers: {
-        ...BROWSER_HEADERS,
-        'X-IG-App-ID': '936619743392459',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      timeout: 15000,
-    });
+    const response = await makeInstagramRequest(apiUrl, { isApiCall: true });
 
-    const items = response.data?.items || [];
-    const results: MediaItem[] = [];
-
-    for (const item of items) {
-      if (item.carousel_media) {
-        for (const media of item.carousel_media) {
-          if (media.video_versions && media.video_versions.length > 0) {
-            const best = media.video_versions[0];
-            results.push({
-              url: best.url,
-              thumbnail: media.image_versions2?.candidates?.[0]?.url,
-              type: 'video',
-            });
-          } else if (media.image_versions2?.candidates?.length > 0) {
-            results.push({
-              url: media.image_versions2.candidates[0].url,
-              type: 'image',
-            });
-          }
-        }
-      } else if (item.video_versions && item.video_versions.length > 0) {
-        const best = item.video_versions[0];
-        results.push({
-          url: best.url,
-          thumbnail: item.image_versions2?.candidates?.[0]?.url,
-          type: 'video',
-        });
-      } else if (item.image_versions2?.candidates?.length > 0) {
-        results.push({
-          url: item.image_versions2.candidates[0].url,
-          type: 'image',
-        });
-      }
+    const body = response.data;
+    if (body?.items?.[0]) {
+      return parseMediaItems(body.items);
+    }
+    if (body?.graphql?.shortcode_media) {
+      return parseGraphQLMedia(body.graphql.shortcode_media);
+    }
+    if (body?.data?.shortcode_media) {
+      return parseGraphQLMedia(body.data.shortcode_media);
     }
 
-    return results;
+    return [];
   } catch (e: any) {
     console.log('JSON API extraction failed:', e.message);
     return [];
@@ -349,10 +368,7 @@ async function tryProfilePictureExtraction(url: string): Promise<MediaItem[]> {
   if (!username) return [];
 
   try {
-    const response = await axios.get(`https://www.instagram.com/${username}/`, {
-      headers: BROWSER_HEADERS,
-      timeout: 15000,
-    });
+    const response = await makeInstagramRequest(`https://www.instagram.com/${username}/`);
 
     const html = response.data;
     const $ = cheerio.load(html);
@@ -396,53 +412,13 @@ async function tryMediaInfoExtraction(url: string): Promise<MediaItem[]> {
   if (!mediaId) return [];
 
   try {
-    const apiUrl = `https://i.instagram.com/api/v1/media/${mediaId}/info/`;
-    const response = await axios.get(apiUrl, {
-      headers: {
-        'User-Agent': 'Instagram 275.0.0.27.98 Android (33/13; 420dpi; 1080x2400; samsung; SM-G991B; o1s; exynos2100; en_US; 458229258)',
-        'X-IG-App-ID': '936619743392459',
-        'X-IG-Capabilities': '3brTvx0=',
-        'Accept': '*/*',
-        'Accept-Language': 'pt-BR,pt;q=0.9',
-      },
-      timeout: 15000,
-    });
+    const apiUrl = `https://www.instagram.com/api/v1/media/${mediaId}/info/`;
+    const response = await makeInstagramRequest(apiUrl, { useMobile: true, isApiCall: true });
 
     const items = response.data?.items;
     if (!items || items.length === 0) return [];
 
-    const results: MediaItem[] = [];
-    for (const item of items) {
-      if (item.carousel_media) {
-        for (const media of item.carousel_media) {
-          if (media.video_versions?.length > 0) {
-            results.push({
-              url: media.video_versions[0].url,
-              thumbnail: media.image_versions2?.candidates?.[0]?.url,
-              type: 'video',
-            });
-          } else if (media.image_versions2?.candidates?.length > 0) {
-            results.push({
-              url: media.image_versions2.candidates[0].url,
-              type: 'image',
-            });
-          }
-        }
-      } else if (item.video_versions?.length > 0) {
-        results.push({
-          url: item.video_versions[0].url,
-          thumbnail: item.image_versions2?.candidates?.[0]?.url,
-          type: 'video',
-        });
-      } else if (item.image_versions2?.candidates?.length > 0) {
-        results.push({
-          url: item.image_versions2.candidates[0].url,
-          type: 'image',
-        });
-      }
-    }
-
-    return results;
+    return parseMediaItems(items);
   } catch (e: any) {
     console.log('Media info extraction failed:', e.message);
     return [];
@@ -454,12 +430,11 @@ async function tryAlternateEmbedExtraction(url: string): Promise<MediaItem[]> {
   if (!shortcode) return [];
 
   try {
-    const response = await axios.get(`https://www.instagram.com/p/${shortcode}/embed/`, {
-      headers: {
+    const response = await makeInstagramRequest(`https://www.instagram.com/p/${shortcode}/embed/`, {
+      useAuth: false,
+      extraHeaders: {
         'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-        'Accept': 'text/html',
       },
-      timeout: 15000,
     });
 
     const html = response.data;
@@ -651,7 +626,8 @@ export async function registerRoutes(
       url = url.split('?')[0];
       if (!url.endsWith('/')) url += '/';
 
-      console.log(`Processing download for URL: ${url} (tool: ${toolType})`);
+      const authenticated = hasSessionAuth();
+      console.log(`Processing download for URL: ${url} (tool: ${toolType}, auth: ${authenticated})`);
 
       let allItems: MediaItem[] = [];
       const isReelUrl = /\/reel(s)?\//.test(url);
@@ -663,14 +639,20 @@ export async function registerRoutes(
           allItems = await tryDirectPageExtraction(url);
         }
       } else {
-        const strategies: { name: string; fn: () => Promise<MediaItem[]> }[] = [
-          { name: 'JSON API extraction', fn: () => tryJsonApiExtraction(url) },
-          { name: 'Media info API', fn: () => tryMediaInfoExtraction(url) },
-          { name: 'GraphQL extraction', fn: () => tryGraphQLExtraction(url) },
+        const strategies: { name: string; fn: () => Promise<MediaItem[]> }[] = [];
+
+        if (authenticated) {
+          strategies.push(
+            { name: 'JSON API extraction', fn: () => tryJsonApiExtraction(url) },
+            { name: 'Media info API', fn: () => tryMediaInfoExtraction(url) },
+            { name: 'GraphQL extraction', fn: () => tryGraphQLExtraction(url) },
+          );
+        }
+        strategies.push(
+          { name: 'Direct page extraction', fn: () => tryDirectPageExtraction(url) },
           { name: 'Embed extraction', fn: () => tryEmbedExtraction(url) },
           { name: 'Alternate embed extraction', fn: () => tryAlternateEmbedExtraction(url) },
-          { name: 'Direct page extraction', fn: () => tryDirectPageExtraction(url) },
-        ];
+        );
 
         if (isReelUrl) {
           const reelUrl = url.replace('/reel/', '/p/').replace('/reels/', '/p/');
@@ -686,10 +668,13 @@ export async function registerRoutes(
             const hasVideo = allItems.some(item => item.type === 'video');
             if (expectsVideo && !hasVideo) {
               console.log(`Strategy ${i + 1} returned only images for a video URL, trying next...`);
+              if (i < strategies.length - 1) await jitterDelay(300, 150);
               continue;
             }
+            console.log(`Strategy ${i + 1} succeeded with ${allItems.length} item(s)`);
             break;
           }
+          if (i < strategies.length - 1) await jitterDelay(400, 200);
         }
 
         if (allItems.length === 0 && expectsVideo) {
