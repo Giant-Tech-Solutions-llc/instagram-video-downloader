@@ -1,6 +1,7 @@
 node_modules
-client/dist
 dist
+client/dist
 .env
 .DS_Store
 *.tar.gz
+.vercel
