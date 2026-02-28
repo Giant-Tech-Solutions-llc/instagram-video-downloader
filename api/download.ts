@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import axios from "axios";
-import * as cheerio from "cheerio";
 
 export default async function handler(
   req: VercelRequest,
@@ -10,45 +9,73 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  try {
-    const { url } = req.body;
+  const { url } = req.body;
 
-    if (!url) {
-      return res.status(400).json({ message: "URL is required" });
-    }
-
-    const response = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Referer": "https://www.instagram.com/",
-      },
-      timeout: 15000,
+  if (!url) {
+    return res.status(400).json({
+      message: "URL inválida. Por favor, use um link do Instagram.",
     });
+  }
 
-    const $ = cheerio.load(response.data);
+  try {
+    const response = await axios.get(
+      "YOUR_RAPIDAPI_ENDPOINT_HERE",
+      {
+        params: { url },
+        headers: {
+          "X-RapidAPI-Key": process.env.RAPIDAPI_KEY!,
+          "X-RapidAPI-Host": "YOUR_RAPIDAPI_HOST",
+        },
+      }
+    );
 
-    const video =
-      $('meta[property="og:video"]').attr("content") ||
-      $('meta[property="og:video:secure_url"]').attr("content");
+    const data = response.data;
 
-    const image = $('meta[property="og:image"]').attr("content");
-
-    if (!video && !image) {
+    if (!data.videos?.length && !data.images?.length) {
       return res.status(400).json({
-        message:
-          "No media found. Profile may be private or Instagram blocked the request.",
+        message: "Não foi possível encontrar mídia para este link.",
       });
     }
 
+    const mediaItems: any[] = [];
+
+    if (data.videos?.length) {
+      data.videos.forEach((videoUrl: string, index: number) => {
+        mediaItems.push({
+          url: videoUrl,
+          thumbnail: data.images?.[0],
+          filename: `instagram-video-${Date.now()}-${index + 1}.mp4`,
+          type: "video",
+        });
+      });
+    }
+
+    if (data.images?.length) {
+      data.images.forEach((imageUrl: string, index: number) => {
+        mediaItems.push({
+          url: imageUrl,
+          filename: `instagram-image-${Date.now()}-${index + 1}.jpg`,
+          type: "image",
+        });
+      });
+    }
+
+    const primary = mediaItems[0];
+
     return res.status(200).json({
-      type: video ? "video" : "image",
-      url: video || image,
+      url: primary.url,
+      thumbnail: primary.thumbnail,
+      filename: primary.filename,
+      type: primary.type,
+      items: mediaItems.length > 1 ? mediaItems : undefined,
     });
+
   } catch (error: any) {
+    console.error("RapidAPI error:", error.response?.data || error.message);
+
     return res.status(500).json({
-      message: "Failed to process request",
-      error: error.message,
+      message:
+        "Temporary error processing. Please try again in a few minutes.",
     });
   }
 }
