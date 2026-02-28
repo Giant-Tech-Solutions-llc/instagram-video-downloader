@@ -12,7 +12,7 @@ export const api = {
   download: {
     process: {
       method: 'POST' as const,
-      path: '/api/download/process' as const,
+      path: '/api/download' as const, // ✅ FIXED FOR VERCEL
       input: z.object({
         url: z.string().url({ message: "Por favor, insira uma URL válida do Instagram" }),
         toolType: z.string().optional(),
