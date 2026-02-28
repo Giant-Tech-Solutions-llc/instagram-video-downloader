@@ -13,65 +13,44 @@ export default async function handler(
 
   if (!url) {
     return res.status(400).json({
-      message: "URL inválida. Por favor, use um link válido.",
+      message: "Please provide a valid Instagram URL.",
     });
   }
 
   try {
     const response = await axios.get(
-      "https://instagram-downloader-download-instagram-videos-stories5.p.rapidapi.com/getThreads",
+      "https://instagram-downloader-download-instagram-stories-videos4.p.rapidapi.com/convert",
       {
         params: { url },
         headers: {
           "x-rapidapi-key": process.env.RAPIDAPI_KEY,
           "x-rapidapi-host":
-            "instagram-downloader-download-instagram-videos-stories5.p.rapidapi.com",
+            "instagram-downloader-download-instagram-stories-videos4.p.rapidapi.com",
         },
       }
     );
 
     const data = response.data;
 
-    if (!data.videos?.length && !data.images?.length) {
+    // You must check actual structure from RapidAPI docs
+    if (!data || !data.url) {
       return res.status(400).json({
-        message: "No media could be found for this link.",
-      });
-    }
-
-    const items: any[] = [];
-
-    if (data.videos?.length) {
-      data.videos.forEach((video: string, i: number) => {
-        items.push({
-          url: video,
-          filename: `threads-video-${Date.now()}-${i + 1}.mp4`,
-          type: "video",
-        });
-      });
-    }
-
-    if (data.images?.length) {
-      data.images.forEach((image: string, i: number) => {
-        items.push({
-          url: image,
-          filename: `threads-image-${Date.now()}-${i + 1}.jpg`,
-          type: "image",
-        });
+        message: "No media found for this link.",
       });
     }
 
     return res.status(200).json({
-      url: items[0].url,
-      filename: items[0].filename,
-      type: items[0].type,
-      items: items.length > 1 ? items : undefined,
+      url: data.url,
+      thumbnail: data.thumbnail,
+      filename: `instagram-${Date.now()}.mp4`,
+      type: "video",
     });
+
   } catch (error: any) {
     console.error("RapidAPI error:", error.response?.data || error.message);
 
     return res.status(500).json({
-      message:
-        "Temporary error processing. Please try again in a few minutes.",
+      message: "Temporary error processing. Please try again later.",
     });
   }
 }
