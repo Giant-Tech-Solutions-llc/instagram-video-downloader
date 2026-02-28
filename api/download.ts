@@ -23,7 +23,7 @@ export default async function handler(
       {
         params: { url },
         headers: {
-          "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+          "x-rapidapi-key": process.env.RAPIDAPI_KEY!,
           "x-rapidapi-host":
             "instagram-downloader-download-instagram-stories-videos4.p.rapidapi.com",
         },
@@ -32,25 +32,37 @@ export default async function handler(
 
     const data = response.data;
 
-    // You must check actual structure from RapidAPI docs
-    if (!data || !data.url) {
+    if (!data?.media?.length) {
       return res.status(400).json({
         message: "No media found for this link.",
       });
     }
 
+    const mediaItems = data.media.map((item: any, index: number) => ({
+      url: item.url,
+      thumbnail: item.thumbnail,
+      filename: `instagram-${item.type}-${Date.now()}-${index + 1}.${
+        item.type === "video" ? "mp4" : "jpg"
+      }`,
+      type: item.type === "video" ? "video" : "image",
+    }));
+
+    const primary = mediaItems[0];
+
     return res.status(200).json({
-      url: data.url,
-      thumbnail: data.thumbnail,
-      filename: `instagram-${Date.now()}.mp4`,
-      type: "video",
+      url: primary.url,
+      thumbnail: primary.thumbnail,
+      filename: primary.filename,
+      type: primary.type,
+      items: mediaItems.length > 1 ? mediaItems : undefined,
     });
 
   } catch (error: any) {
     console.error("RapidAPI error:", error.response?.data || error.message);
 
     return res.status(500).json({
-      message: "Temporary error processing. Please try again later.",
+      message:
+        "Temporary error processing. Please try again in a few minutes.",
     });
   }
 }
