@@ -23,8 +23,8 @@ export default async function handler(
       {
         params: { url },
         headers: {
-          "X-RapidAPI-Key": process.env.RAPIDAPI_KEY!,
-          "X-RapidAPI-Host":
+          "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+          "x-rapidapi-host":
             "instagram-downloader-download-instagram-videos-stories5.p.rapidapi.com",
         },
       }
@@ -32,50 +32,42 @@ export default async function handler(
 
     const data = response.data;
 
-    if (!data?.videos?.length && !data?.images?.length) {
+    if (!data.videos?.length && !data.images?.length) {
       return res.status(400).json({
-        message: "Não foi possível encontrar mídia para este link.",
+        message: "No media could be found for this link.",
       });
     }
 
-    const mediaItems: any[] = [];
+    const items: any[] = [];
 
-    // Videos
     if (data.videos?.length) {
-      data.videos.forEach((videoUrl: string, index: number) => {
-        mediaItems.push({
-          url: videoUrl,
-          thumbnail: data.images?.[0],
-          filename: `threads-video-${Date.now()}-${index + 1}.mp4`,
+      data.videos.forEach((video: string, i: number) => {
+        items.push({
+          url: video,
+          filename: `threads-video-${Date.now()}-${i + 1}.mp4`,
           type: "video",
         });
       });
     }
 
-    // Images
     if (data.images?.length) {
-      data.images.forEach((imageUrl: string, index: number) => {
-        mediaItems.push({
-          url: imageUrl,
-          filename: `threads-image-${Date.now()}-${index + 1}.jpg`,
+      data.images.forEach((image: string, i: number) => {
+        items.push({
+          url: image,
+          filename: `threads-image-${Date.now()}-${i + 1}.jpg`,
           type: "image",
         });
       });
     }
 
-    const primary = mediaItems[0];
-
     return res.status(200).json({
-      url: primary.url,
-      thumbnail: primary.thumbnail,
-      filename: primary.filename,
-      type: primary.type,
-      items: mediaItems.length > 1 ? mediaItems : undefined,
+      url: items[0].url,
+      filename: items[0].filename,
+      type: items[0].type,
+      items: items.length > 1 ? items : undefined,
     });
   } catch (error: any) {
-    console.error("RapidAPI ERROR STATUS:", error.response?.status);
-    console.error("RapidAPI ERROR DATA:", error.response?.data);
-    console.error("RapidAPI ERROR MESSAGE:", error.message);
+    console.error("RapidAPI error:", error.response?.data || error.message);
 
     return res.status(500).json({
       message:
