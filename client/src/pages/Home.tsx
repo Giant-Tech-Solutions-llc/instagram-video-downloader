@@ -229,11 +229,7 @@ export default function Home() {
                       <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
                         {"Seu arquivo foi processado com sucesso e está pronto para baixar."}
                       </p>
-                      {processMutation.data.warning === 'video_not_found' && (
-                        <p className="text-amber-600 text-xs sm:text-sm mt-2 bg-amber-50 px-3 py-2 rounded-lg" data-testid="text-video-warning">
-                          {"Não foi possível extrair o vídeo. A imagem de capa foi baixada."}
-                        </p>
-                      )}
+                  
                     </div>
 
                     <div className="space-y-3 sm:space-y-4">
