@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useProcessDownload } from "@/hooks/use-download";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -10,7 +10,6 @@ import {
   Check,
   CheckCircle,
   Clapperboard,
-  Clock,
   Copy,
   Download,
   AlertCircle,
@@ -35,6 +34,15 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
   const processMutation = useProcessDownload();
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (processMutation.isSuccess && processMutation.data && resultRef.current) {
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [processMutation.isSuccess, processMutation.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,7 +180,9 @@ export default function Home() {
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-bold mb-1 text-sm sm:text-base">{"Erro ao processar"}</p>
-                      <p className="font-medium text-xs sm:text-sm text-red-500">{processMutation.error.message}</p>
+                      <p className="font-medium text-xs sm:text-sm text-red-500">{processMutation.error instanceof Error
+                        ? processMutation.error.message
+                        : "Erro desconhecido"}</p>
                     </div>
                   </motion.div>
                 )}
@@ -193,7 +203,7 @@ export default function Home() {
 
         <AnimatePresence>
           {processMutation.isSuccess && processMutation.data && (
-            <section className="py-8 sm:py-12 bg-white border-b border-border/40">
+            <section ref={resultRef} className="py-8 sm:py-12 bg-white border-b border-border/40">
               <div className="max-w-4xl mx-auto px-4">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -234,10 +244,10 @@ export default function Home() {
                     <div className="space-y-3 sm:space-y-4">
                       <a
                         href={processMutation.data.url}
-download
-data-testid="link-download-instagram-result"
-className="flex items-center justify-center gap-2 sm:gap-3 w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl bg-[#E6195E] text-white font-black text-base sm:text-lg md:text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
->
+                        download
+                        data-testid="link-download-instagram-result"
+                        className="flex items-center justify-center gap-2 sm:gap-3 w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl bg-[#E6195E] text-white font-black text-base sm:text-lg md:text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
+                      >
                         <Download className="w-5 h-5 sm:w-6 sm:h-6" />
                         {processMutation.data.type === "video" ? "BAIXAR VÍDEO" : "BAIXAR IMAGEM"}
                       </a>

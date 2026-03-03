@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useProcessDownload } from "@/hooks/use-download";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -30,6 +30,15 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
   const processMutation = useProcessDownload();
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (processMutation.isSuccess && processMutation.data && resultRef.current) {
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [processMutation.isSuccess, processMutation.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,7 +202,7 @@ export default function ToolPageLayout({ tool }: ToolPageLayoutProps) {
 
         <AnimatePresence>
           {processMutation.isSuccess && processMutation.data && (
-            <section className="py-8 sm:py-12 bg-white border-b border-border/40">
+            <section ref={resultRef} className="py-8 sm:py-12 bg-white border-b border-border/40">
               <div className="max-w-4xl mx-auto px-4">
                 {hasMultipleItems ? (
                   <motion.div
