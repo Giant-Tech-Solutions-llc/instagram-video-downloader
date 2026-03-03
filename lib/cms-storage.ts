@@ -3,7 +3,7 @@ import { eq, desc, asc, and, count } from "drizzle-orm";
 import {
   blogPosts, type BlogPost,
   categories, type Category,
-} from "../../shared/schema";
+} from "../shared/schema";
 
 export class CmsStorage {
   async getPostBySlug(slug: string): Promise<BlogPost | undefined> {

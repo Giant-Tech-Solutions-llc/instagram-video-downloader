@@ -16,13 +16,12 @@ Preferred communication style: Simple, everyday language.
 
 ### Vercel Configuration
 - **`vercel.json`** — Configures builds (individual serverless functions + static client), routes mapping each `/api/*` path to its handler file
-- **Serverless Functions:** Individual handler files under `api/` directory, each exporting `default async function handler(req, res)`
-  - `api/download/process.ts` — POST handler for Instagram media extraction
+- **Serverless Functions:** 6 flat handler files under `api/` (no subdirectories — stays under Vercel Hobby 12-function limit):
+  - `api/download.ts` — POST handler for Instagram media extraction (routed from `/api/download/process`)
   - `api/proxy-download.ts` — GET handler for proxied file downloads
   - `api/proxy-image.ts` — GET handler for proxied image serving
   - `api/stats.ts` — GET handler for download statistics
-  - `api/blog/posts.ts` — GET handler for blog posts (list + single by slug)
-  - `api/blog/categories.ts` — GET handler for blog categories
+  - `api/blog.ts` — GET handler for blog posts + categories (routes by URL path internally)
   - `api/sitemap.ts` — GET handler for dynamic sitemap XML
 - **Frontend:** Static SPA served from `client/dist/` (built by Vite)
 - **SPA Fallback:** Static assets (files with extensions) serve from `client/dist/`; all other non-API routes serve `client/dist/index.html` for client-side routing
@@ -41,8 +40,9 @@ Preferred communication style: Simple, everyday language.
 ### Monorepo Structure
 The project uses a single repository with the following directories:
 - **`client/`** — React frontend (SPA)
-- **`api/`** — Vercel serverless function handlers + shared backend logic (`api/lib/`)
-- **`server/`** — Local development Express server (imports logic from `api/lib/`)
+- **`api/`** — Vercel serverless function handlers only (6 files, no subdirectories)
+- **`lib/`** — Shared backend logic (database, storage, Instagram extraction) used by both `api/` and `server/`
+- **`server/`** — Local development Express server (imports logic from `lib/`)
 - **`shared/`** — Shared types, schemas, and route definitions used by both client and API
 - **`_backup_server/`** — Backup of original monolithic server code (pre-serverless migration)
 
@@ -61,13 +61,13 @@ The project uses a single repository with the following directories:
 
 ### Backend Architecture (Serverless)
 - **Pattern:** Individual Vercel serverless functions in `api/` directory
-- **Shared Logic:** Common modules in `api/lib/` used by all handlers:
-  - `api/lib/instagram-http.ts` — Authenticated requests with browser fingerprint rotation (5 desktop + 3 mobile UAs), session cookie injection, randomized Accept-Language headers
-  - `api/lib/instagram-extractor.ts` — All Instagram media extraction strategies as pure functions
-  - `api/lib/db.ts` — Drizzle ORM + PostgreSQL connection
-  - `api/lib/storage.ts` — Download logging interface
-  - `api/lib/cms-storage.ts` — Blog post/category queries
-  - `api/lib/seed.ts` — Database seeding
+- **Shared Logic:** Common modules in `lib/` (root level, NOT inside `api/` — avoids counting as serverless functions):
+  - `lib/instagram-http.ts` — Authenticated requests with browser fingerprint rotation (5 desktop + 3 mobile UAs), session cookie injection, randomized Accept-Language headers
+  - `lib/instagram-extractor.ts` — All Instagram media extraction strategies as pure functions
+  - `lib/db.ts` — Drizzle ORM + PostgreSQL connection
+  - `lib/storage.ts` — Download logging interface
+  - `lib/cms-storage.ts` — Blog post/category queries
+  - `lib/seed.ts` — Database seeding
 - **API Endpoints:**
   - `POST /api/download/process` — Accepts Instagram URL, runs extraction strategies, returns media info
   - `GET /api/proxy-download` — Proxies file download with Content-Disposition attachment

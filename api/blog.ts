@@ -7,6 +7,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const urlPath = (req.url || '').split('?')[0];
+
+  if (urlPath.match(/\/api\/blog\/categories/)) {
+    try {
+      const cats = await cmsStorage.getCategories();
+      return res.json(cats);
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao carregar categorias." });
+    }
+  }
+
   const slugSegments = urlPath.replace(/^\/api\/blog\/posts\/?/, '').split('/').filter(Boolean);
   const slug = slugSegments?.[0];
 

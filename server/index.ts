@@ -1,9 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { storage } from "../api/lib/storage";
-import { seed } from "../api/lib/seed";
-import { cmsStorage } from "../api/lib/cms-storage";
-import { extractMedia, getErrorMessage, type MediaItem } from "../api/lib/instagram-extractor";
-import { hasSessionAuth } from "../api/lib/instagram-http";
+import { storage } from "../lib/storage";
+import { seed } from "../lib/seed";
+import { cmsStorage } from "../lib/cms-storage";
+import { extractMedia, getErrorMessage, type MediaItem } from "../lib/instagram-extractor";
+import { hasSessionAuth } from "../lib/instagram-http";
 import axios from "axios";
 import path from "path";
 import { fileURLToPath } from "url";

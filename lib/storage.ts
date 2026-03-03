@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { downloads, type InsertDownload, type Download } from "../../shared/schema";
+import { downloads, type InsertDownload, type Download } from "../shared/schema";
 
 export interface IStorage {
   logDownload(download: InsertDownload): Promise<Download>;
