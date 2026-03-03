@@ -1,0 +1,140 @@
+Restructure this project for proper Vercel serverless deployment.
+
+CRITICAL RULES:
+- DO NOT modify frontend UI.
+- DO NOT modify styling.
+- DO NOT change API response format.
+- DO NOT delete any logic before backing it up.
+- DO NOT remove functionality.
+- DO NOT simplify business logic.
+
+STEP 1 — BACKUP FIRST (MANDATORY)
+
+Before deleting anything:
+
+1. Create a folder at root:
+   /_backup_server
+
+2. Move the entire existing:
+   server/
+   uploads/
+
+   INTO:
+   /_backup_server/
+
+DO NOT DELETE them permanently.
+Only move them.
+
+STEP 2 — CREATE VERCEL SERVERLESS STRUCTURE
+
+Create a root-level folder:
+- /api
+
+Inside /api create:
+
+- download.ts
+- proxy-download.ts
+- proxy-image.ts
+
+STEP 3 — MIGRATE LOGIC SAFELY
+
+Move backend logic from the old server into serverless handlers.
+
+Each file must:
+
+- export default async function handler(req, res)
+- NOT use app.listen()
+- NOT start Express server
+- NOT create persistent server
+- NOT bind to ports
+
+If existing server logic depends on Express,
+refactor it into pure functions that can be called inside serverless handlers.
+
+Preserve all business logic exactly as-is.
+
+STEP 4 — API REQUIREMENTS
+
+download.ts:
+- Accept POST request
+- Accept body: { url: string }
+- Return:
+  {
+    url: string,
+    thumbnail?: string,
+    filename?: string,
+    type: "video" | "image"
+  }
+
+proxy-download.ts:
+- Accept query param ?url=
+- Fetch remote file
+- Return file as attachment
+- Set proper Content-Disposition header
+
+proxy-image.ts:
+- Accept query param ?url=
+- Fetch remote image
+- Return buffer
+- Set correct Content-Type
+
+STEP 5 — UPDATE package.json (ROOT ONLY)
+
+Replace root package.json scripts with:
+
+{
+  "name": "instagram-video-downloader",
+  "private": true,
+  "scripts": {
+    "build": "cd client && npm install && npm run build"
+  }
+}
+
+DO NOT modify client/package.json.
+
+STEP 6 — REPLACE vercel.json WITH:
+
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/*.ts", "use": "@vercel/node" },
+    { "src": "client/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1.ts" },
+    { "src": "/(.*)", "dest": "/client/dist/$1" }
+  ]
+}
+
+STEP 7 — FRONTEND VALIDATION
+
+Ensure frontend calls:
+- /api/download
+- /api/proxy-download
+- /api/proxy-image
+
+Do NOT change UI components.
+
+STEP 8 — TYPE SAFETY
+
+Ensure:
+- TypeScript compiles without errors
+- npm run build works
+- No unused imports
+- No implicit any
+
+STEP 9 — FINAL VALIDATION
+
+After restructuring:
+
+- Run build
+- Confirm client builds
+- Confirm API files export properly
+- Confirm no missing imports
+
+If any logic cannot be safely converted,
+keep fallback logic in /_backup_server and explain what requires manual migration.
+
+Do NOT remove backup folder.
+
+Apply changes safely.
