@@ -1,0 +1,102 @@
+Fix Vercel deployment errors without breaking functionality.
+
+CRITICAL:
+- Do NOT modify frontend UI.
+- Do NOT change API response formats.
+- Do NOT remove business logic.
+- Only restructure backend safely.
+
+-----------------------------------
+STEP 1 — FIX VERCEL FUNCTION LIMIT
+-----------------------------------
+
+Vercel Hobby plan allows max 12 serverless functions.
+Currently too many files exist inside /api, including utility files.
+
+Do the following:
+
+1. Inside /api, KEEP ONLY route handler files:
+   - download.ts
+   - proxy-download.ts
+   - proxy-image.ts
+
+2. MOVE ALL OTHER FILES out of /api into a new root folder:
+   - /lib
+
+This includes:
+   - api/lib/db.ts
+   - api/lib/seed.ts
+   - api/lib/storage.ts
+   - any other helper files inside api/
+
+New structure must be:
+
+api/
+  download.ts
+  proxy-download.ts
+  proxy-image.ts
+
+lib/
+  db.ts
+  seed.ts
+  storage.ts
+  (any other helper files)
+
+3. Update ALL imports inside api files.
+
+For example change:
+   import { something } from "./lib/db";
+
+To:
+   import { something } from "../lib/db";
+
+Ensure no broken imports remain.
+
+-----------------------------------
+STEP 2 — FIX TYPESCRIPT ERRORS
+-----------------------------------
+
+Fix error:
+Could not find declaration file for module 'pg'
+
+Add:
+   npm install --save-dev @types/pg
+
+Update package.json devDependencies accordingly.
+
+-----------------------------------
+
+Fix implicit any error in lib/seed.ts:
+
+Find parameters like:
+   (r) =>
+
+Change to:
+   (r: any) =>
+
+OR provide proper type if possible.
+
+Ensure no TS7006 errors remain.
+
+-----------------------------------
+STEP 3 — VERIFY BUILD
+-----------------------------------
+
+Ensure:
+
+- TypeScript compiles without errors
+- Only 3 files exist inside /api
+- npm run build succeeds
+- No unused imports
+- No app.listen() exists anywhere
+
+-----------------------------------
+DO NOT:
+-----------------------------------
+
+- Do not delete backup logic
+- Do not simplify business logic
+- Do not modify client/
+- Do not remove database logic
+
+After changes, confirm final folder structure.
