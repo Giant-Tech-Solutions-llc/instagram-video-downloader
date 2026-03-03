@@ -1,20 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/*.ts", "use": "@vercel/node" },
-    { "src": "client/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
-  ],
-  "routes": [
-    { "src": "/api/download/process", "dest": "/api/download.ts" },
-    { "src": "/api/proxy-download", "dest": "/api/proxy-download.ts" },
-    { "src": "/api/proxy-image", "dest": "/api/proxy-image.ts" },
-    { "src": "/api/stats", "dest": "/api/stats.ts" },
-    { "src": "/api/blog/posts/(.*)", "dest": "/api/blog.ts" },
-    { "src": "/api/blog/posts", "dest": "/api/blog.ts" },
-    { "src": "/api/blog/categories", "dest": "/api/blog.ts" },
-    { "src": "/sitemap.xml", "dest": "/api/sitemap.ts" },
-    { "src": "/assets/(.*)", "dest": "/client/dist/assets/$1" },
-    { "src": "/(.*\\.[a-z0-9]+)$", "dest": "/client/dist/$1" },
-    { "src": "/(.*)", "dest": "/client/dist/index.html" }
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
+  "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" }
   ]
 }

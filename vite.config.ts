@@ -32,6 +32,9 @@ import { defineConfig } from "vite";
       emptyOutDir: true,
     },
     server: {
+      host: "0.0.0.0",
+      port: 5000,
+      allowedHosts: true,
       fs: {
         strict: true,
         deny: ["**/.*"],

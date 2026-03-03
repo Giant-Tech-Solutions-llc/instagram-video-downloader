@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a full-stack TypeScript application with a React frontend and serverless backend, using PostgreSQL for data storage. Blog posts are stored in the database and served via a read-only public API.
+This is **Baixar Vídeo Downloader**, a web application that allows Brazilian users to download media from Instagram (videos, reels, photos, stories, highlights). The app is entirely in Portuguese (pt-BR), targeting the Brazilian market. Users paste a URL, click download, and receive the media file. The project is a TypeScript application with a React frontend (Vite) and Vercel serverless backend, using PostgreSQL for data storage. Blog posts are stored in the database and served via a read-only public API.
 
 ## User Preferences
 
@@ -10,22 +10,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Deployment Workflow
 
-- **Replit** — Development only (local dev server, database provisioning)
+- **Replit** — Development only (Vite dev server, database provisioning)
 - **GitHub** — Source code repository
 - **Vercel** — Production hosting (frontend static files + serverless API functions)
 
 ### Vercel Configuration
-- **`vercel.json`** — Configures builds (individual serverless functions + static client), routes mapping each `/api/*` path to its handler file
-- **Serverless Functions:** 6 flat handler files under `api/` (no subdirectories — stays under Vercel Hobby 12-function limit):
-  - `api/download.ts` — POST handler for Instagram media extraction (routed from `/api/download/process`)
-  - `api/proxy-download.ts` — GET handler for proxied file downloads
-  - `api/proxy-image.ts` — GET handler for proxied image serving
-  - `api/stats.ts` — GET handler for download statistics
-  - `api/blog.ts` — GET handler for blog posts + categories (routes by URL path internally)
-  - `api/sitemap.ts` — GET handler for dynamic sitemap XML
-- **Frontend:** Static SPA served from `client/dist/` (built by Vite)
-- **SPA Fallback:** Static assets (files with extensions) serve from `client/dist/`; all other non-API routes serve `client/dist/index.html` for client-side routing
+- **`vercel.json`** — Minimal config: `buildCommand: "npm run build"`, `outputDirectory: "dist/public"`
+- **Serverless Functions:** Vercel auto-detects 8 handler files under `api/` (under Hobby plan 12-function limit). File paths match frontend API URLs for auto-routing:
+  - `api/download/process.ts` → POST `/api/download/process`
+  - `api/proxy-download.ts` → GET `/api/proxy-download`
+  - `api/proxy-image.ts` → GET `/api/proxy-image`
+  - `api/stats.ts` → GET `/api/stats`
+  - `api/blog/posts.ts` → GET `/api/blog/posts` (list)
+  - `api/blog/posts/[slug].ts` → GET `/api/blog/posts/:slug` (single post, dynamic route)
+  - `api/blog/categories.ts` → GET `/api/blog/categories`
+  - `api/sitemap.ts` → GET `/api/sitemap` (also serves `/sitemap.xml`)
+- **Frontend:** Static SPA served from `dist/public/` (built by Vite)
 - **Proxy Streaming:** `proxy-download` and `proxy-image` handlers stream responses via `pipe()` to avoid serverless memory limits
+- **No Express server** — The project has no Express dependency. All backend logic runs as Vercel serverless functions.
 
 ### Environment Variables (set on Vercel)
 - `DATABASE_URL` — PostgreSQL connection string (required)
@@ -37,14 +39,24 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Monorepo Structure
-The project uses a single repository with the following directories:
-- **`client/`** — React frontend (SPA)
-- **`api/`** — Vercel serverless function handlers only (6 files, no subdirectories)
-- **`lib/`** — Shared backend logic (database, storage, Instagram extraction) used by both `api/` and `server/`
-- **`server/`** — Local development Express server (imports logic from `lib/`)
-- **`shared/`** — Shared types, schemas, and route definitions used by both client and API
-- **`_backup_server/`** — Backup of original monolithic server code (pre-serverless migration)
+### Project Structure
+```
+root/
+├── api/                — 8 Vercel serverless function handlers
+│   ├── download/process.ts
+│   ├── blog/posts.ts, blog/posts/[slug].ts, blog/categories.ts
+│   ├── proxy-download.ts, proxy-image.ts, stats.ts, sitemap.ts
+├── lib/                — Shared backend modules (DB, storage, Instagram extraction)
+├── client/             — React frontend SPA source
+├── shared/             — Shared TypeScript types, schemas, route definitions
+├── dist/public/        — Vite build output (generated)
+├── package.json        — Single root package.json (no client/package.json)
+├── vercel.json         — Minimal Vercel config
+├── vite.config.ts      — Vite configuration
+├── tsconfig.json       — TypeScript configuration
+├── drizzle.config.ts   — Drizzle ORM config
+└── tailwind.config.ts, postcss.config.js, components.json
+```
 
 ### Frontend Architecture
 - **Framework:** React 18 with TypeScript
@@ -55,63 +67,62 @@ The project uses a single repository with the following directories:
 - **Animations:** Framer Motion for loading states and reveal animations
 - **Fonts:** Inter (body) and Outfit (headings) from Google Fonts
 - **Build Tool:** Vite with React plugin, path aliases (`@/` → `client/src/`, `@shared/` → `shared/`)
-- **Build Output:** `client/dist/` (used by both Vercel and local production mode)
+- **Build Output:** `dist/public/` (Vite `outDir` in vite.config.ts)
 - **Pages:** Home (main Instagram Video Downloader at `/`), plus 5 dedicated tool landing pages (Reels, Stories, Photos, Profile Picture, Audio/MP3), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), How it Works (`/como-funciona`), 404 page
-- **Tool Pages Architecture:** Reusable `ToolPageLayout` component renders all tool landing pages. Tool configuration (slugs, titles, FAQs, SEO content) is centralized in `client/src/lib/tools-config.ts`. Individual page components in `client/src/pages/tools/` are thin wrappers around `ToolPageLayout`.
+- **Tool Pages Architecture:** Reusable `ToolPageLayout` component renders all tool landing pages. Tool configuration centralized in `client/src/lib/tools-config.ts`.
 
 ### Backend Architecture (Serverless)
 - **Pattern:** Individual Vercel serverless functions in `api/` directory
+- **No Express server** — removed entirely; no `server/` directory
 - **Shared Logic:** Common modules in `lib/` (root level, NOT inside `api/` — avoids counting as serverless functions):
-  - `lib/instagram-http.ts` — Authenticated requests with browser fingerprint rotation (5 desktop + 3 mobile UAs), session cookie injection, randomized Accept-Language headers
+  - `lib/instagram-http.ts` — Authenticated requests with browser fingerprint rotation
   - `lib/instagram-extractor.ts` — All Instagram media extraction strategies as pure functions
   - `lib/db.ts` — Drizzle ORM + PostgreSQL connection
   - `lib/storage.ts` — Download logging interface
   - `lib/cms-storage.ts` — Blog post/category queries
   - `lib/seed.ts` — Database seeding
 - **API Endpoints:**
-  - `POST /api/download/process` — Accepts Instagram URL, runs extraction strategies, returns media info
-  - `GET /api/proxy-download` — Proxies file download with Content-Disposition attachment
-  - `GET /api/proxy-image` — Proxies Instagram images to bypass CORS
-  - `GET /api/stats` — Download statistics
-  - `GET /api/blog/posts` — Published blog post list (paginated, filterable by category)
-  - `GET /api/blog/posts/:slug` — Single blog post by slug
-  - `GET /api/blog/categories` — Blog category list
-  - `GET /sitemap.xml` — Dynamic XML sitemap
-- **Extraction Strategies (ordered):** JSON API (`?__a=1`), Mobile Media Info API (`/api/v1/media/{id}/info/`), GraphQL (2 query hashes), Direct Page HTML, Embed page, Alternate Embed (Googlebot UA), Reel URL variant
+  - `POST /api/download/process` → `api/download/process.ts`
+  - `GET /api/proxy-download` → `api/proxy-download.ts`
+  - `GET /api/proxy-image` → `api/proxy-image.ts`
+  - `GET /api/stats` → `api/stats.ts`
+  - `GET /api/blog/posts` → `api/blog/posts.ts`
+  - `GET /api/blog/posts/:slug` → `api/blog/posts/[slug].ts`
+  - `GET /api/blog/categories` → `api/blog/categories.ts`
+  - `GET /api/sitemap` → `api/sitemap.ts`
 
 ### Data Storage
 - **Database:** PostgreSQL via `DATABASE_URL` environment variable
 - **ORM:** Drizzle ORM with `drizzle-zod` for schema-to-validation integration
 - **Tables:**
   - `downloads` — Tracks download activity (URL, status, format, timestamp)
-  - `blog_posts` — Blog posts with full CMS fields (title, slug, content, SEO, FAQs, status, author, category)
+  - `blog_posts` — Blog posts with full CMS fields
   - `categories` — Post categories
-- **Migrations:** Managed via `drizzle-kit push` (schema push approach, not migration files)
+- **Migrations:** Managed via `drizzle-kit push`
 
 ### Shared Layer
 - **`shared/schema.ts`** — Drizzle table definitions, Zod insert schemas, and TypeScript types
-- **`shared/routes.ts`** — API contract definitions with Zod schemas for request/response validation, used by both client and server for type safety
+- **`shared/routes.ts`** — API contract definitions with Zod schemas
 
 ### Running the Project (Replit Development)
-- **Workflow:** `Start application` runs `bash start.sh` which builds the frontend with Vite and starts the Express server in production mode (`NODE_ENV=production`)
-- **Local dev server:** `server/index.ts` is a thin Express wrapper that imports all logic from `api/lib/` modules
-- **`start.sh`:** Kills any existing process on port 5000, builds the frontend via `npm run build`, then runs the server with `tsx`
-- **Signal handling:** `server/index.ts` intercepts SIGTERM and SIGHUP to keep the server alive
+- **Workflow:** `Start application` runs `npx vite --host 0.0.0.0 --port 5000` (Vite dev server)
+- **Note:** In local dev, only the frontend is served. API calls require Vercel deployment. The Vite dev server does not proxy API routes.
+- **Build:** `npm run build` runs `vite build`, output goes to `dist/public/`
 
 ### Building for Vercel
-- Vercel detects `vercel.json` and builds individual serverless functions from `api/*.ts` and `api/**/*.ts`
-- Static frontend built from `client/package.json` using `@vercel/static-build`
+- Vercel reads `vercel.json` for `buildCommand` and `outputDirectory`
+- Vercel auto-detects `api/*.ts` as serverless functions
 - Set `DATABASE_URL`, `SESSION_SECRET`, `IG_SESSION_ID`, `IG_CSRF_TOKEN`, `IG_DS_USER_ID` as environment variables in Vercel project settings
 
 ### Key Design Decisions
-1. **Serverless architecture:** Each API endpoint is its own Vercel serverless function for independent scaling and cold start optimization.
-2. **Authenticated session approach:** Instagram content is fetched server-side using authenticated session cookies (`IG_SESSION_ID`) with browser fingerprint rotation. The `api/lib/instagram-http.ts` module handles all authentication and fingerprinting.
-3. **Shared route contracts:** The `shared/routes.ts` file acts as a typed API contract with Zod schemas.
-4. **Mobile-first design:** The UI is optimized for smartphone users (the primary Brazilian user base).
-5. **Portuguese-only public site:** The public-facing site is entirely in Portuguese (pt-BR).
-6. **Database-driven blog:** Blog posts are stored in PostgreSQL and served via read-only API.
-7. **Thumbnail proxy:** Instagram CDN images are proxied through `/api/proxy-image` to avoid CORS/referrer blocking.
-8. **Backup preserved:** Original monolithic server code is kept in `_backup_server/` for reference.
+1. **Pure serverless — no Express:** All backend logic runs as Vercel serverless functions. No Express dependency.
+2. **Authenticated session approach:** Instagram content is fetched server-side using session cookies (`IG_SESSION_ID`) with browser fingerprint rotation.
+3. **Shared route contracts:** `shared/routes.ts` acts as a typed API contract with Zod schemas.
+4. **Mobile-first design:** UI optimized for smartphone users (primary Brazilian user base).
+5. **Portuguese-only public site:** Entirely in pt-BR.
+6. **Database-driven blog:** Blog posts stored in PostgreSQL, served via read-only API.
+7. **Thumbnail proxy:** Instagram CDN images proxied through `/api/proxy-image` to avoid CORS blocking.
+8. **Utility modules outside api/:** `lib/` folder keeps shared logic out of `api/` so Vercel doesn't count them as serverless functions.
 
 ## External Dependencies
 
@@ -119,26 +130,27 @@ The project uses a single repository with the following directories:
 - **PostgreSQL** — Required. Connection via `DATABASE_URL` environment variable. Used with Drizzle ORM.
 
 ### Key NPM Packages
-- **axios** — HTTP client for server-side Instagram page fetching
-- **cheerio** — HTML parser for extracting media URLs from Instagram pages
+- **axios** — HTTP client for Instagram page fetching
+- **cheerio** — HTML parser for extracting media URLs
 - **drizzle-orm** + **drizzle-kit** — Database ORM and schema management
 - **@tanstack/react-query** — Client-side data fetching and caching
 - **framer-motion** — Animation library for UI transitions
 - **zod** + **drizzle-zod** — Runtime validation and schema generation
 - **wouter** — Lightweight client-side routing
-- **Radix UI** — Full suite of accessible UI primitives (dialog, dropdown, tabs, toast, etc.)
+- **Radix UI** — Accessible UI primitives
 - **tailwindcss** + **class-variance-authority** + **clsx** + **tailwind-merge** — Styling utilities
 - **sanitize-html** — HTML content sanitization for blog posts
-- **marked** — Markdown-to-HTML conversion for public blog rendering
-- **dompurify** — HTML sanitization for XSS protection on rendered content
+- **marked** — Markdown-to-HTML conversion
+- **dompurify** — HTML sanitization for XSS protection
 - **@vercel/node** — Vercel serverless function types
+- **pg** — PostgreSQL client
 
 ### Replit-Specific (development only)
-- **@replit/vite-plugin-runtime-error-modal** — Runtime error overlay in development
-- **@replit/vite-plugin-cartographer** — Dev tooling (development only)
-- **@replit/vite-plugin-dev-banner** — Dev banner (development only)
+- **@replit/vite-plugin-runtime-error-modal** — Runtime error overlay
+- **@replit/vite-plugin-cartographer** — Dev tooling
+- **@replit/vite-plugin-dev-banner** — Dev banner
 - These plugins are conditionally loaded only when `REPL_ID` env var is present
 
 ### External Services
-- **Instagram** — The app scrapes Instagram pages to extract media URLs. No official API is used; this relies on parsing HTML/Open Graph tags from public Instagram URLs.
+- **Instagram** — Server-side scraping of Instagram pages to extract media URLs
 - **Google Fonts** — Inter and Outfit fonts loaded via CDN

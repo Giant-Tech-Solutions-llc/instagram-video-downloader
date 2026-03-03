@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../lib/storage';
-import { seed } from '../lib/seed';
-import { extractMedia, getErrorMessage, type MediaItem } from '../lib/instagram-extractor';
+import { storage } from '../../lib/storage';
+import { seed } from '../../lib/seed';
+import { extractMedia, getErrorMessage, type MediaItem } from '../../lib/instagram-extractor';
 
 let seeded = false;
 
