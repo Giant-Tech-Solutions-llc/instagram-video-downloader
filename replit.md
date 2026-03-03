@@ -15,7 +15,7 @@ Preferred communication style: Simple, everyday language.
 - **Vercel** — Production hosting (frontend static files + serverless API functions)
 
 ### Vercel Configuration
-- **`vercel.json`** — Config with `buildCommand: "npm run build"`, `outputDirectory: "dist/public"`, and `functions.includeFiles` to bundle `lib/` and `shared/` into each serverless function (required because Vercel only auto-bundles files inside `api/`)
+- **`vercel.json`** — Minimal config: `buildCommand: "npm run build"`, `outputDirectory: "dist/public"`, plus sitemap rewrite
 - **Serverless Functions:** Vercel auto-detects 8 handler files under `api/` (under Hobby plan 12-function limit). File paths match frontend API URLs for auto-routing:
   - `api/download/process.ts` → POST `/api/download/process`
   - `api/proxy-download.ts` → GET `/api/proxy-download`
@@ -42,13 +42,16 @@ Preferred communication style: Simple, everyday language.
 ### Project Structure
 ```
 root/
-├── api/                — 8 Vercel serverless function handlers
-│   ├── download/process.ts
+├── api/                — Vercel serverless functions + shared modules
+│   ├── download/process.ts       — 8 handler files (serverless functions)
 │   ├── blog/posts.ts, blog/posts/[slug].ts, blog/categories.ts
 │   ├── proxy-download.ts, proxy-image.ts, stats.ts, sitemap.ts
-├── lib/                — Shared backend modules (DB, storage, Instagram extraction)
+│   ├── _lib/           — Shared backend modules (underscore prefix = NOT counted as functions)
+│   │   ├── db.ts, storage.ts, cms-storage.ts
+│   │   ├── instagram-extractor.ts, instagram-http.ts, seed.ts
+│   └── _shared/        — Shared types, schemas, route definitions
+│       ├── schema.ts, routes.ts
 ├── client/             — React frontend SPA source
-├── shared/             — Shared TypeScript types, schemas, route definitions
 ├── dist/public/        — Vite build output (generated)
 ├── package.json        — Single root package.json (no client/package.json)
 ├── vercel.json         — Minimal Vercel config
@@ -66,7 +69,7 @@ root/
 - **Styling:** Tailwind CSS with CSS custom properties for theming, PostCSS with autoprefixer
 - **Animations:** Framer Motion for loading states and reveal animations
 - **Fonts:** Inter (body) and Outfit (headings) from Google Fonts
-- **Build Tool:** Vite with React plugin, path aliases (`@/` → `client/src/`, `@shared/` → `shared/`)
+- **Build Tool:** Vite with React plugin, path aliases (`@/` → `client/src/`, `@shared/` → `api/_shared/`)
 - **Build Output:** `dist/public/` (Vite `outDir` in vite.config.ts)
 - **Pages:** Home (main Instagram Video Downloader at `/`), plus 5 dedicated tool landing pages (Reels, Stories, Photos, Profile Picture, Audio/MP3), Terms of Use (`/termos`), Privacy Policy (`/privacidade`), Contact (`/contato`), How it Works (`/como-funciona`), 404 page
 - **Tool Pages Architecture:** Reusable `ToolPageLayout` component renders all tool landing pages. Tool configuration centralized in `client/src/lib/tools-config.ts`.
@@ -74,13 +77,13 @@ root/
 ### Backend Architecture (Serverless)
 - **Pattern:** Individual Vercel serverless functions in `api/` directory
 - **No Express server** — removed entirely; no `server/` directory
-- **Shared Logic:** Common modules in `lib/` (root level, NOT inside `api/` — avoids counting as serverless functions):
-  - `lib/instagram-http.ts` — Authenticated requests with browser fingerprint rotation
-  - `lib/instagram-extractor.ts` — All Instagram media extraction strategies as pure functions
-  - `lib/db.ts` — Drizzle ORM + PostgreSQL connection
-  - `lib/storage.ts` — Download logging interface
-  - `lib/cms-storage.ts` — Blog post/category queries
-  - `lib/seed.ts` — Database seeding
+- **Shared Logic:** Common modules in `api/_lib/` (underscore prefix means Vercel does NOT count them as serverless functions):
+  - `api/_lib/instagram-http.ts` — Authenticated requests with browser fingerprint rotation
+  - `api/_lib/instagram-extractor.ts` — All Instagram media extraction strategies as pure functions
+  - `api/_lib/db.ts` — Drizzle ORM + PostgreSQL connection
+  - `api/_lib/storage.ts` — Download logging interface
+  - `api/_lib/cms-storage.ts` — Blog post/category queries
+  - `api/_lib/seed.ts` — Database seeding
 - **API Endpoints:**
   - `POST /api/download/process` → `api/download/process.ts`
   - `GET /api/proxy-download` → `api/proxy-download.ts`
@@ -101,8 +104,8 @@ root/
 - **Migrations:** Managed via `drizzle-kit push`
 
 ### Shared Layer
-- **`shared/schema.ts`** — Drizzle table definitions, Zod insert schemas, and TypeScript types
-- **`shared/routes.ts`** — API contract definitions with Zod schemas
+- **`api/_shared/schema.ts`** — Drizzle table definitions, Zod insert schemas, and TypeScript types
+- **`api/_shared/routes.ts`** — API contract definitions with Zod schemas
 
 ### Running the Project (Replit Development)
 - **Workflow:** `Start application` runs `npx vite --host 0.0.0.0 --port 5000` (Vite dev server)
@@ -122,7 +125,7 @@ root/
 5. **Portuguese-only public site:** Entirely in pt-BR.
 6. **Database-driven blog:** Blog posts stored in PostgreSQL, served via read-only API.
 7. **Thumbnail proxy:** Instagram CDN images proxied through `/api/proxy-image` to avoid CORS blocking.
-8. **Utility modules outside api/:** `lib/` folder keeps shared logic out of `api/` so Vercel doesn't count them as serverless functions. The `functions.includeFiles` config in `vercel.json` ensures these files are bundled into each function.
+8. **Utility modules inside api/ with underscore prefix:** `api/_lib/` and `api/_shared/` directories use the Vercel convention where underscore-prefixed folders inside `api/` are bundled into functions but NOT treated as separate serverless endpoints.
 
 ## External Dependencies
 
