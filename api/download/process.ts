@@ -1,18 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage';
-import { seed } from '../_lib/seed';
 import { extractMedia, getErrorMessage, type MediaItem } from '../_lib/instagram-extractor';
-
-let seeded = false;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
-  }
-
-  if (!seeded) {
-    await seed();
-    seeded = true;
   }
 
   try {
@@ -41,7 +32,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { items: allItems, warning } = await extractMedia(url, toolType);
 
     if (allItems.length === 0) {
-      await storage.logDownload({ url, status: 'failed', format: 'unknown' });
       return res.status(400).json({
         message: getErrorMessage(toolType),
       });
@@ -53,8 +43,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const primary = uniqueItems[0];
     const format = primary.type === 'video' ? 'mp4' : 'jpg';
-
-    await storage.logDownload({ url, status: 'success', format });
 
     const response: any = {
       url: primary.url,
@@ -78,7 +66,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error: any) {
     console.error('Download error:', error.message);
-    await storage.logDownload({ url: req.body?.url || 'unknown', status: 'failed', format: 'error' });
     return res.status(500).json({ message: "Erro temporário ao processar o link. O Instagram pode estar bloqueando conexões. Tente novamente em alguns minutos." });
   }
 }
