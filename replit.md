@@ -15,7 +15,7 @@ Preferred communication style: Simple, everyday language.
 - **Vercel** — Production hosting (frontend static files + serverless API functions)
 
 ### Vercel Configuration
-- **`vercel.json`** — Minimal config: `buildCommand: "npm run build"`, `outputDirectory: "dist/public"`
+- **`vercel.json`** — Config with `buildCommand: "npm run build"`, `outputDirectory: "dist/public"`, and `functions.includeFiles` to bundle `lib/` and `shared/` into each serverless function (required because Vercel only auto-bundles files inside `api/`)
 - **Serverless Functions:** Vercel auto-detects 8 handler files under `api/` (under Hobby plan 12-function limit). File paths match frontend API URLs for auto-routing:
   - `api/download/process.ts` → POST `/api/download/process`
   - `api/proxy-download.ts` → GET `/api/proxy-download`
@@ -122,7 +122,7 @@ root/
 5. **Portuguese-only public site:** Entirely in pt-BR.
 6. **Database-driven blog:** Blog posts stored in PostgreSQL, served via read-only API.
 7. **Thumbnail proxy:** Instagram CDN images proxied through `/api/proxy-image` to avoid CORS blocking.
-8. **Utility modules outside api/:** `lib/` folder keeps shared logic out of `api/` so Vercel doesn't count them as serverless functions.
+8. **Utility modules outside api/:** `lib/` folder keeps shared logic out of `api/` so Vercel doesn't count them as serverless functions. The `functions.includeFiles` config in `vercel.json` ensures these files are bundled into each function.
 
 ## External Dependencies
 
