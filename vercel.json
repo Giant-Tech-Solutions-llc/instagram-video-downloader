@@ -1,14 +1,20 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "client/dist",
-  "framework": null,
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.ts", "use": "@vercel/node" },
+    { "src": "client/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
   ],
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 30
-    }
-  }
+  "routes": [
+    { "src": "/api/download/process", "dest": "/api/download/process.ts" },
+    { "src": "/api/proxy-download", "dest": "/api/proxy-download.ts" },
+    { "src": "/api/proxy-image", "dest": "/api/proxy-image.ts" },
+    { "src": "/api/stats", "dest": "/api/stats.ts" },
+    { "src": "/api/blog/posts/(.*)", "dest": "/api/blog/posts.ts" },
+    { "src": "/api/blog/posts", "dest": "/api/blog/posts.ts" },
+    { "src": "/api/blog/categories", "dest": "/api/blog/categories.ts" },
+    { "src": "/sitemap.xml", "dest": "/api/sitemap.ts" },
+    { "src": "/assets/(.*)", "dest": "/client/dist/assets/$1" },
+    { "src": "/(.*\\.[a-z0-9]+)$", "dest": "/client/dist/$1" },
+    { "src": "/(.*)", "dest": "/client/dist/index.html" }
+  ]
 }
