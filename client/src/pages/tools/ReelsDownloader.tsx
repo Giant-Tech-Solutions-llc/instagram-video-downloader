@@ -230,6 +230,8 @@ export default function ReelsDownloader() {
                           <div className="p-2 sm:p-3">
                             <a
                               href={`/api/proxy-download?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(item.filename || `instagram-${item.type}-${index + 1}.${item.type === 'video' ? 'mp4' : 'jpg'}`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               data-testid={`link-download-item-${index}`}
                               className="flex items-center justify-center gap-1.5 sm:gap-2 w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-[#E6195E] text-white font-bold text-xs sm:text-sm shadow-lg shadow-[#E6195E]/20 hover:brightness-110 active:scale-95 transition-all"
                             >
@@ -286,6 +288,8 @@ export default function ReelsDownloader() {
                       <div className="space-y-3 sm:space-y-4">
                         <a
                           href={`/api/proxy-download?url=${encodeURIComponent(processMutation.data.url)}&filename=${encodeURIComponent(processMutation.data.filename || "instagram-download.mp4")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           data-testid={`link-download-${tool.id}-result`}
                           className="flex items-center justify-center gap-2 sm:gap-3 w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl bg-[#E6195E] text-white font-black text-base sm:text-lg md:text-xl shadow-xl shadow-[#E6195E]/20 hover:scale-[1.02] hover:brightness-110 transition-all"
                         >
