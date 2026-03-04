@@ -8,6 +8,7 @@
     }
   },
   "rewrites": [
+    { "source": "/api/download/process", "destination": "/api/download-process" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" }
   ]
 }
