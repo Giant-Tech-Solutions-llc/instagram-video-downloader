@@ -1,14 +1,8 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist/public",
-  "framework": null,
   "functions": {
     "api/**/*.ts": {
-      "maxDuration": 30
+      "runtime": "nodejs20.x"
     }
-  },
-  "rewrites": [
-    { "source": "/api/download/process", "destination": "/api/download-process" },
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" }
-  ]
+  }
 }
