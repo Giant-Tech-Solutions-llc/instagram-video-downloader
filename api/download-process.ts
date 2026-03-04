@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { extractMedia, getErrorMessage } from './_lib/instagram-extractor';
-import type { MediaItem } from './_lib/instagram-extractor';
+import { extractMedia, getErrorMessage } from './_lib/instagram-extractor.js';
+import type { MediaItem } from './_lib/instagram-extractor.js';
 
 const ALLOWED_HOSTS = ['instagram.com', 'www.instagram.com', 'm.instagram.com'];
 const INVALID_URL_MSG = "URL inválida. Por favor, use um link do Instagram.";
