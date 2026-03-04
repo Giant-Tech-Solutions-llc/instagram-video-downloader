@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { makeInstagramRequest, hasSessionAuth, jitterDelay } from "./instagram-http";
+import { makeInstagramRequest, hasSessionAuth, jitterDelay } from "./instagram-http.js";
 
 export interface MediaItem {
   url: string;
