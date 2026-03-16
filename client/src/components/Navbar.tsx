@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 
 import Baixar_V_deo_downloader_Logo from "@assets/Baixar Vídeo downloader Logo.png";
 
+import Baixar_V_deo_Instagram from "@assets/Baixar-Vídeo-Instagram.png";
+
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -16,7 +18,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16 gap-4">
           <Link href="/" className="flex items-center flex-shrink-0">
-            <img src={Baixar_V_deo_downloader_Logo} alt="Baixar Video Downloader" className="h-7 sm:h-9" data-testid="img-logo" />
+            <img src={Baixar_V_deo_Instagram} alt="Baixar Video Downloader" className="h-7 sm:h-9" data-testid="img-logo" />
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
