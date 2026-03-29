@@ -28,12 +28,26 @@ export function extractUsername(url: string): string | null {
 }
 
 export function cleanInstagramUrl(rawUrl: string): string {
-  return rawUrl
+  const cleaned = rawUrl
     .replace(/\\\\\//g, '/')
     .replace(/\\\//g, '/')
     .replace(/\\u0026/g, '&')
     .replace(/\\u00253D/g, '%3D')
     .replace(/&amp;/g, '&');
+
+  // Some Instagram payloads append encoded JSON right after URL
+  // (e.g. ...mp4?...&oe=XXXX\%22,\%22video_view_count...). Trim that tail.
+  const noiseMarkers = ['\\%22,', '%22,', '\\"', '"', '\\u0022'];
+  let normalized = cleaned;
+  for (const marker of noiseMarkers) {
+    const idx = normalized.indexOf(marker);
+    if (idx !== -1) {
+      normalized = normalized.slice(0, idx);
+      break;
+    }
+  }
+
+  return normalized.trim();
 }
 
 export function shortcodeToMediaId(shortcode: string): string | null {
