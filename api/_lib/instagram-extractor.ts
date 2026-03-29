@@ -248,9 +248,14 @@ export async function tryDirectPageExtraction(url: string): Promise<MediaItem[]>
     const imageUrl = $('meta[property="og:image"]').attr('content');
 
     if (videoUrl) {
-      items.push({ url: videoUrl, thumbnail: imageUrl || undefined, type: 'video' });
-    } else if (imageUrl) {
-      items.push({ url: imageUrl, type: 'image' });
+      videoUrl = cleanInstagramUrl(videoUrl);
+    }
+    const cleanedImageUrl = imageUrl ? cleanInstagramUrl(imageUrl) : undefined;
+
+    if (videoUrl) {
+      items.push({ url: videoUrl, thumbnail: cleanedImageUrl, type: 'video' });
+    } else if (cleanedImageUrl) {
+      items.push({ url: cleanedImageUrl, type: 'image' });
     }
 
     if (items.length === 0) {
